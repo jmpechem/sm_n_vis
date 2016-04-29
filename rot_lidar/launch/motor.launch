@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find rot_lidar)/launch/controller_manager.launch" />
+  <include file="$(find rot_lidar)/launch/start_tilt_controller.launch" />
+</launch>
