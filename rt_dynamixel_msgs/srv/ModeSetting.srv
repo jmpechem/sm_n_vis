@@ -1,0 +1,12 @@
+# Constants
+int32 DISABLE=0
+int32 CONTROL_RUN=1
+int32 SETTING=2
+int32 TEST=500
+
+int32 mode
+---
+
+
+
+

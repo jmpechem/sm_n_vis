@@ -1,0 +1,5 @@
+int32 mode # see constants
+
+# Constants
+int32 CONTROL=1
+int32 SETTING=2

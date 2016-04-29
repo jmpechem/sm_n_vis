@@ -1,0 +1,10 @@
+
+---
+uint8[] id
+float64[] angle
+float64[] velocity
+float64[] current
+int32[] homing_offset
+int16[] velocity_i_gain
+int16[] velocity_p_gain
+int16[] position_p_gain
