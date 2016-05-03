@@ -1,0 +1,2074 @@
+<robot name="thormang_biped">
+  <link
+    name="Pelvis">
+    <inertial>
+      <origin
+        xyz="-0.0207455406635074 6.47853827404495E-05 0.00380982131902759"
+        rpy="0 0 0" />
+      <mass
+        value="2.19306457334278" />
+      <inertia
+        ixx="0.0153339760496231"
+        ixy="2.94749587502496E-06"
+        ixz="-0.000209196844286706"
+        iyy="0.00398144349279579"
+        iyz="-5.41293804035755E-07"
+        izz="0.0162134477869545" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Pelvis.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Pelvis.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Waist">
+    <inertial>
+      <origin
+        xyz="3.46944695195361E-18 2.37301874171323E-17 0.0382726623568151"
+        rpy="0 0 0" />
+      <mass
+        value="0.105008981553768" />
+      <inertia
+        ixx="0.00028923325259777"
+        ixy="-8.85936872449097E-21"
+        ixz="1.70143032864586E-20"
+        iyy="5.76459310010768E-05"
+        iyz="5.42136269993996E-20"
+        izz="0.000281002197190509" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Waist.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Waist.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="WaistPitch"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="Pelvis" />
+    <child
+      link="Waist" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="Torso">
+    <inertial>
+      <origin
+        xyz="-0.0168979700897844 0.000140576613513264 0.22966016396624"
+        rpy="0 0 0" />
+      <mass
+        value="5.57174840569226" />
+      <inertia
+        ixx="0.0769002816264981"
+        ixy="5.26727349633804E-05"
+        ixz="0.00517017691313698"
+        iyy="0.0480759423374482"
+        iyz="5.27826324523314E-05"
+        izz="0.0687309509996623" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Torso.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/Torso.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="WaistYaw"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="Waist" />
+    <child
+      link="Torso" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_ShoulderPitch">
+    <inertial>
+      <origin
+        xyz="3.46944695195361E-18 -0.00342712853152077 5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.416028900494078" />
+      <inertia
+        ixx="0.000238893106729317"
+        ixy="1.85898592168744E-18"
+        ixz="1.53965504651903E-19"
+        iyy="0.000629224025339215"
+        iyz="1.24549355981854E-19"
+        izz="0.000668967703762948" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_ShoulderPitch.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_ShoulderPitch.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_ShoulderPitch"
+    type="revolute">
+    <origin
+      xyz="0 0.234 0.276"
+      rpy="0 0 0" />
+    <parent
+      link="Torso" />
+    <child
+      link="L_ShoulderPitch" />
+    <axis
+      xyz="0 1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_ShoulderRoll">
+    <inertial>
+      <origin
+        xyz="1.43982048506075E-15 0.0632257039890232 -0.019398477881721"
+        rpy="0 0 0" />
+      <mass
+        value="0.74323252855722" />
+      <inertia
+        ixx="0.000871617137653335"
+        ixy="1.42765372431216E-19"
+        ixz="-1.05384119479055E-18"
+        iyy="0.00197133227800301"
+        iyz="0.000122042446311375"
+        izz="0.00222116483779518" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_ShoulderRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_ShoulderRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_ShoulderRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="1.57 0 0" />
+    <parent
+      link="L_ShoulderPitch" />
+    <child
+      link="L_ShoulderRoll" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Brachium">
+    <inertial>
+      <origin
+        xyz="1.09287578986539E-15 -0.00707253917999612 -0.177442810656575"
+        rpy="0 0 0" />
+      <mass
+        value="1.22027557987287" />
+      <inertia
+        ixx="0.00632162045138092"
+        ixy="2.30341245066915E-18"
+        ixz="3.49898774029815E-18"
+        iyy="0.0065801910115911"
+        iyz="0.000731955168547619"
+        izz="0.00132711461746966" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Brachium.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Brachium.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_ShoulderYaw"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_ShoulderRoll" />
+    <child
+      link="L_Brachium" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Forearm">
+    <inertial>
+      <origin
+        xyz="6.66133814775094E-16 0.0301802557882228 -0.125371968681661"
+        rpy="0 0 0" />
+      <mass
+        value="0.894740704969577" />
+      <inertia
+        ixx="0.00316761849786979"
+        ixy="8.99015611908446E-18"
+        ixz="-4.28374668871665E-17"
+        iyy="0.00351862682136402"
+        iyz="4.38013509654595E-06"
+        izz="0.000878865795651263" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Forearm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Forearm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_ElbowRoll"
+    type="revolute">
+    <origin
+      xyz="0 -0.03 -0.261"
+      rpy="-0.785 0 0" />
+    <parent
+      link="L_Brachium" />
+    <child
+      link="L_Forearm" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_WristRoll">
+    <inertial>
+      <origin
+        xyz="1.1518563880486E-15 -1.11022302462516E-16 0.00067715994469672"
+        rpy="0 0 0" />
+      <mass
+        value="0.150315450247039" />
+      <inertia
+        ixx="4.40315708714133E-05"
+        ixy="-6.01255559899408E-21"
+        ixz="5.93966197532904E-21"
+        iyy="0.000108075785878161"
+        iyz="-4.6910701991474E-22"
+        izz="0.000105927651159539" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_WristYaw"
+    type="revolute">
+    <origin
+      xyz="0 0.03 -0.252"
+      rpy="0 0 0" />
+    <parent
+      link="L_Forearm" />
+    <child
+      link="L_WristRoll" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_WristPitch">
+    <inertial>
+      <origin
+        xyz="5.48172618408671E-16 4.9960036108132E-16 -0.0279403454542276"
+        rpy="0 0 0" />
+      <mass
+        value="0.0596026537824495" />
+      <inertia
+        ixx="1.59829512203542E-05"
+        ixy="-1.31008815943191E-19"
+        ixz="-7.63295657012053E-19"
+        iyy="7.19116624785128E-05"
+        iyz="4.27671696206679E-19"
+        izz="7.33052713556691E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristPitch.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristPitch.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_WristRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_WristRoll" />
+    <child
+      link="L_WristPitch" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_WristYaw">
+    <inertial>
+      <origin
+        xyz="1.12410081243297E-15 -2.4980018054066E-16 -0.136382080206716"
+        rpy="0 0 0" />
+      <mass
+        value="0.339829436067223" />
+      <inertia
+        ixx="0.00110530407214956"
+        ixy="4.0800302623266E-21"
+        ixz="2.20286100939062E-21"
+        iyy="0.00110530686188384"
+        iyz="1.00750091961227E-19"
+        izz="9.91805437826409E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristYaw.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_WristYaw.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_HandYaw"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_WristPitch" />
+    <child
+      link="L_WristYaw" />
+    <axis
+      xyz="0 0 1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Gripper_1">
+    <inertial>
+      <origin
+        xyz="0.0121411900875521 -2.77555756156289E-17 0.0193142445729918"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743348693421169" />
+      <inertia
+        ixx="0.000122351896140951"
+        ixy="-6.41368630681924E-22"
+        ixz="6.97589954062859E-06"
+        iyy="0.000115752232168573"
+        iyz="-1.08143688961258E-20"
+        izz="1.20667033003481E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Gripper_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Gripper_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_Gripper_1"
+    type="prismatic">
+    <origin
+      xyz="0.017 0 -0.2378"
+      rpy="-5.55111512312578E-16 0 0" />
+    <parent
+      link="L_WristYaw" />
+    <child
+      link="L_Gripper_1" />
+    <axis
+      xyz="1 0 1" />
+ <limit
+      lower="-0.04"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Gripper_2">
+    <inertial>
+      <origin
+        xyz="-0.012141190087552 -5.55111512312578E-17 0.0193142445729917"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743348693421169" />
+      <inertia
+        ixx="0.000122351896140951"
+        ixy="-1.63687340802703E-21"
+        ixz="-6.97589954062858E-06"
+        iyy="0.000115752232168573"
+        iyz="1.18536861579849E-20"
+        izz="1.20667033003481E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Gripper_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Gripper_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_Gripper_2"
+    type="prismatic">
+    <origin
+      xyz="-0.017 0 -0.2378"
+      rpy="0 0 0" />
+    <parent
+      link="L_WristYaw" />
+    <child
+      link="L_Gripper_2" />
+    <axis
+      xyz="-1 0 1" />
+ <limit
+      lower="-0.04"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  <mimic joint="L_Gripper_1" multiplier="1" offset="0"/>
+  </joint>
+  <link
+    name="R_ShoulderPitch">
+    <inertial>
+      <origin
+        xyz="-1.66533453693773E-16 0.00342712853152929 1.77635683940025E-15"
+        rpy="0 0 0" />
+      <mass
+        value="0.416028900494078" />
+      <inertia
+        ixx="0.000238893106729317"
+        ixy="-1.70627694277485E-18"
+        ixz="1.72789151585829E-19"
+        iyy="0.000629224025339215"
+        iyz="-2.51190062196878E-19"
+        izz="0.000668967703762948" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_ShoulderPitch.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_ShoulderPitch.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_ShoulderPitch"
+    type="revolute">
+    <origin
+      xyz="0 -0.234 0.276"
+      rpy="0 0 0" />
+    <parent
+      link="Torso" />
+    <child
+      link="R_ShoulderPitch" />
+    <axis
+      xyz="0 -1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_ShoulderRoll">
+    <inertial>
+      <origin
+        xyz="-1.73472347597681E-16 -0.0632257039890194 -0.0193984778817191"
+        rpy="0 0 0" />
+      <mass
+        value="0.74323252855722" />
+      <inertia
+        ixx="0.000871617137653335"
+        ixy="-4.29995576373334E-18"
+        ixz="-1.39091718422936E-18"
+        iyy="0.00197133227800301"
+        iyz="-0.000122042446311376"
+        izz="0.00222116483779518" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_ShoulderRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_ShoulderRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_ShoulderRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.57 0 0" />
+    <parent
+      link="R_ShoulderPitch" />
+    <child
+      link="R_ShoulderRoll" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Brachium">
+    <inertial>
+      <origin
+        xyz="-2.56739074444567E-16 0.00707253917999937 -0.177442810656573"
+        rpy="0 0 0" />
+      <mass
+        value="1.22027557987287" />
+      <inertia
+        ixx="0.00632162045138092"
+        ixy="-3.08753877840026E-18"
+        ixz="5.42576799484679E-19"
+        iyy="0.0065801910115911"
+        iyz="-0.0007319551685476"
+        izz="0.00132711461746966" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Brachium.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Brachium.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_ShoulderYaw"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_ShoulderRoll" />
+    <child
+      link="R_Brachium" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Forearm">
+    <inertial>
+      <origin
+        xyz="-6.90419943438769E-16 -0.0301802557882202 -0.125371968681659"
+        rpy="0 0 0" />
+      <mass
+        value="0.894740704969576" />
+      <inertia
+        ixx="0.00316761849786979"
+        ixy="-1.01729322997928E-17"
+        ixz="-4.3166385399175E-17"
+        iyy="0.00351862682136402"
+        iyz="-4.38013509653758E-06"
+        izz="0.000878865795651262" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Forearm.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Forearm.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_ElbowRoll"
+    type="revolute">
+    <origin
+      xyz="0 0.03 -0.261"
+      rpy="0.785 0 0" />
+    <parent
+      link="R_Brachium" />
+    <child
+      link="R_Forearm" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_WristRoll">
+    <inertial>
+      <origin
+        xyz="-2.08166817117217E-16 2.38697950294409E-15 0.000677159944698441"
+        rpy="0 0 0" />
+      <mass
+        value="0.150315450247039" />
+      <inertia
+        ixx="4.40315708714133E-05"
+        ixy="-2.25602046964142E-19"
+        ixz="6.15069358178715E-21"
+        iyy="0.000108075785878161"
+        iyz="6.00519892877253E-21"
+        izz="0.000105927651159539" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_WristYaw"
+    type="revolute">
+    <origin
+      xyz="0 -0.03 -0.252"
+      rpy="0 0 0" />
+    <parent
+      link="R_Forearm" />
+    <child
+      link="R_WristRoll" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_WristPirch">
+    <inertial>
+      <origin
+        xyz="-7.63278329429795E-16 1.69309011255336E-15 -0.0279403454542258"
+        rpy="0 0 0" />
+      <mass
+        value="0.0596026537824494" />
+      <inertia
+        ixx="1.59829512203542E-05"
+        ixy="-6.41322851625969E-20"
+        ixz="-7.70255192278706E-19"
+        iyy="7.19116624785125E-05"
+        iyz="-4.30201523947514E-19"
+        izz="7.33052713556688E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristPirch.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristPirch.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_WristRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_WristRoll" />
+    <child
+      link="R_WristPirch" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_WristYaw">
+    <inertial>
+      <origin
+        xyz="-1.2490009027033E-16 1.97064586870965E-15 -0.136382080206715"
+        rpy="0 0 0" />
+      <mass
+        value="0.339829436067223" />
+      <inertia
+        ixx="0.00110530407214957"
+        ixy="-2.41405675922207E-21"
+        ixz="-7.47564644287288E-19"
+        iyy="0.00110530686188384"
+        iyz="3.17180054928491E-18"
+        izz="9.91805437826409E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristYaw.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_WristYaw.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_HandYaw"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_WristPirch" />
+    <child
+      link="R_WristYaw" />
+    <axis
+      xyz="0 0 1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Gripper_1">
+    <inertial>
+      <origin
+        xyz="0.0121411900875521 5.55111512312578E-17 0.0193142445729919"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743348693421169" />
+      <inertia
+        ixx="0.00012235189614095"
+        ixy="1.05553360562055E-21"
+        ixz="6.97589954062858E-06"
+        iyy="0.000115752232168572"
+        iyz="1.03150393781901E-21"
+        izz="1.20667033003482E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Gripper_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Gripper_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_Gripper_1"
+    type="prismatic">
+    <origin
+      xyz="0.017 0 -0.2378"
+      rpy="0 0 0" />
+    <parent
+      link="R_WristYaw" />
+    <child
+      link="R_Gripper_1" />
+    <axis
+      xyz="1 0 1" />
+ <limit
+      lower="-0.04"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Gripper_2">
+    <inertial>
+      <origin
+        xyz="-0.0121411900875521 1.11022302462516E-16 0.0193142445729919"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743348693421169" />
+      <inertia
+        ixx="0.000122351896140951"
+        ixy="-9.08130289243433E-22"
+        ixz="-6.97589954062859E-06"
+        iyy="0.000115752232168573"
+        iyz="-1.71657017293003E-20"
+        izz="1.20667033003481E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Gripper_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Gripper_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_Gripper_2"
+    type="prismatic">
+    <origin
+      xyz="-0.017 0 -0.2378"
+      rpy="0 0 0" />
+    <parent
+      link="R_WristYaw" />
+    <child
+      link="R_Gripper_2" />
+    <axis
+      xyz="-1 0 1" />
+  <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  <mimic joint="R_Gripper_1" multiplier="1" offset="0"/>
+  </joint>
+  <link
+    name="HeadYaw">
+    <inertial>
+      <origin
+        xyz="-1.38777878078145E-17 -5.35104110956884E-16 -0.00067715994469647"
+        rpy="0 0 0" />
+      <mass
+        value="0.150315450247039" />
+      <inertia
+        ixx="0.000108075785878161"
+        ixy="-2.27307476693817E-20"
+        ixz="2.46953871238486E-21"
+        iyy="4.40315708714134E-05"
+        iyz="5.39361979487452E-21"
+        izz="0.00010592765115954" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/HeadYaw.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/HeadYaw.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="HeadYaw"
+    type="revolute">
+    <origin
+      xyz="0.00025 0 0.393"
+      rpy="0 0 0" />
+    <parent
+      link="Torso" />
+    <child
+      link="HeadYaw" />
+    <axis
+      xyz="0 0 1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="HeadPitch">
+    <inertial>
+      <origin
+        xyz="-1.52655665885959E-16 -3.85624632820465E-16 0.071641467671459"
+        rpy="0 0 0" />
+      <mass
+        value="0.337544108804753" />
+      <inertia
+        ixx="0.000475512791439341"
+        ixy="-1.20085338855777E-19"
+        ixz="2.09834249485506E-18"
+        iyy="0.000411590544181183"
+        iyz="-2.19404182596517E-18"
+        izz="0.000216341594056485" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/HeadPitch.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/HeadPitch.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="HeadPitch"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="HeadYaw" />
+    <child
+      link="HeadPitch" />
+    <axis
+      xyz="0 1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="ChestLidar">
+    <inertial>
+      <origin
+        xyz="-1.38777878078145E-17 0.0116948039792169 1.47664693310734E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.282959869119411" />
+      <inertia
+        ixx="0.000239924579150412"
+        ixy="7.44861410120348E-21"
+        ixz="1.17015423832789E-20"
+        iyy="0.000149433938356934"
+        iyz="-4.88646126541286E-08"
+        izz="0.000230200431484816" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/ChestLidar.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/ChestLidar.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ChestLidar"
+    type="revolute">
+    <origin
+      xyz="0.04975 0 0.23915"
+      rpy="0 0 0" />
+    <parent
+      link="Torso" />
+    <child
+      link="ChestLidar" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_HipYaw">
+    <inertial>
+      <origin
+        xyz="-0.0228902675343666 4.16333634234434E-17 0.065587302187414"
+        rpy="0 0 0" />
+      <mass
+        value="0.72157709426411" />
+      <inertia
+        ixx="0.00167992979561845"
+        ixy="-6.97560486576371E-19"
+        ixz="0.000282432152427089"
+        iyy="0.00298368009748716"
+        iyz="-2.60113278275012E-19"
+        izz="0.00166031884737342" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_HipYaw.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_HipYaw.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_HipYaw"
+    type="revolute">
+    <origin
+      xyz="0 0.105 -0.18"
+      rpy="0 0 0" />
+    <parent
+      link="Pelvis" />
+    <child
+      link="L_HipYaw" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_HipRoll">
+    <inertial>
+      <origin
+        xyz="1.49186218934005E-16 -0.0103148017844754 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.437311321751758" />
+      <inertia
+        ixx="0.00065956104526658"
+        ixy="-1.16427869146066E-19"
+        ixz="-1.20255085608181E-19"
+        iyy="0.000259056705757512"
+        iyz="1.38930726444506E-19"
+        izz="0.000692208200527019" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_HipRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_HipRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_HipRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_HipYaw" />
+    <child
+      link="L_HipRoll" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Thigh">
+    <inertial>
+      <origin
+        xyz="0.0105118439759244 -0.012 -0.15"
+        rpy="0 0 0" />
+      <mass
+        value="1.94959368227371" />
+      <inertia
+        ixx="0.0101895537834064"
+        ixy="4.38786705235751E-19"
+        ixz="-4.01268763067474E-18"
+        iyy="0.00728041107930321"
+        iyz="-1.00585162486448E-18"
+        izz="0.00452526621081512" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Thigh.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Thigh.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_HipPitch"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_HipRoll" />
+    <child
+      link="L_Thigh" />
+    <axis
+      xyz="0 1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Shin">
+    <inertial>
+      <origin
+        xyz="0.00883415484125563 -0.0149274590341243 -0.120537445426911"
+        rpy="0 0 0" />
+      <mass
+        value="2.6825235982642" />
+      <inertia
+        ixx="0.0259265488038337"
+        ixy="6.97622449613815E-05"
+        ixz="0.00103300020370769"
+        iyy="0.0228497663941152"
+        iyz="0.00115455762450985"
+        izz="0.00636055026513296" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Shin.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Shin.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_KneePitch"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.3"
+      rpy="0 0 0" />
+    <parent
+      link="L_Thigh" />
+    <child
+      link="L_Shin" />
+    <axis
+      xyz="0 1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_AnkleRoll">
+    <inertial>
+      <origin
+        xyz="-0.0103148017844745 4.85722573273506E-16 -4.44089209850063E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.437311321751758" />
+      <inertia
+        ixx="0.000259056705757512"
+        ixy="5.72280956461342E-21"
+        ixz="3.65475772255778E-18"
+        iyy="0.00065956104526658"
+        iyz="-2.28785306866449E-20"
+        izz="0.00069220820052702" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_AnkleRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_AnkleRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_AnklePitch"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.3"
+      rpy="0 0 0" />
+    <parent
+      link="L_Shin" />
+    <child
+      link="L_AnkleRoll" />
+    <axis
+      xyz="0 1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="L_Foot">
+    <inertial>
+      <origin
+        xyz="-0.0061851838800501 5.2004747730372E-08 -0.0794940769535744"
+        rpy="0 0 0" />
+      <mass
+        value="0.65915676187322" />
+      <inertia
+        ixx="0.00127562804191711"
+        ixy="-6.05428625153341E-10"
+        ixz="-0.000138880278119591"
+        iyy="0.00310726088876845"
+        iyz="1.82606232071821E-10"
+        izz="0.00373686225576651" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/L_Foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L_AnkleRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="L_AnkleRoll" />
+    <child
+      link="L_Foot" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_HipYaw">
+    <inertial>
+      <origin
+        xyz="-0.0228902675343661 -2.77555756156289E-17 0.065587302187414"
+        rpy="0 0 0" />
+      <mass
+        value="0.721577094264109" />
+      <inertia
+        ixx="0.00167992979561845"
+        ixy="2.60946625942876E-19"
+        ixz="0.000282432152427088"
+        iyy="0.00298368009748715"
+        iyz="2.2616458583073E-19"
+        izz="0.00166031884737341" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_HipYaw.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_HipYaw.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_HipYaw"
+    type="revolute">
+    <origin
+      xyz="0 -0.105 -0.18"
+      rpy="0 0 0" />
+    <parent
+      link="Pelvis" />
+    <child
+      link="R_HipYaw" />
+    <axis
+      xyz="0 0 -1" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_HipRoll">
+    <inertial>
+      <origin
+        xyz="1.70002900645727E-16 0.0103148017844754 5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.437311321751758" />
+      <inertia
+        ixx="0.00065956104526658"
+        ixy="1.08472710698544E-19"
+        ixz="-9.50826502122702E-20"
+        iyy="0.000259056705757512"
+        iyz="-1.51548489589848E-19"
+        izz="0.00069220820052702" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_HipRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_HipRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_HipRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_HipYaw" />
+    <child
+      link="R_HipRoll" />
+    <axis
+      xyz="1 0 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Thigh">
+    <inertial>
+      <origin
+        xyz="0.0105118439759232 0.012 -0.15"
+        rpy="0 0 0" />
+      <mass
+        value="1.94959368227371" />
+      <inertia
+        ixx="0.0101895537834064"
+        ixy="3.42384353184078E-18"
+        ixz="1.71133887550666E-17"
+        iyy="0.00728041107930323"
+        iyz="-1.05879118406788E-18"
+        izz="0.00452526621081513" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Thigh.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Thigh.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_HipPitch"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_HipRoll" />
+    <child
+      link="R_Thigh" />
+    <axis
+      xyz="0 -1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Shin">
+    <inertial>
+      <origin
+        xyz="0.00890006797507049 0.0149266819138829 -0.12050212446888"
+        rpy="0 0 0" />
+      <mass
+        value="2.67787367792702" />
+      <inertia
+        ixx="0.0259194029068191"
+        ixy="-6.96831136603028E-05"
+        ixz="0.00102940360022767"
+        iyy="0.0228402528244798"
+        iyz="-0.00115451522031508"
+        izz="0.00634949217950655" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Shin.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Shin.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_KneePitch"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.3"
+      rpy="0 0 0" />
+    <parent
+      link="R_Thigh" />
+    <child
+      link="R_Shin" />
+    <axis
+      xyz="0 -1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_AnkleRoll">
+    <inertial>
+      <origin
+        xyz="-0.0103148017844745 -5.55111512312578E-16 -5.55111512312578E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.437311321751758" />
+      <inertia
+        ixx="0.000259056705757512"
+        ixy="-5.14684701742323E-20"
+        ixz="3.71738106477709E-18"
+        iyy="0.000659561045266581"
+        iyz="8.98861778656178E-20"
+        izz="0.00069220820052702" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_AnkleRoll.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_AnkleRoll.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_AnklePitch"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.3"
+      rpy="0 0 0" />
+    <parent
+      link="R_Shin" />
+    <child
+      link="R_AnkleRoll" />
+    <axis
+      xyz="0 -1 0" />
+ <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="R_Foot">
+    <inertial>
+      <origin
+        xyz="-0.00618518691126019 -5.20047584023908E-08 -0.0794940776763972"
+        rpy="0 0 0" />
+      <mass
+        value="0.659156664663425" />
+      <inertia
+        ixx="0.00127562802362637"
+        ixy="-1.79010201154943E-09"
+        ixz="-0.000138880273318211"
+        iyy="0.00310726072748259"
+        iyz="-1.82606258681801E-10"
+        izz="0.00373686209935571" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://thormang_biped/meshes/R_Foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R_AnkleRoll"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="R_AnkleRoll" />
+    <child
+      link="R_Foot" />
+    <axis
+      xyz="1 0 0" />
+  <limit
+      lower="-3.14159"
+      upper="3.14159"
+      effort="0"
+      velocity="0" />
+  </joint>
+</robot>
