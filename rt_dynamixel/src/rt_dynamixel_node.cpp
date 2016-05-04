@@ -20,10 +20,6 @@
 using namespace DXL_PRO;
 
 
-
-void dynamixel_motor_init();
-void motion_init_proc(void *arg);
-
 /**
  * @brief main proc
  * @return
