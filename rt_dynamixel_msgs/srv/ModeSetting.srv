@@ -6,6 +6,8 @@ int32 TEST=500
 
 int32 mode
 ---
+int32 result
+
 
 
 
