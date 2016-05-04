@@ -34,7 +34,6 @@ extern dxl_pro_data& dxl_from_id(int id);
 
 // rt_task_proc -----------------------------------------
 void publisher_proc(void *arg);
-// void motion_init_proc(void *arg);
 void subscribe_proc(void *arg);
 void motor_set_proc(void *arg);
 // ------------------------------------------------------

@@ -203,6 +203,14 @@ namespace DXL_PRO {
         int index;
     };
 
+    struct dxl_gains
+    {
+        int id;
+        int position_p_gain;
+        int velocity_p_gain;
+        int velocity_i_gain;
+    };
+
     struct dxl_pro_data
     {
         uint8_t id;
@@ -302,13 +310,9 @@ namespace DXL_PRO {
             rt_mutex_delete(&rttDataMutex);
         }
         void mutex_acquire()
-        {
-            rt_mutex_acquire(&rttDataMutex,TM_INFINITE);
-        }
+        { rt_mutex_acquire(&rttDataMutex,TM_INFINITE); }
         void mutex_release()
-        {
-            rt_mutex_release(&rttDataMutex);
-        }
+        { rt_mutex_release(&rttDataMutex); }
 
         dxl_pro_data& operator [] (const int& i) { return vMotorData[i]; }
 
@@ -330,46 +334,10 @@ namespace DXL_PRO {
         void setIDList(int motorNum, dxl_pro_data *motorList);      ///< Set ID List for whole control.
 
         // non control loop function
-        int setHomingOffset(int index, int nValue, int* error)
-        {
-            if(checkControlLoopEnabled("homing offset"))  { return 1; }
-            rttLoopStartTime = rt_timer_read();
-            rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
-            unsigned char _pbParams[10];
-            unsigned int _nParam = 0;
-            _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nValue));
-            _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nValue));
-            _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nValue));
-            _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nValue));
-            Write(vMotorData[index].id, 13, _nParam, _pbParams, error);
-        }
+        int setHomingOffset(int index, int nValue, int* error);
         // non control loop function
-        int setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error)
-        {
-            if(checkControlLoopEnabled("homing offset"))  { return 1; }
-            rttLoopStartTime = rt_timer_read();
-            rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
-            unsigned char _pbParams[10];
-            unsigned int _nParam = 0;
-            _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nVelocityIGain));
-            _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nVelocityIGain));
-            _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nVelocityPGain));
-            _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nVelocityPGain));
-            Write(vMotorData[index].id, 586, _nParam, _pbParams, error);
-        }
-        
-        int setPositionGain(int index, int nPositionPGain, int* error)
-        {
-            if(checkControlLoopEnabled("homing offset"))  { return 1; }
-            rttLoopStartTime = rt_timer_read();
-            rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
-            unsigned char _pbParams[10];
-            unsigned int _nParam = 0;
-            _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nPositionPGain));
-            _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nPositionPGain));
-            Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
-        }
-
+        int setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error);
+        int setPositionGain(int index, int nPositionPGain, int* error);
 
         void setReturnDelayTime(int nValue);
         void setAllTorque(int nValue);

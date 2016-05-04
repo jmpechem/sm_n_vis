@@ -49,7 +49,50 @@ dxl_pro_data dxlLists[4][10] = {
     }
 };   // Max 4channels, 10 motors
 
-
+// Position P, Velocity P, Velocity I
+dxl_gains dxlGains[4][10] =
+{
+    {
+#ifdef DXL_TEST_SET
+        {56, H54},
+#else
+        // Index: 0
+        {1, 1,1,1},
+        {3, 1,1,1},
+        {5, 1,1,1},
+        {7, 1,1,1},
+        {9, 1,1,1},
+        {11, 1,1,1},
+        {13, 1,1,1}
+#endif
+    },    {
+        // Index: 1
+        {2, 1,1,1},
+        {4, 1,1,1},
+        {6, 1,1,1},
+        {8, 1,1,1},
+        {10, 1,1,1},
+        {12, 1,1,1},
+        {14, 1,1,1}
+    },    {
+        // Index: 2
+        {15, 1,1,1},
+        {17, 1,1,1},
+        {19, 1,1,1},
+        {21, 1,1,1},
+        {23, 1,1,1},
+        {25, 1,1,1},
+        {27, 1,1,1}
+    },    {
+        // Index: 3
+        {16, 1,1,1},
+        {18, 1,1,1},
+        {20, 1,1,1},
+        {22, 1,1,1},
+        {24, 1,1,1},
+        {26, 1,1,1}
+    }
+};
 
 // Global Variables
 RTDynamixelPro dxlDevice[4] = {0, 1, 2, 3}; // index set
@@ -58,6 +101,21 @@ int nDXLCount[4] = {0, };
 
 dxl_inverse dxlID2Addr[60] = { 0, };    // max ID = 50,
 // How to use: dxlLists[dxlID2Addr[id].channel][dxlID2Addr[id].index];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void make_dxl_count()
 {
@@ -124,4 +182,39 @@ dxl_pro_data& dxl_from_id(int id)
 
 
 
+void dynamixel_motor_init()
+{
+    RT_TASK rtt_dxl_init;
+    rt_task_create(&rtt_dxl_init,"rt_dxl_init",0,30,T_JOINABLE);
+    rt_task_start(&rtt_dxl_init,&motion_init_proc,NULL);
+    rt_task_join(&rtt_dxl_init);
+    rt_task_delete(&rtt_dxl_init);
+}
 
+/**
+ * @brief motion_init_proc
+ * @param arg a param from rt_task_start()
+ * @detail Set all dynamixels to init position
+ */
+void motion_init_proc(void *arg)
+{
+    for(int i=0;i<4;i++)
+    {
+        dxlDevice[i].getAllStatus();
+        dxlDevice[i].setReturnDelayTime(0);
+        dxlDevice[i].setAllAcceleration(0);
+        dxlDevice[i].setAllVelocity(0);
+        dxlDevice[i].setAllTorque(0);
+        // Gain Set
+        /*
+        for(int j=0; j<nDXLCount[i]; j++)
+        {
+            int err;
+            dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
+            dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
+                                         dxlGains[i][j].velocity_p_gain, &err);
+        }
+        */
+
+    }
+}

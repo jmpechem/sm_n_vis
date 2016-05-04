@@ -21,23 +21,32 @@ using namespace DXL_PRO;
 
 
 
+void dynamixel_motor_init();
+void motion_init_proc(void *arg);
+
 /**
  * @brief main proc
  * @return
  */
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "rt_dynamixel_test");
+    ros::init(argc, argv, "rt_dynamixel_node");
     rosrt::init();
 
     ros::NodeHandle nh;
 
+    // Realtime layer communication initailization
+    if(dxl_initailize() == false) return -1;
+
+    // Get initial pose and set default settings
+    dynamixel_motor_init();
+
+    // Enable ROS Service, Pub and Sub
     RTROSPublisher rtRosPublisher(nh);
     RTROSSubscriber rtRosSubscriber(nh);
     RTROSMotorSettingService rtRosMotorSettingService(nh);
 
-    //if(dxl_initailize() == false) return -1;
-
+    // Start
     rtRosPublisher.start();
     rtRosSubscriber.start();
 
@@ -51,25 +60,6 @@ int main(int argc, char **argv)
 
 
 
-
-
-/**
- * @brief motion_init_proc
- * @param arg a param from rt_task_start()
- * @detail Set all dynamixels to init position
- */
-void motion_init_proc(void *arg)
-{
-    int i,j;
-    for(i=0;i<4;i++)
-    {
-        dxlDevice[i].getAllStatus();
-        dxlDevice[i].setReturnDelayTime(0);
-        dxlDevice[i].setAllAcceleration(0);
-        dxlDevice[i].setAllVelocity(0);
-        dxlDevice[i].setAllTorque(0);
-    }
-}
 
 /*
 void motion_init_proc(void *arg)

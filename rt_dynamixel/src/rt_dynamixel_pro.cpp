@@ -806,6 +806,48 @@ void RTDynamixelPro::setIDList(int motorNum, dxl_pro_data * motorList)
     }
 }
 
+int RTDynamixelPro::setHomingOffset(int index, int nValue, int* error)
+{
+    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    rttLoopStartTime = rt_timer_read();
+    rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
+    unsigned char _pbParams[10];
+    unsigned int _nParam = 0;
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nValue));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nValue));
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nValue));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nValue));
+    Write(vMotorData[index].id, 13, _nParam, _pbParams, error);
+}
+
+
+// non control loop function
+int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error)
+{
+    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    rttLoopStartTime = rt_timer_read();
+    rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
+    unsigned char _pbParams[10];
+    unsigned int _nParam = 0;
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nVelocityIGain));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nVelocityIGain));
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nVelocityPGain));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nVelocityPGain));
+    Write(vMotorData[index].id, 586, _nParam, _pbParams, error);
+}
+
+int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
+{
+    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    rttLoopStartTime = rt_timer_read();
+    rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
+    unsigned char _pbParams[10];
+    unsigned int _nParam = 0;
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nPositionPGain));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nPositionPGain));
+    Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
+}
+
 void RTDynamixelPro::setReturnDelayTime(int nValue)
 {
     if(checkControlLoopEnabled("return delay time"))  { return; }

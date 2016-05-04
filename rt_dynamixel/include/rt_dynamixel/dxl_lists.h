@@ -14,8 +14,12 @@ void make_inverse_access_data();
 bool dxl_initailize();
 dxl_pro_data& dxl_from_id(int id);
 
+void motion_init_proc(void *arg);
+void dynamixel_motor_init();
+
 
 extern dxl_pro_data dxlLists[4][10];
+extern dxl_gains dxlGains[4][10];
 
 extern RTDynamixelPro dxlDevice[4]; // index set
 
