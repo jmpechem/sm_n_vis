@@ -1,4 +1,6 @@
 <launch>
   <include file="$(find rot_lidar)/launch/lidar.launch" />
   <include file="$(find rot_lidar)/launch/motor.launch" />
+  <node name="lidar_to_pcl" pkg="rot_lidar" type="lidar_to_pcl"/>
+  <node name="sweep_n_assembly" pkg="rot_lidar" type="sweep_n_assembly"/>  
 </launch>
