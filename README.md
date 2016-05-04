@@ -1,5 +1,5 @@
 # ROS Development Storage (THORMANG)
-This works has done by jimin lee and suwan park.
+This works has done by jimin lee and suhan park.
 All systems running in Ubuntu 14.04 LTS ROS indigo system.
 
 Here is some guide line to use these packages.
@@ -43,6 +43,20 @@ State machine
 Vision
 ##Dynamixel PRO(Realtime)
 Dynamixel Pro node (xenomai)
+
+1. Required Device <br />
+  (1) DS-MPE-SER4M<br />
+  (2) Dynamixel PRO H54, H42 Series<br />
+
+2. Required Package and installation<br />
+  (1) Xenomai 2.4.6 kernel and libraries<br />
+  (2) rosrt<br />
+	$ sudo apt-get install ros-indigo-rosrt<br />
+  (3) rt_dynamixel_msgs (included)<br />
+
+3. How to use?<br />
+  - Under the construction
+
 ##User Interface
 Qt based user interface
 
