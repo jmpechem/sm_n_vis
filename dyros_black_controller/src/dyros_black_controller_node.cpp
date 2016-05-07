@@ -5,19 +5,9 @@
 
 #include <ros/ros.h>
 
-#include <sensor_msgs/JointState.h>
-#include <geometry_msgs/PoseStamped.h>
-
-#include "vrep_common/JointSetStateData.h"
-#include "vrep_common/simRosGetObjectHandle.h"
-
-#include "rt_dynamixel_msgs/JointSet.h"
-#include "rt_dynamixel_msgs/JointState.h"
-
-#include "smach_msgs/SmachContainerStatus.h"
-#include "smach_msgs/SmachContainerInitialStatusCmd.h"
-
 #include "data_bridge.h"
+#include "smach_control.h"
+
 
 using namespace std;
 
@@ -32,16 +22,6 @@ string JointName[] = {"WaistPitch","WaistYaw",
 int JointID[28] = {1,};
 int nJoints = 28;
 
-class SMACHControl
-{
-private:
-    ros::Subscriber smach_sub;
-    ros::Publisher smach_pub;
-
-public:
-    SMACHControl()
-    {  }
-};
 
 int main(int argc, char **argv)
 {
@@ -49,6 +29,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     dyros_robot_state* dataObjectPtr;
+    SMACHControl smach(nh);
     // ros::Subscriber
 
 
@@ -72,6 +53,10 @@ int main(int argc, char **argv)
         // ex)
         // process(dataObjectPtr);
 
+        if(smach.getState() == "Joint")
+        {
+
+        }
 
         // Write
         dataObjectPtr->setJoint();
