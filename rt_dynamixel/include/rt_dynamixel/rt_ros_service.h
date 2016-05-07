@@ -29,6 +29,7 @@ extern int nDXLCount[4];
 extern dxl_inverse dxlID2Addr[60]; // max ID = 50,
 
 extern dxl_pro_data& dxl_from_id(int id);
+
 // ------------------------------------------------------
 
 

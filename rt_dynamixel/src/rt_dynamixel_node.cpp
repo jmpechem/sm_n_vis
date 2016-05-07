@@ -19,10 +19,12 @@
 
 using namespace DXL_PRO;
 
+// control period; 1e6 -> 1ms   25e5 -> 2.5ms, 400Hz
+RTIME control_period = 25e5;
 
 /**
  * @brief main proc
- * @return
+ * @return err=-1 done=0
  */
 int main(int argc, char **argv)
 {

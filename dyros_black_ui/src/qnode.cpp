@@ -49,6 +49,7 @@ bool QNode::init() {
 	ros::NodeHandle n;
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
 	start();
 	return true;
 }
@@ -65,29 +66,30 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::NodeHandle n;
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
 	start();
 	return true;
 }
 
 void QNode::run() {
-	ros::Rate loop_rate(1);
-	int count = 0;
+    ros::Rate loop_rate(100);
 	while ( ros::ok() ) {
 
-		std_msgs::String msg;
-		std::stringstream ss;
-		ss << "hello world " << count;
-		msg.data = ss.str();
-		chatter_publisher.publish(msg);
-		log(Info,std::string("I sent: ")+msg.data);
-		ros::spinOnce();
-		loop_rate.sleep();
-		++count;
+
+        ros::spinOnce();
+        loop_rate.sleep();
 	}
-	std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;
+    std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;
 	Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
 }
 
+
+void QNode::send_transition(std::string str)
+{
+    std_msgs::String msg;
+    msg.data = str;
+    smach_publisher.publish(msg);
+}
 
 void QNode::log( const LogLevel &level, const std::string &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);

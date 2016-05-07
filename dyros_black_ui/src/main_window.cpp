@@ -105,6 +105,19 @@ void MainWindow::on_button_connect_clicked(bool check ) {
 }
 
 
+void MainWindow::on_manuButton_clicked(bool check )
+{
+    qnode.send_transition("manu_on");
+}
+
+void MainWindow::on_button_joint_control_clicked(bool check)
+    {
+
+    qnode.send_transition("cmd1");
+
+    //qnode.send_transition("activate_jctrl");
+}
+
 void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	bool enabled;
 	if ( state == 0 ) {

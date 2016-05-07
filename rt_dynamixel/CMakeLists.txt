@@ -36,6 +36,7 @@ target_link_libraries(rt_dynamixel_pro
 #  ${catkin_LIBRARIES}
   -lpthread
   -L/usr/xenomai/lib -lnative -lxenomai -lrtdm
+
 )
 
 target_link_libraries(rt_ros_service

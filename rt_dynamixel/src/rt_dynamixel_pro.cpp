@@ -1173,6 +1173,7 @@ int RTDynamixelPro::getAllStatus()
 
 
 
+RTIME control_period = 25e5;
 // dxl_control for rt call
 void dxl_control(void* parent)
 {
@@ -1181,7 +1182,7 @@ void dxl_control(void* parent)
 
     double pdRadians[10] = {0, };
 
-    rt_task_set_periodic(NULL, TM_NOW, 100e5);    // 1e6 -> 1ms   5e5 -> 500us
+    rt_task_set_periodic(NULL, TM_NOW, control_period);    // 1e6 -> 1ms   5e5 -> 500us
 
 
     while (1)
@@ -1191,7 +1192,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + 23e5; // 80%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (control_period * 0.9); // 90%
 
             // mutex acqr
             pRTDynamixelObj->mutex_acquire();

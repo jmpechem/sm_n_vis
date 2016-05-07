@@ -55,14 +55,17 @@ public:
 	QStringListModel* loggingModel() { return &logging_model; }
 	void log( const LogLevel &level, const std::string &msg);
 
+    void send_transition(std::string str);
+
 Q_SIGNALS:
-	void loggingUpdated();
+    void loggingUpdated();
     void rosShutdown();
 
 private:
 	int init_argc;
 	char** init_argv;
 	ros::Publisher chatter_publisher;
+    ros::Publisher smach_publisher;
     QStringListModel logging_model;
 };
 

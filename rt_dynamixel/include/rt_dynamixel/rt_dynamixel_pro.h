@@ -193,6 +193,7 @@ namespace DXL_PRO {
     const double H54_TO_RAD = PI / H54_180_DEG;
     const double H42_TO_RAD = PI / H42_180_DEG;
 
+    // control period extern
     //const double
 
     enum dxl_pro_type { H54 = 1, H42 = 2};
