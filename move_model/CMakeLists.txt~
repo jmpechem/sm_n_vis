@@ -25,8 +25,8 @@ include_directories(
    ${catkin_LIBRARIES}
  )
 
- add_executable(custom_recog src/custom_recog.cpp)
- target_link_libraries(custom_recog
+ add_executable(move_model src/move_model.cpp)
+ target_link_libraries(move_model
    ${catkin_LIBRARIES}
  )
 

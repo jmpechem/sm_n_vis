@@ -57,44 +57,22 @@ void Match_Filter::dxlCB(const dynamixel_msgs::JointState::ConstPtr& enc){
 	tf::Quaternion q;
 	q.setRPY(dxl_enc_,0,0);
 	enc_tf_.setRotation(q);
-	enc_br_.sendTransform(tf::StampedTransform(enc_tf_, ros::Time::now(), "base", "dxl_link"));	
+	enc_br_.sendTransform(tf::StampedTransform(enc_tf_, ros::Time::now(), "Pelvis", "dxl_link"));	
 	
 }
 
 void Match_Filter::scanCB(const sensor_msgs::LaserScan::ConstPtr& scan){		
 	sensor_msgs::PointCloud2 cloud_in,cloud_out;
 	projector_.transformLaserScanToPointCloud("/lidar_link",*scan,cloud_in,tfListener_);
-/*	cloud_tf_.setOrigin(tf::Vector3(0.0,0.0,0.0));
-	tf::Quaternion q;
-	q.setRPY(0,0,0);
-	cloud_tf_.setRotation(q);
-	cloud_br_.sendTransform(tf::StampedTransform(cloud_tf_,ros::Time::now(),"base","cloud_link"));
-	*/
-	rot_tf.header.frame_id = "/base";
+	rot_tf.header.frame_id = "/Pelvis";
 	rot_tf.transform.rotation.x = enc_tf_.getRotation().x();
 	rot_tf.transform.rotation.y = enc_tf_.getRotation().y();
 	rot_tf.transform.rotation.z = enc_tf_.getRotation().z();
 	rot_tf.transform.rotation.w = enc_tf_.getRotation().w();
 	tf2::doTransform(cloud_in,cloud_out,rot_tf);
-	point_cloud_pub_.publish(cloud_out);	
-	
-
-	
+	point_cloud_pub_.publish(cloud_out);		
 	moving_now.data = dxl_ismove_;
 	dxl_ismove_pub_.publish(moving_now);
-
-
-/*	if(dxl_ismove_)
-	{
-		ROS_INFO("Motor is Moving : %f %d %d",dxl_enc_,cloud_out.height,cloud_out.width);
-		
-		
-	}		
-	else if(dxl_ismove_)
-	{
-	
-	}
-*/
 }
 
 int main(int argc, char** argv)

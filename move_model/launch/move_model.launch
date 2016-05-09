@@ -1,0 +1,4 @@
+<launch>  
+  <node name="move_model" pkg="move_model" type="move_model"/>
+  <node name="custom_recog" pkg="move_model" type="custom_recog"/>  
+</launch>

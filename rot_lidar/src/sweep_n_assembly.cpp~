@@ -90,7 +90,7 @@ void SNA::cloud_cb(const sensor_msgs::PointCloud2::ConstPtr& cloud)
 	}
 	else
 	{
-		output_.header.frame_id = "/ChestLidar";	
+		output_.header.frame_id = "/Pelvis";	
 		assembled_cloud_pub_.publish(output_);
 		if(dxl_err_ < 0.01){
 		remap_ = output_;
