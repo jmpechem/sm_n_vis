@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(thormang_ctrl)
+
+find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  roscpp
+  sensor_msgs
+  std_msgs
+  vrep_common
+)
+catkin_package()
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  include
+)
+file(GLOB WALKING_SRC
+  "src/walking_ctrl/*.cpp"
+)
+add_library(thormang_ctrl_lib
+   ${WALKING_SRC}
+)
+add_executable(thormang_ctrl src/thormang_ctrl.cpp)
+target_link_libraries(thormang_ctrl
+   ${catkin_LIBRARIES}
+   thormang_ctrl_lib
+)
+SET(CMAKE_BUILD_TYPE Debug)
