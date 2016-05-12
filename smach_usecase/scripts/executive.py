@@ -8,6 +8,19 @@ from std_msgs.msg import String
 import time
 trans_tag = ""
 pub_state = rospy.Publisher('/sm_jimin/command',String)
+#define state Stand_By
+class Stand_By(smach.State):
+      def __init__(self):
+	  smach.State.__init__(self, outcomes=['power_on','loop'])
+      def execute(self, userdata):
+	  rospy.sleep(1.0)
+	  rospy.loginfo('Executing state Stand_By')
+	  rospy.loginfo(trans_tag)
+	  if trans_tag == "power_on":
+	     return 'power_on'
+          else:
+	     return 'loop'
+
 #define state Power_On
 class Power_On(smach.State):
       def __init__(self):
@@ -444,6 +457,10 @@ def main():
     
     # Open the container
     with sm_top:
+        # Stand By state
+	smach.StateMachine.add('Stand_By',Stand_By(),
+			       transitions={'power_on':'Power_On','loop':'Stand_By'})
+
         # Power on state
 	smach.StateMachine.add('Power_On',Power_On(),
 			       transitions={'auto_on':'Auto','manu_on':'Manual','loop':'Power_On'})
