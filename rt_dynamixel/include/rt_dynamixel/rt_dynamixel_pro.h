@@ -216,9 +216,13 @@ namespace DXL_PRO {
     {
         uint8_t id;
         dxl_pro_type type;
+        uint8_t updated;
+        bool write_enable;
         int32_t position;
         int32_t velocity;
         int16_t current;
+
+        enum update { UPDATED=1, LOST=255 };
 
         double aim_radian;
 
@@ -288,13 +292,14 @@ namespace DXL_PRO {
         RTIME rttLoopTimeoutTime;       ///< Control loop timeout time.
         int nIndex;                     ///< Serial channel index
         bool bControlLoopEnable;        ///< For enable control loop
+        bool bControlWriteEnable;       ///< For enable writing angles
         bool bControlLoopProcessing;    ///< for safe
 
         dxl_pro_data vMotorData[10];
         //std::vector<dxl_pro_data> vMotorData;   ///< Data of all motors
 
         RTDynamixelPro(int index) :
-            rt_dynamixel(), nIndex(index), bControlLoopEnable(false)
+            rt_dynamixel(), nIndex(index), bControlLoopEnable(false), bControlWriteEnable(false)
         {
             char threadName[40] = {0, };
             char threadName2[40] = {0, };
@@ -339,6 +344,7 @@ namespace DXL_PRO {
         // non control loop function
         int setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error);
         int setPositionGain(int index, int nPositionPGain, int* error);
+        int setAimRadian(int index, double radian, int* error);
 
         void setReturnDelayTime(int nValue);
         void setAllTorque(int nValue);

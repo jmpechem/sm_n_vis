@@ -75,7 +75,6 @@ public:
 class RTROSMotorSettingService
 {
 private:
-    RT_TASK rttMotorSetTask;
 
     bool modeSwitch(rt_dynamixel_msgs::ModeSettingRequest &req,
                     rt_dynamixel_msgs::ModeSettingResponse &res);
@@ -91,7 +90,7 @@ public:
 
     RTROSMotorSettingService(ros::NodeHandle &nh);
     virtual ~RTROSMotorSettingService()
-    {        rt_task_delete(&rttMotorSetTask);    }
+    {           }
 
 
 

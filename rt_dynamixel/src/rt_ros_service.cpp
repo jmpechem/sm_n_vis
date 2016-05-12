@@ -4,7 +4,7 @@
 
 RTROSPublisher::RTROSPublisher(ros::NodeHandle &nh)
 {
-    pubState.initialize(nh.advertise<rt_dynamixel_msgs::JointState>("rt_dyanmixel/joint_state",0),
+    pubState.initialize(nh.advertise<rt_dynamixel_msgs::JointState>("rt_dynamixel/joint_state",1),
                         1, rt_dynamixel_msgs::JointState());
     rt_task_create(&rttTaskObject,"dxl ros pub",0,10,0);
     jointMsg = pubState.allocate();
@@ -13,6 +13,7 @@ RTROSPublisher::RTROSPublisher(ros::NodeHandle &nh)
     jointMsg->angle.resize(nTotalMotors);
     jointMsg->velocity.resize(nTotalMotors);
     jointMsg->current.resize(nTotalMotors);
+    jointMsg->updated.resize(nTotalMotors);
 
     int _cnt=0;
     for(int i=0;i<4;i++)
@@ -31,9 +32,8 @@ RTROSSubscriber::RTROSSubscriber(ros::NodeHandle &nh)
 
 RTROSMotorSettingService::RTROSMotorSettingService(ros::NodeHandle &nh)
 {
-    rt_task_create(&rttMotorSetTask,"dxl motorset service",0,7,T_JOINABLE);
     modeServer = nh.advertiseService("rt_dynamixel/mode",&RTROSMotorSettingService::modeSwitch,this);
-    motorServer = nh.advertiseService("rt_dynamixel/motor_set",&RTROSMotorSettingService::modeSwitch,this);
+    motorServer = nh.advertiseService("rt_dynamixel/motor_set",&RTROSMotorSettingService::motorSet,this);
 }
 
 bool RTROSMotorSettingService::modeSwitch(rt_dynamixel_msgs::ModeSettingRequest &req,
@@ -46,7 +46,7 @@ bool RTROSMotorSettingService::modeSwitch(rt_dynamixel_msgs::ModeSettingRequest 
     case rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN:
         for(int i=0;i<4;i++)
         {
-            dxlDevice[i].bControlLoopEnable = true;
+            dxlDevice[i].bControlWriteEnable = true;
         }
         res.result =  rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN;
         break;
@@ -54,7 +54,7 @@ bool RTROSMotorSettingService::modeSwitch(rt_dynamixel_msgs::ModeSettingRequest 
     case rt_dynamixel_msgs::ModeSettingRequest::DISABLE:
         for(int i=0;i<4;i++)
         {
-            dxlDevice[i].bControlLoopEnable = false;
+            dxlDevice[i].bControlWriteEnable = false;
         }
 
         // wait for process end
@@ -66,7 +66,7 @@ bool RTROSMotorSettingService::modeSwitch(rt_dynamixel_msgs::ModeSettingRequest 
     case rt_dynamixel_msgs::ModeSettingRequest::SETTING:
         for(int i=0;i<4;i++)
         {
-            dxlDevice[i].bControlLoopEnable = false;
+            dxlDevice[i].bControlWriteEnable = false;
         }
 
         // wait for process end
@@ -88,15 +88,32 @@ bool RTROSMotorSettingService::modeSwitch(rt_dynamixel_msgs::ModeSettingRequest 
 bool RTROSMotorSettingService::motorSet(rt_dynamixel_msgs::MotorSettingRequest &req,
                 rt_dynamixel_msgs::MotorSettingResponse &res)
 {
+    for(int i=0; i<4; i++)
+    {
+        dxlDevice[i].bControlLoopEnable = false;
+    }
+    for(int i=0; i<4; i++)
+    {
+        while(dxlDevice[i].bControlLoopProcessing) {}
+    }
+
+
+    RT_TASK rttMotorSetTask;
+    rt_task_create(&rttMotorSetTask,"dxl motorset service",0,7,T_JOINABLE);
     res.result = -1;
 
     motorRequest = req;
     rt_task_start(&rttMotorSetTask, &motor_set_proc, (void*)this);
     rt_task_join(&rttMotorSetTask);
 
+    rt_task_delete(&rttMotorSetTask);
+
     res.result = req.mode;
 
-
+    for(int i=0; i<4; i++)
+    {
+        dxlDevice[i].bControlLoopEnable = true;
+    }
     return true;
 }
 
@@ -133,6 +150,7 @@ void publisher_proc(void *arg)
                 pObj->jointMsg->angle[_cnt] = dxlDevice[i][j].position_rad();
                 pObj->jointMsg->velocity[_cnt] = dxlDevice[i][j].velocity_radsec();
                 pObj->jointMsg->current[_cnt] = dxlDevice[i][j].current_amp();
+                pObj->jointMsg->updated[_cnt] = dxlDevice[i][j].updated;
                 _cnt++;
             }
         }
@@ -182,6 +200,9 @@ void subscribe_proc(void *arg)
 void motor_set_proc(void *arg)
 {
     RTROSMotorSettingService *pObj = (RTROSMotorSettingService*)arg;
+    int channel;
+    int index;
+    int error;
     switch (pObj->motorRequest.mode)
     {
     case rt_dynamixel_msgs::MotorSettingRequest::SET_TORQUE_ENABLE:
@@ -191,7 +212,14 @@ void motor_set_proc(void *arg)
         }
         break;
 
+    case rt_dynamixel_msgs::MotorSettingRequest::SET_GOAL_POSITION:
+        channel = dxlID2Addr[pObj->motorRequest.id].channel;
+        index = dxlID2Addr[pObj->motorRequest.id].index;
+        dxlDevice[channel].setAimRadian(index,pObj->motorRequest.fvalue,&error);
+        break;
+
     default:
         break;
     }
+    rt_task_sleep(5e6);
 }

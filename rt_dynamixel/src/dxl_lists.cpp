@@ -4,13 +4,24 @@
 using namespace DXL_PRO;
 
 // Defines (Debug, Test, ...)
-// #define DXL_TEST_SET
+#define DXL_TEST_SET
 
+#ifdef DXL_TEST_SET
 dxl_pro_data dxlLists[4][10] = {
     {
-#ifdef DXL_TEST_SET
-        {56, H54},
+        // Index: 0
+        {1, H54},
+    },    {
+        // Index: 1
+    },    {
+        // Index: 2
+    },    {
+        // Index: 3
+    }
+};   // Max 4channels, 10 motors
 #else
+dxl_pro_data dxlLists[4][10] = {
+    {
         // Index: 0
         {1, H54},
         {3, H54},
@@ -19,7 +30,6 @@ dxl_pro_data dxlLists[4][10] = {
         {9, H54},
         {11, H42},
         {13, H42}
-#endif
     },    {
         // Index: 1
         {2, H54},
@@ -48,14 +58,11 @@ dxl_pro_data dxlLists[4][10] = {
         {26, H54}
     }
 };   // Max 4channels, 10 motors
-
+#endif
 // Position P, Velocity P, Velocity I
 dxl_gains dxlGains[4][10] =
 {
     {
-#ifdef DXL_TEST_SET
-        {56, H54},
-#else
         // Index: 0
         {1, 1,1,1},
         {3, 1,1,1},
@@ -64,7 +71,6 @@ dxl_gains dxlGains[4][10] =
         {9, 1,1,1},
         {11, 1,1,1},
         {13, 1,1,1}
-#endif
     },    {
         // Index: 1
         {2, 1,1,1},
@@ -182,13 +188,17 @@ dxl_pro_data& dxl_from_id(int id)
 
 
 
-void dynamixel_motor_init()
+bool dynamixel_motor_init()
 {
     RT_TASK rtt_dxl_init;
+    bool isDone = false;
+
     rt_task_create(&rtt_dxl_init,"rt_dxl_init",0,30,T_JOINABLE);
-    rt_task_start(&rtt_dxl_init,&motion_init_proc,NULL);
+    rt_task_start(&rtt_dxl_init,&motion_init_proc,&isDone);
     rt_task_join(&rtt_dxl_init);
     rt_task_delete(&rtt_dxl_init);
+
+    return isDone;
 }
 
 /**
@@ -198,23 +208,52 @@ void dynamixel_motor_init()
  */
 void motion_init_proc(void *arg)
 {
-    for(int i=0;i<4;i++)
+    bool *isDone = (bool*)arg;
+    bool isUpdateComplete[4] = {false, };
+    int nRecv[4] = {0, };
+    for(int c=0; c<10;c++)
     {
-        dxlDevice[i].getAllStatus();
-        dxlDevice[i].setReturnDelayTime(0);
-        dxlDevice[i].setAllAcceleration(0);
-        dxlDevice[i].setAllVelocity(0);
-        dxlDevice[i].setAllTorque(0);
-        // Gain Set
-        /*
-        for(int j=0; j<nDXLCount[i]; j++)
+        for(int i=0;i<4;i++)
         {
-            int err;
-            dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
-            dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
-                                         dxlGains[i][j].velocity_p_gain, &err);
+            dxlDevice[i].rttLoopStartTime = rt_timer_read();
+            dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 10e6; // 5ms
+            nRecv[i] = dxlDevice[i].getAllStatus();
+            if(nRecv[i] == dxlDevice[i].getMotorNum())
+            {
+                isUpdateComplete[i] = true;
+            }
+            dxlDevice[i].setReturnDelayTime(0);
+            dxlDevice[i].setAllAcceleration(0);
+            dxlDevice[i].setAllVelocity(0);
+            dxlDevice[i].setAllTorque(0);
+            // Gain Set
+            /*
+            for(int j=0; j<nDXLCount[i]; j++)
+            {
+                int err;
+                dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
+                dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
+                                             dxlGains[i][j].velocity_p_gain, &err);
+            }
+            */
+
         }
-        */
+        rt_task_sleep(1e8);
 
     }
+    // check all motor read
+    for(int i=0;i<4;i++)
+        if(isUpdateComplete[i] == false)
+        {
+            *isDone = false;
+           return;
+        }
+
+    // Update all radian angle
+    for(int i=0;i<4; i++)
+        for(int j=0;j<dxlDevice[i].getMotorNum(); j++)
+        {
+            dxlDevice[i][j].aim_radian = dxlDevice[i][j].position_rad();
+        }
+    *isDone = true;
 }

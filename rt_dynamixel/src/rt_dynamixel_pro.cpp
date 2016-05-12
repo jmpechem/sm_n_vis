@@ -824,7 +824,7 @@ int RTDynamixelPro::setHomingOffset(int index, int nValue, int* error)
 // non control loop function
 int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error)
 {
-    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    if(checkControlLoopEnabled("velocity gain"))  { return 1; }
     rttLoopStartTime = rt_timer_read();
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
@@ -838,7 +838,7 @@ int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocity
 
 int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
 {
-    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    if(checkControlLoopEnabled("position gain"))  { return 1; }
     rttLoopStartTime = rt_timer_read();
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
@@ -846,6 +846,33 @@ int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
     _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nPositionPGain));
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nPositionPGain));
     Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
+}
+
+int RTDynamixelPro::setAimRadian(int index, double radian, int *error)
+{
+    if(checkControlLoopEnabled("aim radian"))  { return 1; }
+    rttLoopStartTime = rt_timer_read();
+    rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
+
+    vMotorData[index].aim_radian = radian;
+
+    int position;
+    if (vMotorData[index].type == H54)
+    {
+        position = (int)(radian * RAD_TO_H54);
+    }
+    else if (vMotorData[index].type == H42)
+    {
+        position = (int)(radian * RAD_TO_H42);
+    }
+    unsigned char _pbParams[10];
+    unsigned int _nParam = 0;
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(position));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(position));
+    _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(position));
+    _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(position));
+    Write(vMotorData[index].id, 596, _nParam, _pbParams, error);
+
 }
 
 void RTDynamixelPro::setReturnDelayTime(int nValue)
@@ -1145,7 +1172,8 @@ int RTDynamixelPro::getAllStatus()
     error = SyncRead(611, 12, nMotorNum, pucIDList, pSyncData, &nReceived);
 
     mutex_acquire();
-    for (int i = 0; i < nReceived; i++)
+    int i;
+    for (i = 0; i < nReceived; i++)
     {
         vMotorData[i].position = (int32_t)(DXL_MAKEDWORD(
             DXL_MAKEWORD(pSyncData[i].pucTable[0], pSyncData[i].pucTable[1]),
@@ -1156,7 +1184,12 @@ int RTDynamixelPro::getAllStatus()
         vMotorData[i].current = (int16_t)(
             DXL_MAKEWORD(pSyncData[i].pucTable[10], pSyncData[i].pucTable[11]));
 
+        vMotorData[i].updated = dxl_pro_data::UPDATED;
         printErrorCode((int)pucIDList[i], pSyncData[i].iError);
+    }
+    for(; i<nMotorNum; i++)
+    {
+        vMotorData[i].updated = dxl_pro_data::LOST;
     }
     mutex_release();
 
@@ -1194,17 +1227,21 @@ void dxl_control(void* parent)
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
             pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (control_period * 0.9); // 90%
 
-            // mutex acqr
-            pRTDynamixelObj->mutex_acquire();
-            // copy rads
-            for(i=0;i<motorNum;i++)
-            {
-                pdRadians[i] = (*pRTDynamixelObj).vMotorData[i].aim_radian;
-            }
-            // release
-            pRTDynamixelObj->mutex_release();
 
-            pRTDynamixelObj->setEachRadian(pdRadians);
+            if(pRTDynamixelObj->bControlWriteEnable)
+            {
+                // mutex acqr
+                pRTDynamixelObj->mutex_acquire();
+                // copy rads
+                for(i=0;i<motorNum;i++)
+                {
+                    pdRadians[i] = (*pRTDynamixelObj).vMotorData[i].aim_radian;
+                }
+                // release
+                pRTDynamixelObj->mutex_release();
+                pRTDynamixelObj->setEachRadian(pdRadians);
+            }
+
             pRTDynamixelObj->getAllStatus();
 
 

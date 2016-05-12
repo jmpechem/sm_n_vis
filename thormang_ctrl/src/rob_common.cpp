@@ -12,7 +12,7 @@ realrobot::realrobot()
     dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
 
     dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
-    dxlJointSub = nh.subscribe("rt_dyanmixel/joint_state",1,&realrobot::JointCallback,this);
+    dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
 
     jointCtrlSub = nh.subscribe("thormang_ctrl/joint_ctrl",1,&realrobot::UIJointCtrlCallback,this);
 

@@ -10,6 +10,7 @@ add_message_files(
   FILES
   JointState.msg
   JointSet.msg
+  Error.msg
 )
 
 add_service_files(

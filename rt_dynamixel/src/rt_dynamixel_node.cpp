@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     if(dxl_initailize() == false) return -1;
 
     // Get initial pose and set default settings
-    dynamixel_motor_init();
+    if(dynamixel_motor_init() == false) return -1;
 
     // Enable ROS Service, Pub and Sub
     RTROSPublisher rtRosPublisher(nh);
@@ -47,6 +47,11 @@ int main(int argc, char **argv)
     // Start
     rtRosPublisher.start();
     rtRosSubscriber.start();
+
+    for(int i=0; i<4; i++)
+    {
+        dxlDevice[i].bControlLoopEnable = true;
+    }
 
     ros::spin();
 
