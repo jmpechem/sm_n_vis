@@ -49,6 +49,9 @@ public Q_SLOTS:
     void on_button_connect_clicked(bool check );
     void on_manuButton_clicked(bool check );
     void on_button_joint_control_clicked(bool check);
+    void on_button_power_on_clicked(bool check);
+    void on_button_minus_clicked(bool check);
+    void on_button_plus_clicked(bool check);
 	void on_checkbox_use_environment_stateChanged(int state);
 
     /******************************************

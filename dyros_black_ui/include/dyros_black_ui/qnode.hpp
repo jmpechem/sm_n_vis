@@ -20,6 +20,7 @@
 #include <string>
 #include <QThread>
 #include <QStringListModel>
+#include "thormang_ctrl_msgs/JointSet.h"
 
 
 /*****************************************************************************
@@ -56,6 +57,7 @@ public:
 	void log( const LogLevel &level, const std::string &msg);
 
     void send_transition(std::string str);
+    void send_joint_ctrl(int id, double angle);
 
 Q_SIGNALS:
     void loggingUpdated();
@@ -66,6 +68,8 @@ private:
 	char** init_argv;
 	ros::Publisher chatter_publisher;
     ros::Publisher smach_publisher;
+    ros::Publisher joint_ctrl_publisher;
+
     QStringListModel logging_model;
 };
 

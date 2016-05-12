@@ -98,9 +98,9 @@ void simulation::RftCallback(const vrep_common::ForceSensorData::ConstPtr& Rft)
 }
 void simulation::parameter_initialize()
 {
-  q.resize(28); q.setZero();
-  q_dot.resize(28); q_dot.setZero();
-  torque.resize(28); torque.setZero();
+  q.resize(total_dof); q.setZero();
+  q_dot.resize(total_dof); q_dot.setZero();
+  torque.resize(total_dof); torque.setZero();
   LFT.setZero();  RFT.setZero(); Gyro.setZero();
   _desired_q.resize(total_dof); _desired_q.setZero();
 }

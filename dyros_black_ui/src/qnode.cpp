@@ -50,6 +50,8 @@ bool QNode::init() {
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
+    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
+
 	start();
 	return true;
 }
@@ -67,6 +69,8 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	// Add your ros communications here.
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
+    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
+
 	start();
 	return true;
 }
@@ -90,6 +94,15 @@ void QNode::send_transition(std::string str)
     msg.data = str;
     smach_publisher.publish(msg);
 }
+void QNode::send_joint_ctrl(int id, double angle)
+{
+    thormang_ctrl_msgs::JointSet msg;
+    msg.angle = angle;
+    msg.id = id;
+
+    joint_ctrl_publisher.publish(msg);
+}
+
 
 void QNode::log( const LogLevel &level, const std::string &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);

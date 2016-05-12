@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1288</width>
-    <height>792</height>
+    <height>880</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>880</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>DYROS THORMANG User Interface</string>
@@ -24,18 +30,34 @@
    <layout class="QHBoxLayout">
     <item>
      <widget class="QTableWidget" name="motor_table">
+      <property name="minimumSize">
+       <size>
+        <width>270</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>270</width>
         <height>16777215</height>
        </size>
       </property>
       <property name="rowCount">
-       <number>25</number>
+       <number>32</number>
       </property>
       <property name="columnCount">
-       <number>3</number>
+       <number>4</number>
       </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>60</number>
+      </attribute>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
       <row/>
       <row/>
       <row/>
@@ -64,6 +86,167 @@
       <column/>
       <column/>
       <column/>
+      <column/>
+      <item row="0" column="0">
+       <property name="text">
+        <string>R-Sh-P</string>
+       </property>
+      </item>
+      <item row="1" column="0">
+       <property name="text">
+        <string>L-Sh-P</string>
+       </property>
+      </item>
+      <item row="2" column="0">
+       <property name="text">
+        <string>R-Sh-R</string>
+       </property>
+      </item>
+      <item row="3" column="0">
+       <property name="text">
+        <string>L-Sh-R</string>
+       </property>
+      </item>
+      <item row="4" column="0">
+       <property name="text">
+        <string>R-Sh-Y</string>
+       </property>
+      </item>
+      <item row="5" column="0">
+       <property name="text">
+        <string>L-Sh-Y</string>
+       </property>
+      </item>
+      <item row="6" column="0">
+       <property name="text">
+        <string>R-Elbo</string>
+       </property>
+      </item>
+      <item row="7" column="0">
+       <property name="text">
+        <string>L-Elbo</string>
+       </property>
+      </item>
+      <item row="8" column="0">
+       <property name="text">
+        <string>R-Wr-Y</string>
+       </property>
+      </item>
+      <item row="9" column="0">
+       <property name="text">
+        <string>L-Wr-Y</string>
+       </property>
+      </item>
+      <item row="10" column="0">
+       <property name="text">
+        <string>R-Wr-R</string>
+       </property>
+      </item>
+      <item row="11" column="0">
+       <property name="text">
+        <string>L-Wr-R</string>
+       </property>
+      </item>
+      <item row="12" column="0">
+       <property name="text">
+        <string>R-W-Y2</string>
+       </property>
+      </item>
+      <item row="13" column="0">
+       <property name="text">
+        <string>L-W-Y2</string>
+       </property>
+      </item>
+      <item row="14" column="0">
+       <property name="text">
+        <string>R-Hi-Y</string>
+       </property>
+      </item>
+      <item row="15" column="0">
+       <property name="text">
+        <string>L-Hi-Y</string>
+       </property>
+      </item>
+      <item row="16" column="0">
+       <property name="text">
+        <string>R-Hi-R</string>
+       </property>
+      </item>
+      <item row="17" column="0">
+       <property name="text">
+        <string>L-Hi-R</string>
+       </property>
+      </item>
+      <item row="18" column="0">
+       <property name="text">
+        <string>R-Hi-P</string>
+       </property>
+      </item>
+      <item row="19" column="0">
+       <property name="text">
+        <string>L-Hi-P</string>
+       </property>
+      </item>
+      <item row="20" column="0">
+       <property name="text">
+        <string>R-Kne</string>
+       </property>
+      </item>
+      <item row="21" column="0">
+       <property name="text">
+        <string>L-Kne</string>
+       </property>
+      </item>
+      <item row="22" column="0">
+       <property name="text">
+        <string>R-An-P</string>
+       </property>
+      </item>
+      <item row="23" column="0">
+       <property name="text">
+        <string>L-An-P</string>
+       </property>
+      </item>
+      <item row="24" column="0">
+       <property name="text">
+        <string>R-An-R</string>
+       </property>
+      </item>
+      <item row="25" column="0">
+       <property name="text">
+        <string>L-An-R</string>
+       </property>
+      </item>
+      <item row="26" column="0">
+       <property name="text">
+        <string>W-Pan</string>
+       </property>
+      </item>
+      <item row="27" column="0">
+       <property name="text">
+        <string>W-Tilt</string>
+       </property>
+      </item>
+      <item row="28" column="0">
+       <property name="text">
+        <string>H-Pan</string>
+       </property>
+      </item>
+      <item row="29" column="0">
+       <property name="text">
+        <string>H-Tilt</string>
+       </property>
+      </item>
+      <item row="30" column="0">
+       <property name="text">
+        <string>R-Hand</string>
+       </property>
+      </item>
+      <item row="31" column="0">
+       <property name="text">
+        <string>L-Hand</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item>
@@ -78,7 +261,7 @@
        <locale language="English" country="Australia"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -123,6 +306,19 @@
          <string>Joint Ctrl</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="button_power_on">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>220</y>
+          <width>121</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>POWER ON</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -133,6 +329,48 @@
        <attribute name="title">
         <string>Manual</string>
        </attribute>
+       <widget class="QPushButton" name="button_minus">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>90</y>
+          <width>41</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_plus">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>90</y>
+          <width>41</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>+</string>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_joint_set">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>180</y>
+          <width>691</width>
+          <height>471</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_status">
        <attribute name="title">

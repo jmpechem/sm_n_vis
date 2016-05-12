@@ -57,28 +57,30 @@ class Auto(smach.State):
 #define state Manual
 class Manual(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd1','cmd2','cmd3','loop'])
+	  smach.State.__init__(self, outcomes=['activate_jctrl','activate_tctrl','activate_recog','loop'])
       def execute(self, userdata):
           rospy.sleep(1.0)
 	  rospy.loginfo('Executing state Manual')
 	  rospy.loginfo(trans_tag)
-          if trans_tag == "cmd1":
-             return 'cmd1'
-          elif trans_tag == "cmd2":
-             return 'cmd2'
-	  elif trans_tag == "cmd3":
-	     return 'cmd3'
+          if trans_tag == "activate_jctrl":
+	     pub_state.publish("Activate_Joint_Ctrl");
+             return 'activate_jctrl'
+          elif trans_tag == "activate_tctrl":
+	     pub_state.publish("Activate_Task_Ctrl");
+             return 'activate_tctrl'
+	  elif trans_tag == "activate_recog":
+	     pub_state.publish("Activate_Recognition");
+	     return 'activate_recog'
 	  else:
 	     return 'loop'
 #define state JointCtrl
 class JointCtrl(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['activate_jctrl','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['jctrl_back','cmd_modechg','loop'])
       def execute(self, userdata):
           rospy.sleep(1.0)
-          if trans_tag == "activate_jctrl":
-	     pub_state.publish("Activate_Joint_Ctrl");
-             return 'activate_jctrl'
+	  if trans_tag == "jctrl_back":
+	     return 'jctrl_back'
           elif trans_tag == "cmd_modechg":
              return 'cmd_modechg'
           else:
@@ -87,11 +89,11 @@ class JointCtrl(smach.State):
 #define state task
 class TaskCtrl(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['activate_tctrl','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['tctrl_back','cmd_modechg','loop'])
       def execute(self, userdata):
           rospy.sleep(1.0)
-          if trans_tag == "activate_tctrl":
-             return 'activate_tctrl'
+	  if trans_tag == "tctrl_back":
+	     return 'tctrl_back'
           elif trans_tag == "cmd_modechg":
              return 'cmd_modechg'
           else:
@@ -99,11 +101,11 @@ class TaskCtrl(smach.State):
 #define state recog
 class Recog(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['activate_recog','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['recog_back','cmd_modechg','loop'])
       def execute(self, userdata):
           rospy.sleep(1.0)
-          if trans_tag == "activate_recog":
-             return 'activate_recog'
+	  if trans_tag == "recog_back":
+	     return 'recog_back'
           elif trans_tag == "cmd_modechg":
              return 'cmd_modechg'
           else:
@@ -469,16 +471,16 @@ def main():
 			       transitions={'mission1':'Valve_Mission','mission2':'Door_Mission','mission3':'Wall','loop':'Auto'})
         # Manual state
 	smach.StateMachine.add('Manual',Manual(),
-			       transitions={'cmd1':'JointCtrl','cmd2':'TaskCtrl','cmd3':'Recog','loop':'Manual'})
+			       transitions={'activate_jctrl':'JointCtrl','activate_tctrl':'TaskCtrl','activate_recog':'Recog','loop':'Manual'})
 	# JointCtrl state
 	smach.StateMachine.add('JointCtrl',JointCtrl(),
-			       transitions={'activate_jctrl':'Joint','cmd_modechg':'Mode_Chg','loop':'JointCtrl'})
+			       transitions={'jctrl_back':'Manual','cmd_modechg':'Mode_Chg','loop':'JointCtrl'})
 	# TaskCtrl state
 	smach.StateMachine.add('TaskCtrl',TaskCtrl(),
-			       transitions={'activate_tctrl':'Task','cmd_modechg':'Mode_Chg','loop':'TaskCtrl'})
+			       transitions={'tctrl_back':'Manual','cmd_modechg':'Mode_Chg','loop':'TaskCtrl'})
 	# Recog state
 	smach.StateMachine.add('Recog',Recog(),
-			       transitions={'activate_recog':'Recognize','cmd_modechg':'Mode_Chg','loop':'Recog'})
+			       transitions={'recog_back':'Manual','cmd_modechg':'Mode_Chg','loop':'Recog'})
 
 	# Mode_Chg state
 	smach.StateMachine.add('Mode_Chg',Mode_Chg(),transitions={'auto_to_manu':'Manual','manu_to_auto':'Auto','loop':'Mode_Chg'})

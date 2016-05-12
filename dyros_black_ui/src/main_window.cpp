@@ -22,6 +22,7 @@ namespace dyros_black_ui {
 
 using namespace Qt;
 
+// std::string motorID = {"R-SP", "L-SP", "R-SR", ""};
 /*****************************************************************************
 ** Implementation [MainWindow]
 *****************************************************************************/
@@ -52,13 +53,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     }
     QStringList horizonHeaderLabel;
     QStringList verticalHeaderLabel;
-    horizonHeaderLabel.append("Position");
+    horizonHeaderLabel.append("Name");
+    horizonHeaderLabel.append("Pos");
+    horizonHeaderLabel.append("Torque");
     horizonHeaderLabel.append("Error");
-    ui.motor_table->setRowCount(25);
-    ui.motor_table->setColumnCount(3);
-    ui.motor_table->setColumnWidth(0,50);
-    ui.motor_table->setColumnWidth(1,50);
-    ui.motor_table->setColumnWidth(2,50);
     ui.motor_table->setHorizontalHeaderLabels(horizonHeaderLabel);
 
     // Table
@@ -111,11 +109,23 @@ void MainWindow::on_manuButton_clicked(bool check )
 }
 
 void MainWindow::on_button_joint_control_clicked(bool check)
-    {
+{
+    qnode.send_transition("activate_jctrl");
+}
 
-    qnode.send_transition("cmd1");
+void MainWindow::on_button_power_on_clicked(bool check)
+{
+    qnode.send_transition("power_on");
+}
 
-    //qnode.send_transition("activate_jctrl");
+void MainWindow::on_button_plus_clicked(bool check)
+{
+    qnode.send_joint_ctrl(1,1.0); // degree
+}
+
+void MainWindow::on_button_minus_clicked(bool check)
+{
+    qnode.send_joint_ctrl(1,-1.0);
 }
 
 void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
