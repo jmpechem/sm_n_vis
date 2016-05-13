@@ -55,7 +55,31 @@ Dynamixel Pro node (xenomai)
   (3) rt_dynamixel_msgs (included)<br />
 
 3. How to use?<br />
-  - Under the construction
+  - Service name
+  	- Mode Setting (Server): 	/rt_dynamixel/mode
+  	- Motor Setting (Server):	/rt_dynamixel/motor_set
+  - Topic name
+  	- Joint State (Publish): 	/rt_dynamixel/joint_state
+  	- Joint Set (Subscribe): 	/rt_dynamixel/joint_set
+
+  (1) Setting Mode
+	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::SETTING)
+	- Call a ros service to set a motor (rt_dynamixel_msgs::MotorSetting)
+	
+	- Modes
+		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_GOAL_POSITION
+			id = target motor id
+			fvalue = radian
+		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_TORQUE_ENABLE
+			value = 1 or 0 (torque ON = 1, OFF = 0)
+
+  (2) Freerun Mode (400 Hz)
+  	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN)
+  	- Publish target angle datas(Radian) to joint_set
+  
+  (3) Joint Data
+	- Current joint state datas are published via /rt_dynamixel/joint_state (400 Hz)
+	- If motor set service is called, data updating is stopped shortly.
 
 ##User Interface
 Qt based user interface
