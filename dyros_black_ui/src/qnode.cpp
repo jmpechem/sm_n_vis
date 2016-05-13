@@ -51,6 +51,8 @@ bool QNode::init() {
 	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
     joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
+    joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+
 
 	start();
 	return true;
@@ -104,7 +106,7 @@ void QNode::send_joint_ctrl(int id, double angle)
     joint_ctrl_publisher.publish(msg);
 }
 
-void QNode::jointStateCallback(thormang_ctrl_msgs::JointStateConstPtr &msg)
+void QNode::jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr &msg)
 {
     joint_msg = *msg;
     jointStateUpdated();

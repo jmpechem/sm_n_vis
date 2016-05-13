@@ -80,7 +80,7 @@ private:
 
     QStringListModel logging_model;
 
-    void jointStateCallback(thormang_ctrl_msgs::JointStateConstPtr& msg);
+    void jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr& msg);
 
 };
 
