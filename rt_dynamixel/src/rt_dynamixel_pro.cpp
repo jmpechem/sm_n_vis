@@ -248,15 +248,20 @@ int rt_dynamixel::RxPacket(unsigned char *rxpacket)
     while(1)
     {
         int rx_real = 0;
-        rt_task_sleep(1e4);
+        //rt_task_sleep(1e4);
 
 
         //rt_mutex_acquire(&mutex_serial,TM_INFINITE);
+        rt_task_sleep(1e4); // for other tasks
         rx_real = ComPort->ReadPort(&rxpacket[rx_length], wait_length - rx_length);
+        //if(rx_real != 0)
+        //    printf("rx_real: %d\n",rx_real);
         //rt_mutex_release(&mutex_serial);
-        if(rx_real == -1)
-            printf("RxError -1\n");
-
+        if(rx_real < 0)
+        {
+            //printf("RxError %s\n",strerror(-rx_real));
+            continue;
+        }
         rx_length += rx_real;
         if(rx_length >= wait_length)	// wait_length minimum : 11
         {
@@ -303,7 +308,10 @@ int rt_dynamixel::RxPacket(unsigned char *rxpacket)
             else
             {
                 // remove unnecessary packets
-                memcpy(&rxpacket[0], &rxpacket[i], rx_length - i);
+                static unsigned char tmp_packet[250] = {0,};
+                memcpy(tmp_packet, &rxpacket[i], rx_length - i);
+                memcpy(&rxpacket[0],tmp_packet,rx_length - i);
+                //memcpy(&rxpacket[0], &rxpacket[i], rx_length - i);
                 rx_length -= i;
             }
         }
@@ -685,7 +693,7 @@ int rt_dynamixel::SyncRead(int start_addr, int data_length, unsigned char id_len
     // recieve
 
     //rt_task_
-    //rt_task_sleep(10e5); // give a time to get some buffers
+    rt_task_sleep(1e6); // give a time to get some buffers
     for (n = 0; n < id_length; n++)
     {
         int id = read_ids[n];
@@ -696,9 +704,11 @@ int rt_dynamixel::SyncRead(int start_addr, int data_length, unsigned char id_len
         else
             return result;
         // rxpacket to rxdata[id].pucTable
-        memcpy(rxdata[n].pucTable, &rxpacket[PKT_PARAMETER + 1], data_length);
-        (*received)++;
-
+        if(rxpacket[PKT_ID] == id)
+        {
+            memcpy(rxdata[n].pucTable, &rxpacket[PKT_PARAMETER + 1], data_length);
+            (*received)++;
+        }
     }
 
     return result;
@@ -1195,7 +1205,7 @@ int RTDynamixelPro::getAllStatus()
 
     if (nReceived != nMotorNum)
     {
-        std::cout << "[WARN] Failed to receieve the response. (ID: " << (int)vMotorData[nReceived].id << ")" << std::endl;
+        //std::cout << "[WARN] Failed to receieve the response. (ID: " << (int)vMotorData[nReceived].id << ")" << std::endl;
     }
 
     // free
@@ -1225,7 +1235,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (control_period * 0.9); // 90%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (24e5); // 90%
 
 
             if(pRTDynamixelObj->bControlWriteEnable)

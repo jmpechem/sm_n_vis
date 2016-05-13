@@ -80,9 +80,9 @@ int rt_serial_port::ReadPort(unsigned char* packet, int packet_len)
     int err;
 
     err = rt_dev_ioctl(SocketFD, RTSER_RTIOC_WAIT_EVENT, &rx_event);
+    //printf("%s : pending = %d, packet_len = %d\n",PortName,rx_event.rx_pending,packet_len);
 
     if(rx_event.rx_pending == 0) return 0;
-    //printf("%s : pending = %d, packet_len = %d\n",PortName,rx_event.rx_pending,packet_len);
 
     if(packet_len > rx_event.rx_pending)
         return rt_dev_read(SocketFD, packet, rx_event.rx_pending);

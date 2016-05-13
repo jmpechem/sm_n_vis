@@ -4,7 +4,7 @@
 using namespace DXL_PRO;
 
 // Defines (Debug, Test, ...)
-#define DXL_TEST_SET
+// #define DXL_TEST_SET
 
 #ifdef DXL_TEST_SET
 dxl_pro_data dxlLists[4][10] = {
@@ -41,17 +41,17 @@ dxl_pro_data dxlLists[4][10] = {
         {14, H42}
     },    {
         // Index: 2
-        {15, H54},
-        {17, H54},
+//        {15, H54},
+//        {17, H54},
         {19, H54},
         {21, H54},
         {23, H54},
-        {25, H54},
-        {27, H42}
+//        {25, H54},
+//        {27, H54}
     },    {
         // Index: 3
         {16, H54},
-//        {18, H54},
+        {18, H54},
         {20, H54},
         {22, H54},
         {24, H54},
@@ -193,7 +193,7 @@ bool dynamixel_motor_init()
     RT_TASK rtt_dxl_init;
     bool isDone = false;
 
-    rt_task_create(&rtt_dxl_init,"rt_dxl_init",0,30,T_JOINABLE);
+    rt_task_create(&rtt_dxl_init,"rt_dxl_init",0,90,T_JOINABLE);
     rt_task_start(&rtt_dxl_init,&motion_init_proc,&isDone);
     rt_task_join(&rtt_dxl_init);
     rt_task_delete(&rtt_dxl_init);
@@ -211,21 +211,37 @@ void motion_init_proc(void *arg)
     bool *isDone = (bool*)arg;
     bool isUpdateComplete[4] = {false, };
     int nRecv[4] = {0, };
-    for(int c=0; c<10;c++)
+
+    ROS_INFO("Writing Settings");
+    for(int c=0; c<3; c++)
     {
+
         for(int i=0;i<4;i++)
         {
+        dxlDevice[i].setReturnDelayTime(0);
+        rt_task_sleep(5e6);
+        dxlDevice[i].setAllAcceleration(0);
+        rt_task_sleep(5e6);
+        dxlDevice[i].setAllVelocity(0);
+        rt_task_sleep(5e6);
+        dxlDevice[i].setAllTorque(0);
+        rt_task_sleep(5e6);
+}
+    }
+    for(int i=0;i<4;i++)
+    {
+        ROS_INFO("chennal... %d",i);
+        for(int c=0; c<10;c++)
+        {
+            ROS_INFO("init try... %d",c);
             dxlDevice[i].rttLoopStartTime = rt_timer_read();
-            dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 10e6; // 5ms
+            dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 5e6; // 10ms
+
             nRecv[i] = dxlDevice[i].getAllStatus();
             if(nRecv[i] == dxlDevice[i].getMotorNum())
             {
                 isUpdateComplete[i] = true;
             }
-            dxlDevice[i].setReturnDelayTime(0);
-            dxlDevice[i].setAllAcceleration(0);
-            dxlDevice[i].setAllVelocity(0);
-            dxlDevice[i].setAllTorque(0);
             // Gain Set
             /*
             for(int j=0; j<nDXLCount[i]; j++)
@@ -237,8 +253,9 @@ void motion_init_proc(void *arg)
             }
             */
 
+            rt_task_sleep(5e7);
         }
-        rt_task_sleep(1e8);
+        rt_task_sleep(5e7);
 
     }
     // check all motor read
