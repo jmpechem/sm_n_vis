@@ -308,10 +308,8 @@ int rt_dynamixel::RxPacket(unsigned char *rxpacket)
             else
             {
                 // remove unnecessary packets
-                static unsigned char tmp_packet[250] = {0,};
-                memcpy(tmp_packet, &rxpacket[i], rx_length - i);
-                memcpy(&rxpacket[0],tmp_packet,rx_length - i);
-                //memcpy(&rxpacket[0], &rxpacket[i], rx_length - i);
+                memmove(&rxpacket[0], &rxpacket[i], rx_length - i); // safe
+                //memcpy(&rxpacket[0], &rxpacket[i], rx_length - i); // not safe
                 rx_length -= i;
             }
         }
@@ -445,7 +443,7 @@ int rt_dynamixel::BroadcastPing(std::vector<PingInfo>& vec_info)
                 vec_info.at(vec_info.size()-1).ModelNumber = DXL_MAKEWORD(rxpacket[PKT_PARAMETER+1], rxpacket[PKT_PARAMETER+2]);
                 vec_info.at(vec_info.size()-1).FirmwareVersion = rxpacket[PKT_PARAMETER+3];
 
-                memcpy(&rxpacket[0], &rxpacket[PING_STATUS_LENGTH], rx_length - PING_STATUS_LENGTH);
+                memmove(&rxpacket[0], &rxpacket[PING_STATUS_LENGTH], rx_length - PING_STATUS_LENGTH);
                 rx_length -= PING_STATUS_LENGTH;
             }
             else
@@ -453,7 +451,7 @@ int rt_dynamixel::BroadcastPing(std::vector<PingInfo>& vec_info)
                 result = COMM_RXCORRUPT;
 
                 // remove header (0xFF 0xFF 0xFD)
-                memcpy(&rxpacket[0], &rxpacket[3], rx_length - 3);
+                memmove(&rxpacket[0], &rxpacket[3], rx_length - 3);
                 rx_length -= 3;
             }
 
@@ -463,7 +461,7 @@ int rt_dynamixel::BroadcastPing(std::vector<PingInfo>& vec_info)
         else
         {
             // remove unnecessary packets
-            memcpy(&rxpacket[0], &rxpacket[idx], rx_length - idx);
+            memmove(&rxpacket[0], &rxpacket[idx], rx_length - idx);
             rx_length -= idx;
         }
     }
