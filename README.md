@@ -55,6 +55,9 @@ Dynamixel Pro node (xenomai)
   (3) rt_dynamixel_msgs (included)<br />
 
 3. How to use?<br />
+  - First boot
+  	- Run serial_setup.sh
+  
   - Service name
   	- Mode Setting (Server): 	/rt_dynamixel/mode
   	- Motor Setting (Server):	/rt_dynamixel/motor_set
