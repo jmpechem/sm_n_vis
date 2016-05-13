@@ -1235,7 +1235,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (24e5); // 90%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (21e5); // 90%
 
 
             if(pRTDynamixelObj->bControlWriteEnable)
