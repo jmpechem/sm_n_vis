@@ -1,0 +1,5 @@
+<launch>
+  <node name="rt_dynamixel" pkg="rt_dynamixel" type="rt_dynamixel_node" respawn="false" output="screen" />
+  <node name="smach" pkg="smach_usecase" type="executive.py" respawn="false" output="screen" />
+  <node name="thormang_ctrl" pkg="thormang_ctrl" type="thormang_ctrl" respawn="false" output="screen" />
+</launch>
