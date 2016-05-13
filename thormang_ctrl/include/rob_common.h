@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <ros/ros.h>
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -17,12 +15,12 @@
 #include "smach_msgs/SmachContainerStatus.h"
 
 #include "thormang_ctrl_msgs/JointSet.h"
+#include "thormang_ctrl_msgs/JointState.h"
 
 //math library
 #include "Walking_Controller.h"
 
-#include <iostream>
-#include <fstream>
+#include <vector>
 
 
 #define TotalJointNumber 28
@@ -62,6 +60,7 @@ class realrobot{
    ros::Publisher smachPub;
    ros::Subscriber smachSub;
 
+   ros::Publisher jointStateUIPub;
    ros::Subscriber jointCtrlSub;
    bool jointCtrlMsgRecv;
    thormang_ctrl_msgs::JointSet jointCtrlMsg;
@@ -73,6 +72,11 @@ class realrobot{
 
    string smach_state;
 
+   vector<int> jointID;
+   vector<int> jointInvID;
+
+
+   int uiUpdateCount;
 
 
    VectorXD q; // current q

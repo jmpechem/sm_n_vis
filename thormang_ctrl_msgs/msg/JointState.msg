@@ -1,6 +1,3 @@
-uint8 UPDATED=1
-uint8 LOST=255
-
 uint8[] id
 float64[] angle
 float64[] velocity

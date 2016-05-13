@@ -1,6 +1,6 @@
 #include "rob_common.h"
 
-realrobot::realrobot()
+realrobot::realrobot() : uiUpdateCount(0)
 {
 
     total_dof = 28; //
@@ -14,12 +14,14 @@ realrobot::realrobot()
     dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
 
+    jointStateUIPub = nh.advertise<thormang_ctrl_msgs::JointState>("thormang_ctrl/joint_state",1);
     jointCtrlSub = nh.subscribe("thormang_ctrl/joint_ctrl",1,&realrobot::UIJointCtrlCallback,this);
 
     smachPub = nh.advertise<std_msgs::String>("transition",1);
     smachSub = nh.subscribe("Jimin_machine/smach/container_status",1,&realrobot::SmachCallback,this);
 
     parameter_initialize();
+    make_id_inverse_list();
 }
 
 void realrobot::UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr &joint)
@@ -37,12 +39,6 @@ void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint
                              "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
                              "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
     */
-    const static int jointID[] = {28, 27,
-                     1,3,5,7,9,11,13,
-                     2,4,6,8,10,12,14,
-                     15,17,19,21,23,25,
-                     16,18,20,22,24,26};
-
 
     for(int i=0; i<total_dof; i++)
     {
@@ -113,17 +109,18 @@ void realrobot::set_torque(int value)
 void realrobot::make_id_inverse_list()
 {
 
-    const static int jointID[] = {28, 27,
+    const static int jointIDs[] = {28, 27,
                      1,3,5,7,9,11,13,
                      2,4,6,8,10,12,14,
                      15,17,19,21,23,25,
                      16,18,20,22,24,26};
 
-    static int jointInvID[50];
 
+    jointInvID.resize(50);
     for(int i=0;i<total_dof; i++)
     {
-        jointInvID[jointID[i]] = i;
+        jointID.push_back(jointIDs[i]);
+        jointInvID[jointIDs[i]] = i;
     }
 }
 
@@ -153,7 +150,20 @@ void realrobot::compute()
 
 void realrobot::reflect()
 {
+    if(++uiUpdateCount > 10)
+    {
+        uiUpdateCount = 0;
+        thormang_ctrl_msgs::JointState msg;
+        for(int i=0; i<total_dof; i++)
+        {
+            msg.id.push_back(jointID[i]);
+            msg.angle.push_back(q(i) * 57.295791433);
+            msg.velocity.push_back(q_dot(i) * 57.295791433);
+            msg.current.push_back(torque(i));
+        }
 
+        jointStateUIPub.publish(msg);
+    }
 }
 
 void realrobot::writedevice()
@@ -166,7 +176,6 @@ void realrobot::writedevice()
     }
     else if (smach_state == "JointCtrl")
     {
-        static int jointInvID[50];
         if(jointCtrlMsgRecv == true)
         {
             jointCtrlMsgRecv = false;

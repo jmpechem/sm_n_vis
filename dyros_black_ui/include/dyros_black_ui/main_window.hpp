@@ -13,6 +13,7 @@
 *****************************************************************************/
 
 #include <QtGui/QMainWindow>
+#include <vector>
 #include "ui_main_window.h"
 #include "qnode.hpp"
 
@@ -58,10 +59,12 @@ public Q_SLOTS:
     ** Manual connections
     *******************************************/
     void updateLoggingView(); // no idea why this can't connect automatically
+    void updateJointView();
 
 private:
 	Ui::MainWindowDesign ui;
 	QNode qnode;
+    std::vector<int> jointID;
 };
 
 }  // namespace dyros_black_ui

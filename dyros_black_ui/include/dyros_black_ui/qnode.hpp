@@ -20,7 +20,9 @@
 #include <string>
 #include <QThread>
 #include <QStringListModel>
+#include <vector>
 #include "thormang_ctrl_msgs/JointSet.h"
+#include "thormang_ctrl_msgs/JointState.h"
 
 
 /*****************************************************************************
@@ -59,7 +61,11 @@ public:
     void send_transition(std::string str);
     void send_joint_ctrl(int id, double angle);
 
+    thormang_ctrl_msgs::JointState joint_msg;
+
 Q_SIGNALS:
+
+    void jointStateUpdated();
     void loggingUpdated();
     void rosShutdown();
 
@@ -70,7 +76,12 @@ private:
     ros::Publisher smach_publisher;
     ros::Publisher joint_ctrl_publisher;
 
+    ros::Subscriber joint_state_subscirber;
+
     QStringListModel logging_model;
+
+    void jointStateCallback(thormang_ctrl_msgs::JointStateConstPtr& msg);
+
 };
 
 }  // namespace dyros_black_ui

@@ -42,7 +42,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 	/*********************
 	** Logging
 	**********************/
-	ui.view_logging->setModel(qnode.loggingModel());
+    ui.view_logging->setModel(qnode.loggingModel());
+    QObject::connect(&qnode, SIGNAL(jointStateUpdated()), this, SLOT(updateJointView()));
     QObject::connect(&qnode, SIGNAL(loggingUpdated()), this, SLOT(updateLoggingView()));
 
     /*********************
@@ -60,7 +61,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.motor_table->setHorizontalHeaderLabels(horizonHeaderLabel);
 
     // Table
-
+    for(int i=0; i<32; i++)
+    {
+        jointID.push_back(i+1);
+    }
 
 }
 
@@ -151,6 +155,17 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
  */
 void MainWindow::updateLoggingView() {
         ui.view_logging->scrollToBottom();
+}
+
+void MainWindow::updateJointView() {
+    for(int i=0;i<qnode.joint_msg.id.size(); i++)
+    {
+        QTableWidgetItem *newItem = new QTableWidgetItem(tr("%1").arg(
+                                                            qnode.joint_msg.angle[i]));
+
+        ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
+
+    }
 }
 
 /*****************************************************************************
