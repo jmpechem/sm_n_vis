@@ -49,23 +49,26 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** Auto Start
     **********************/
+
+
+    // | Creating UI
+    // -- Table
     if ( ui.checkbox_remember_settings->isChecked() ) {
         on_button_connect_clicked(true);
     }
     QStringList horizonHeaderLabel;
-    QStringList verticalHeaderLabel;
     horizonHeaderLabel.append("Name");
     horizonHeaderLabel.append("Pos");
     horizonHeaderLabel.append("Torque");
     horizonHeaderLabel.append("Error");
     ui.motor_table->setHorizontalHeaderLabels(horizonHeaderLabel);
 
-    // Table
     for(int i=0; i<32; i++)
     {
         jointID.push_back(i+1);
     }
 
+    // -- Joint Control Set
 }
 
 MainWindow::~MainWindow() {}

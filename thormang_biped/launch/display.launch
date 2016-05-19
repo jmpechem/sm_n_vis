@@ -2,7 +2,7 @@
   <arg name="model" />
   <arg name="gui" default="false" />
   <arg name="use_present" default="true"/>
-<param name="robot_description" command="cat $(find thormang_biped)/robots/thormang_biped.xml" />
+<param name="robot_description" command="cat $(find thormang_biped)/robots/thormang_biped.URDF" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
     <remap from="/joint_states" to="/thormang/joint_states"/>
   </node>

@@ -16,6 +16,7 @@
 #include <vector>
 #include "ui_main_window.h"
 #include "qnode.hpp"
+#include <QPushButton>
 
 /*****************************************************************************
 ** Namespace
@@ -65,8 +66,38 @@ private:
 	Ui::MainWindowDesign ui;
 	QNode qnode;
     std::vector<int> jointID;
-};
 
+};
+/*
+class QJointControlButtonFrame : public QFrame {
+Q_OBJECT
+
+public:
+    QJointControlButtonFrame(QWidget *parent=0)
+        : QFrame(parent),
+    button_minus1deg(0), button_minus5deg(0), button_plus1deg(0), button_plus5deg(0)
+    {   }
+
+
+    virtual ~QJointControlButtonFrame()
+    {
+        if(button_minus1deg)
+            delete button_minus1deg;
+        if(button_minus5deg)
+            delete button_minus5deg;
+        if(button_plus1deg)
+            delete button_plus1deg;
+        if(button_plus5deg)
+            delete button_plus5deg;
+    }
+
+protected:
+    QPushButton *button_minus1deg;
+    QPushButton *button_minus5deg;
+    QPushButton *button_plus1deg;
+    QPushButton *button_plus5deg;
+};
+*/
 }  // namespace dyros_black_ui
 
 #endif // dyros_black_ui_MAIN_WINDOW_H

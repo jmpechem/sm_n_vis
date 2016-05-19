@@ -1,18 +1,8 @@
 <launch>
-  <!--arg name="model" /-->
+  <arg name="model" />
   <arg name="gui" default="false" />
   <arg name="use_present" default="true"/>
-  <!--param name="robot_description" textfile="$(find thormang_biped)/robots/thormang_biped.URDF" /-->
-
 <param name="robot_description" command="cat $(find thormang_biped)/robots/thormang_biped.xml" />
-
-  <!--param name="use_gui" value="$(arg gui)" /-->
-
-  <!--node name="thormang_joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"-->
-    <!--param name="use_gui" value="FALSE"/-->
-    <!--param name="rate" value="30"/-->
-    <!--remap from="/joint_states" to="/thormang/joint_states"/-->
-  <!--/node-->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
     <remap from="/joint_states" to="/thormang/joint_states"/>
   </node>
