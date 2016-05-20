@@ -252,7 +252,7 @@ int rt_dynamixel::RxPacket(unsigned char *rxpacket)
 
 
         //rt_mutex_acquire(&mutex_serial,TM_INFINITE);
-        rt_task_sleep(1e4); // for other tasks
+        rt_task_sleep(2e4); // for other tasks
         rx_real = ComPort->ReadPort(&rxpacket[rx_length], wait_length - rx_length);
         //if(rx_real != 0)
         //    printf("rx_real: %d\n",rx_real);
@@ -1214,7 +1214,7 @@ int RTDynamixelPro::getAllStatus()
 
 
 
-RTIME control_period = 25e5;
+RTIME control_period = 30e5;
 // dxl_control for rt call
 void dxl_control(void* parent)
 {
@@ -1233,7 +1233,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (21e5); // 90%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (28e5); // 90%
 
 
             if(pRTDynamixelObj->bControlWriteEnable)

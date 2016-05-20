@@ -22,34 +22,35 @@ dxl_pro_data dxlLists[4][10] = {
 #else
 dxl_pro_data dxlLists[4][10] = {
     {
-        // Index: 0
+        // Index: 0: 1-Right Upper body
         {1, H54},
         {3, H54},
-        {5, H54},
+//        {5, H54},     // Warning
         {7, H54},
         {9, H54},
         {11, H42},
         {13, H42}
     },    {
-        // Index: 1
+        // Index: 1: 2-Left Upper body
         {2, H54},
         {4, H54},
         {6, H54},
         {8, H54},
         {10, H54},
         {12, H42},
-        {14, H42}
+        {14, H42},
+            {28, H54}
     },    {
-        // Index: 2
-//        {15, H54},
-//        {17, H54},
-        {19, H54},
-        {21, H54},
+        // Index: 2: 3-Right Lower body
+//        {15, H54},    // Fatal
+//        {17, H54},    // Fatal
+//        {19, H54},    // Warning
+//        {21, H54},    // Warning
         {23, H54},
-//        {25, H54},
-//        {27, H54}
+//        {25, H54},    // Fatal
+        {27, H54}
     },    {
-        // Index: 3
+        // Index: 3: 4-Left Lower body
         {16, H54},
         {18, H54},
         {20, H54},
@@ -64,39 +65,41 @@ dxl_gains dxlGains[4][10] =
 {
     {
         // Index: 0
-        {1, 1,1,1},
-        {3, 1,1,1},
-        {5, 1,1,1},
-        {7, 1,1,1},
-        {9, 1,1,1},
-        {11, 1,1,1},
-        {13, 1,1,1}
+        {1, 100,100,10},
+        {3, 100,100,10},
+       // {5, 1,1,1},
+        {7, 100,100,10},
+        {9, 100,100,10},
+        {11, 100,100,10},
+        {13, 100,100,10}
     },    {
         // Index: 1
-        {2, 1,1,1},
-        {4, 1,1,1},
-        {6, 1,1,1},
-        {8, 1,1,1},
-        {10, 1,1,1},
-        {12, 1,1,1},
-        {14, 1,1,1}
+        {2, 100,100,10},
+        {4, 100,100,10},
+        {6, 100,100,10},
+        {8, 100,100,10},
+        {10, 100,100,10},
+        {12, 100,100,10},
+        {14, 100,100,10},
+        {28, 100,100,10}
     },    {
         // Index: 2
-        {15, 1,1,1},
-        {17, 1,1,1},
-        {19, 1,1,1},
-        {21, 1,1,1},
-        {23, 1,1,1},
-        {25, 1,1,1},
-        {27, 1,1,1}
+      //  {15, 1,1,1},
+     //   {17, 1,1,1},
+      //  {19, 1,1,1},
+      //  {21, 1,1,1},
+        {23, 100,100,10},
+     //   {25, 1,1,1},
+        {27, 100,100,10}
     },    {
         // Index: 3
-        {16, 1,1,1},
-        {18, 1,1,1},
-        {20, 1,1,1},
-        {22, 1,1,1},
-        {24, 1,1,1},
-        {26, 1,1,1}
+        {16, 100,100,10},
+        {18, 100,100,10},
+        {20, 100,100,10},
+        {22, 100,100,10},
+        {24, 100,100,10},
+        {26, 100,100,10},
+
     }
 };
 
@@ -140,6 +143,11 @@ void make_dxl_count()
 void make_inverse_access_data()
 {
     int i,j;
+    for(i=0;i<50;i++)
+    {
+        dxlID2Addr[i].channel = -1;
+        dxlID2Addr[i].index = -1;
+    }
     for(i=0;i<4;i++)
     {
         for(j=0;j<nDXLCount[i];j++)
@@ -180,6 +188,12 @@ bool dxl_initailize()
     return true;
 }
 
+bool check_vaild_dxl_from_id(int id)
+{
+    if ( dxlID2Addr[id].channel == -1 ) return false;
+
+    return true;
+}
 
 dxl_pro_data& dxl_from_id(int id)
 {
@@ -233,7 +247,6 @@ void motion_init_proc(void *arg)
         ROS_INFO("chennal... %d",i);
         for(int c=0; c<10;c++)
         {
-            ROS_INFO("init try... %d",c);
             dxlDevice[i].rttLoopStartTime = rt_timer_read();
             dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 5e6; // 10ms
 
@@ -242,16 +255,28 @@ void motion_init_proc(void *arg)
             {
                 isUpdateComplete[i] = true;
             }
+            else
+            {
+                ROS_INFO("ID: %d Motor seems to be dead?",dxlDevice[i][nRecv[i]].id);
+            }
             // Gain Set
-            /*
+
             for(int j=0; j<nDXLCount[i]; j++)
             {
                 int err;
-                dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
-                dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
-                                             dxlGains[i][j].velocity_p_gain, &err);
+                if(dxlDevice[i][j].id == dxlGains[i][j].id)
+                {
+                    dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
+                    dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
+                                                 dxlGains[i][j].velocity_p_gain, &err);
+                }
+                else
+                {
+                    ROS_ERROR("No match between Devices ID and Gain datas");
+                }
+
             }
-            */
+
 
             rt_task_sleep(5e7);
         }

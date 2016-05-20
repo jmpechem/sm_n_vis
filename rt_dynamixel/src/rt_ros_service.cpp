@@ -129,7 +129,7 @@ void publisher_proc(void *arg)
     RTROSPublisher* pObj = (RTROSPublisher*)arg;
     int i,j;
 
-    rt_task_set_periodic(NULL, TM_NOW, 25e5);    // 1e6 -> 1ms   5e5 -> 500us
+    rt_task_set_periodic(NULL, TM_NOW, 30e5);    // 1e6 -> 1ms   5e5 -> 500us
 
     while (1)
     {
@@ -179,6 +179,7 @@ void subscribe_proc(void *arg)
         if(rcvMsg) // if message recieved ( if not rcvMsg == NULL )
         {
             // Data set
+            // ROS_INFO("Sub ")
             for(i=0;i<4;i++)
             {
                 dxlDevice[i].mutex_acquire();
@@ -186,7 +187,10 @@ void subscribe_proc(void *arg)
 
             for(i=0;i< (int)rcvMsg->id.size();i++)
             {
-                dxl_from_id(rcvMsg->id[i]).aim_radian = rcvMsg->angle[i];
+                if(check_vaild_dxl_from_id(rcvMsg->id[i]))
+                {
+                    dxl_from_id(rcvMsg->id[i]).aim_radian = rcvMsg->angle[i];
+                }
             }
 
             for(i=0;i<4;i++)

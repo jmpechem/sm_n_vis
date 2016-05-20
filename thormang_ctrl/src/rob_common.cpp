@@ -1,6 +1,6 @@
 #include "rob_common.h"
 
-realrobot::realrobot() : uiUpdateCount(0)
+realrobot::realrobot() : uiUpdateCount(0), isFirstBoot(true)
 {
 
     total_dof = 28; //
@@ -47,11 +47,16 @@ void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint
             if(jointID[i] == joint->id[j])
             {
                 q(i) = joint->angle[j];
+                if(isFirstBoot)
+                {    _desired_q(i) = joint->angle[j]; }
+
                 q_dot(i) = joint->velocity[j];
                 torque(i) = joint->current[j];
             }
         }
     }
+    if(isFirstBoot)
+    {isFirstBoot = false;}
 }
 
 void realrobot::SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &smach)
@@ -120,8 +125,10 @@ void realrobot::make_id_inverse_list()
     for(int i=0;i<total_dof; i++)
     {
         jointID.push_back(jointIDs[i]);
+        jointSetMsg.id.push_back(jointIDs[i]);
         jointInvID[jointIDs[i]] = i;
     }
+    jointSetMsg.angle.resize(total_dof);
 }
 
 void realrobot::parameter_initialize()
@@ -140,11 +147,41 @@ void realrobot::readdevice()
 
 void realrobot::update()
 {
-
+    key_cmd = getch();
 }
 
 void realrobot::compute()
 {
+    if (key_cmd == 'i')
+    {
+        ROS_INFO("Init Walking");
+        _Init_walking_flag = true;
+        _Walking_flag = true;
+        _WalkingCtrl._initialize();
+    }
+    else if (key_cmd == 'w')
+    {
+        ROS_INFO("Walking Command");
+        _Walking_flag = true;
+        _Init_walking_flag = false;
+        _WalkingCtrl._initialize();
+    }
+    else if (key_cmd == 'q')
+    {
+       ROS_INFO("q trigger");
+  // vrep_stop();
+    }
+
+    if(_Init_walking_flag == true)
+    {
+        _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
+        _WalkingCtrl.Init_walking_pose(_desired_q);
+    }
+    else if (_Walking_flag == true)
+    {
+         _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
+         _WalkingCtrl.compute(_desired_q);
+    }
 
 }
 
@@ -174,6 +211,15 @@ void realrobot::writedevice()
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::SETTING);
         set_torque(1);
     }
+    else if (smach_state == "Auto")
+    {
+        change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
+        for(int i=0; i< total_dof; i++)
+        {
+            jointSetMsg.angle[i] = _desired_q(i);
+        }
+        dxlJointSetPub.publish(jointSetMsg);
+    }
     else if (smach_state == "JointCtrl")
     {
         if(jointCtrlMsgRecv == true)
@@ -185,4 +231,45 @@ void realrobot::writedevice()
             set_aim_position(jointCtrlMsg.id,aimPos);
         }
     }
+}
+
+
+int realrobot::getch()
+{
+        fd_set set;
+        struct timeval timeout;
+        int rv;
+        char buff = 0;
+        int len = 1;
+        int filedesc = 0;
+        FD_ZERO(&set);
+        FD_SET(filedesc, &set);
+
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100;
+
+        rv = select(filedesc + 1, &set, NULL, NULL, &timeout);
+
+        struct termios old = {0};
+        if (tcgetattr(filedesc, &old) < 0)
+            ROS_ERROR("tcsetattr()");
+        old.c_lflag &= ~ICANON;
+        old.c_lflag &= ~ECHO;
+        old.c_cc[VMIN] = 1;
+        old.c_cc[VTIME] = 0;
+        if (tcsetattr(filedesc, TCSANOW, &old) < 0)
+            ROS_ERROR("tcsetattr ICANON");
+
+        if(rv == -1)
+        { }
+        else if(rv == 0)
+          {}
+        else
+            read(filedesc, &buff, len );
+
+        old.c_lflag |= ICANON;
+        old.c_lflag |= ECHO;
+        if (tcsetattr(filedesc, TCSADRAIN, &old) < 0)
+            ROS_ERROR ("tcsetattr ~ICANON");
+        return (buff);
 }

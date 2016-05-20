@@ -307,7 +307,7 @@ namespace DXL_PRO {
             sprintf(threadName,"dxl ctr thr %d", index);
             sprintf(mutexName,"dxl dat mtx %d", index);
             rt_mutex_create(&rttDataMutex, mutexName);
-            rt_task_create(&rttTaskObject, threadName, 0, 50, 0);
+            rt_task_create(&rttTaskObject, threadName, 0, 90, 0);
         }
 
         ~RTDynamixelPro()

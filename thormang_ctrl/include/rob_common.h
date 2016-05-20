@@ -22,6 +22,10 @@
 
 #include <vector>
 
+#include <termios.h>
+#include <iostream>
+#include <fstream>
+
 
 #define TotalJointNumber 28
 
@@ -32,7 +36,6 @@ class realrobot{
 
    void JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint); // current joint value callback
    void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr& smach);
-
    void UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr& joint);
    //void ftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft); // current left ft sensor value callback
 
@@ -47,6 +50,8 @@ class realrobot{
    void compute(); // compute algorithm and update all class object
    void reflect(); // reflect next step actuation such as motor angle else
    void writedevice(); // publish to actuate devices
+
+   int getch();
 
  private:
    ros::NodeHandle nh; ///< node handle for real robot Class
@@ -63,7 +68,9 @@ class realrobot{
    ros::Publisher jointStateUIPub;
    ros::Subscriber jointCtrlSub;
    bool jointCtrlMsgRecv;
+
    thormang_ctrl_msgs::JointSet jointCtrlMsg;
+   rt_dynamixel_msgs::JointSet jointSetMsg;
 
    // ros::Subscriber taskCtrlSub;
 
@@ -78,6 +85,11 @@ class realrobot{
 
    int uiUpdateCount;
 
+   int key_cmd;
+   bool _Init_walking_flag;
+   bool _Walking_flag;
+
+   bool isFirstBoot;
 
    VectorXD q; // current q
    VectorXD q_dot; // current qdot

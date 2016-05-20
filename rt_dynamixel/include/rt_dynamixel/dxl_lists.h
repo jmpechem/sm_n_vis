@@ -16,6 +16,7 @@ dxl_pro_data& dxl_from_id(int id);
 
 void motion_init_proc(void *arg);
 bool dynamixel_motor_init();
+bool check_vaild_dxl_from_id(int id);
 
 
 extern dxl_pro_data dxlLists[4][10];
