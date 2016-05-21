@@ -41,8 +41,8 @@ Here is some guide line to use these packages.
 State machine
 ##Vision
 Vision
-##Dynamixel PRO(Realtime)
-Dynamixel Pro node (xenomai)
+##Dynamixel PRO(Realtime)<br />
+Dynamixel Pro node (xenomai)<br />
 
 1. Required Device <br />
   (1) DS-MPE-SER4M<br />
@@ -82,7 +82,7 @@ Dynamixel Pro node (xenomai)
   	- Publish target angle datas(Radian) to joint_set <br />
   
   (3) Joint Data <br />
-	- Current joint state datas are published via /rt_dynamixel/joint_state (400 Hz) <br />
+	- Current joint state datas are published via /rt_dynamixel/joint_state (333.3 Hz) <br />
 	- If motor set service is called, data updating is stopped shortly. <br />
 
 ##User Interface
