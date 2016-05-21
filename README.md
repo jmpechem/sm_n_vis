@@ -55,34 +55,35 @@ Dynamixel Pro node (xenomai)
   (3) rt_dynamixel_msgs (included)<br />
 
 3. How to use?<br />
-  - First boot
-  	- Run serial_setup.sh
+  - First boot<br />
+  	- Run serial_setup.sh<br />
   
-  - Service name
-  	- Mode Setting (Server): 	/rt_dynamixel/mode
-  	- Motor Setting (Server):	/rt_dynamixel/motor_set
+  - Service name<br />
+  	- Mode Setting (Server): 	/rt_dynamixel/mode<br />
+  	- Motor Setting (Server):	/rt_dynamixel/motor_set<br />
+ 
   - Topic name
-  	- Joint State (Publish): 	/rt_dynamixel/joint_state
-  	- Joint Set (Subscribe): 	/rt_dynamixel/joint_set
+  	- Joint State (Publish): 	/rt_dynamixel/joint_state<br />
+  	- Joint Set (Subscribe): 	/rt_dynamixel/joint_set<br />
 
-  (1) Setting Mode
-	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::SETTING)
-	- Call a ros service to set a motor (rt_dynamixel_msgs::MotorSetting)
+  (1) Setting Mode<br />
+	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::SETTING)<br />
+	- Call a ros service to set a motor (rt_dynamixel_msgs::MotorSetting)<br />
 	
-	- Modes
-		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_GOAL_POSITION
-			id = target motor id
-			fvalue = radian
-		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_TORQUE_ENABLE
-			value = 1 or 0 (torque ON = 1, OFF = 0)
+	- Modes<br />
+		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_GOAL_POSITION<br />
+			id = target motor id<br />
+			fvalue = radian<br />
+		mode = rt_dynamixel_msgs::MotorSettingRequest::SET_TORQUE_ENABLE<br />
+			value = 1 or 0 (torque ON = 1, OFF = 0)<br />
 
-  (2) Freerun Mode (400 Hz)
-  	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN)
-  	- Publish target angle datas(Radian) to joint_set
+  (2) Freerun Mode (333.3 Hz, Duration 3ms) <br />
+  	- Call a ros service to change the mode (rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN) <br />
+  	- Publish target angle datas(Radian) to joint_set <br />
   
-  (3) Joint Data
-	- Current joint state datas are published via /rt_dynamixel/joint_state (400 Hz)
-	- If motor set service is called, data updating is stopped shortly.
+  (3) Joint Data <br />
+	- Current joint state datas are published via /rt_dynamixel/joint_state (400 Hz) <br />
+	- If motor set service is called, data updating is stopped shortly. <br />
 
 ##User Interface
 Qt based user interface
