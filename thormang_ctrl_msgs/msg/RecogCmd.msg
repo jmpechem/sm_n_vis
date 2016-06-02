@@ -1,0 +1,5 @@
+uint8[] id
+float64[] angle
+float64[] velocity
+float64[] current
+

@@ -44,7 +44,7 @@ dxl_pro_data dxlLists[4][10] = {
         // Index: 2: 3-Right Lower body
 
         {15, H54},    // Fatal
-        //{17, H54},    // Fatal
+        {17, H54},    // Fatal
         {19, H54},    // Warning
         {21, H54},    // Warning
         {23, H54},

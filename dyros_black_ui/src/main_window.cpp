@@ -138,7 +138,95 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
         QObject::connect(button_joint_ctrl[i][1], SIGNAL(clicked()), this, SLOT(jointCtrlPlusClicked()));
         QObject::connect(button_joint_ctrl[i][2], SIGNAL(clicked()), this, SLOT(jointCtrlSetClicked()));
     }
+    // -- Task Control Set
+    for (int i = 0; i < 12; i++)
+    {
+        button_task_ctrl[i][0] = new QPushButton("<");
+        button_task_ctrl[i][1] = new QPushButton(">");
 
+        doubleSpin_task_ctrl[i] = new QDoubleSpinBox;
+
+        QString text = "";
+        switch(i)
+        {
+            case 0:
+                text = "left arm x";
+                break;
+            case 1:
+                text = "left arm y";
+                break;
+            case 2:
+                text = "left arm z";
+                break;
+            case 3:
+                text = "left arm roll";
+                break;
+            case 4:
+                text = "left arm pitch";
+            break;
+            case 5:
+                text = "left arm yaw";
+            break;
+            case 6:
+                text = "right arm x";
+            break;
+            case 7:
+                text = "right arm y";
+            break;
+            case 8:
+                text = "right arm z";
+            break;
+            case 9:
+                text = "right arm roll";
+            break;
+            case 10:
+                text = "right arm pitch";
+            break;
+            case 11:
+                text = "right arm yaw";
+            break;
+        }
+
+        label_task_ctrl[i] = new QLabel(text);
+        //labels_joint_ctrl_ids[i].setText(text);
+
+        button_task_ctrl[i][0]->setMaximumWidth(40);
+        button_task_ctrl[i][1]->setMaximumWidth(40);
+
+        button_task_ctrl[i][0]->setObjectName(tr("%1").arg(i+1));
+        button_task_ctrl[i][1]->setObjectName(tr("%1").arg(i+1));
+
+        doubleSpin_task_ctrl[i]->setMinimumWidth(80);
+        doubleSpin_task_ctrl[i]->setValue(0.0);
+        doubleSpin_task_ctrl[i]->setMinimum(0.0);
+        doubleSpin_task_ctrl[i]->setMaximum(30.0);
+
+        label_task_ctrl[i]->setMaximumWidth(100);
+        //label_task_ctrl[i]->setAlignment(Qt::AlignCenter);
+
+        if(i<6)
+        {
+            ui.gridLayout_task_ctrl->addWidget(label_task_ctrl[i]     , i, 0, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(doubleSpin_task_ctrl[i], i, 1, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(button_task_ctrl[i][0] , i, 2, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(button_task_ctrl[i][1] , i, 3, Qt::AlignTop);
+        }
+        else
+        {
+            ui.gridLayout_task_ctrl->addWidget(label_task_ctrl[i]     , i+1, 0, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(doubleSpin_task_ctrl[i], i+1, 1, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(button_task_ctrl[i][0] , i+1, 2, Qt::AlignTop);
+            ui.gridLayout_task_ctrl->addWidget(button_task_ctrl[i][1] , i+1, 3, Qt::AlignTop);
+        }
+
+
+        QObject::connect(button_task_ctrl[i][0], SIGNAL(clicked()), this, SLOT(taskCtrlMinusClicked()));
+        QObject::connect(button_task_ctrl[i][1], SIGNAL(clicked()), this, SLOT(taskCtrlPlusClicked()));
+    }
+    label_task_ctrl[12] = new QLabel("");
+    ui.gridLayout_task_ctrl->addWidget(label_task_ctrl[12] , 6, 0, Qt::AlignTop);
+
+    ui.gridLayout_task_ctrl->setColumnStretch(1,1);
     updateUI();
 
 }
@@ -176,12 +264,16 @@ void MainWindow::updateUI()
         ui.groupBox_state->setEnabled(true);
         ui.groupBox_joint_ctrl->setEnabled(true);
         ui.groupBox_task_ctrl->setEnabled(true);
+        ui.groupBox_recog_ctrl->setEnabled(true);
+        ui.groupBox_walk_ctrl->setEnabled(true);
     }
     else
     {
         ui.groupBox_state->setEnabled(false);
         ui.groupBox_joint_ctrl->setEnabled(false);
         ui.groupBox_task_ctrl->setEnabled(false);
+        ui.groupBox_recog_ctrl->setEnabled(false);
+        ui.groupBox_walk_ctrl->setEnabled(false);
     }
 }
 
@@ -258,6 +350,56 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 }
 
 
+void MainWindow::on_button_walk_start_clicked()
+{
+    thormang_ctrl_msgs::WalkingCmd msg;
+    msg.command = "start";
+    msg.planner = ui.comboBox_walk_planner->currentText().toStdString();
+    msg.walking_alg = ui.comboBox_walk_algorithm->currentText().toStdString();
+    msg.x = ui.doubleSpinBox_walk_x->value();
+    msg.y = ui.doubleSpinBox_walk_y->value();
+    msg.height = ui.doubleSpinBox_walk_height->value();
+    msg.theta = ui.doubleSpinBox_walk_theta->value();
+    msg.imp_time = ui.doubleSpinBox_walk_imp_time->value();
+    msg.recov_time= ui.doubleSpinBox_walk_recov_time->value();
+
+    qnode.send_walking_cmd(msg);
+}
+
+void MainWindow::on_button_walk_init_clicked()
+{
+    thormang_ctrl_msgs::WalkingCmd msg;
+    msg.command = "init";
+    msg.planner = ui.comboBox_walk_planner->currentText().toStdString();
+    msg.walking_alg = ui.comboBox_walk_algorithm->currentText().toStdString();
+    msg.x = ui.doubleSpinBox_walk_x->value();
+    msg.y = ui.doubleSpinBox_walk_y->value();
+    msg.height = ui.doubleSpinBox_walk_height->value();
+    msg.theta = ui.doubleSpinBox_walk_theta->value();
+    msg.imp_time = ui.doubleSpinBox_walk_imp_time->value();
+    msg.recov_time= ui.doubleSpinBox_walk_recov_time->value();
+
+    qnode.send_walking_cmd(msg);
+
+}
+
+void MainWindow::on_button_walk_stop_clicked()
+{
+    thormang_ctrl_msgs::WalkingCmd msg;
+    msg.command = "stop";
+    msg.planner = ui.comboBox_walk_planner->currentText().toStdString();
+    msg.walking_alg = ui.comboBox_walk_algorithm->currentText().toStdString();
+    msg.x = ui.doubleSpinBox_walk_x->value();
+    msg.y = ui.doubleSpinBox_walk_y->value();
+    msg.height = ui.doubleSpinBox_walk_height->value();
+    msg.theta = ui.doubleSpinBox_walk_theta->value();
+    msg.imp_time = ui.doubleSpinBox_walk_imp_time->value();
+    msg.recov_time= ui.doubleSpinBox_walk_recov_time->value();
+
+    qnode.send_walking_cmd(msg);
+
+}
+
 void MainWindow::stateButtonClicked()
 {
     QString objName = sender()->objectName();
@@ -324,6 +466,15 @@ void MainWindow::jointCtrlSetClicked()
     double deg = doubleSpin_joint_ctrl[id-1]->value();
 
     qnode.send_joint_ctrl(id, deg); // degree
+}
+
+void MainWindow::taskCtrlMinusClicked()
+{
+
+}
+void MainWindow::taskCtrlPlusClicked()
+{
+
 }
 
 /*****************************************************************************

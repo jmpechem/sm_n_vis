@@ -274,7 +274,7 @@
       </property>
       <widget class="QWidget" name="tab_status">
        <attribute name="title">
-        <string>Ros Communications</string>
+        <string>ROS</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -944,7 +944,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -989,11 +989,296 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_task_ctrl">
-            <property name="title">
-             <string>Task Control</string>
+           <layout class="QVBoxLayout" name="verticalLayout_19" stretch="0,0,0,0">
+            <item>
+             <widget class="QGroupBox" name="groupBox_task_ctrl">
+              <property name="title">
+               <string>Task Control</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_5">
+               <item row="1" column="0">
+                <layout class="QGridLayout" name="gridLayout_task_ctrl" rowstretch="0" columnstretch="0">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>8</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>5</number>
+                 </property>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_walk_ctrl">
+              <property name="maximumSize">
+               <size>
+                <width>370</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Walking Control</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_20">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_16" stretch="0,0">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_walk_ctrl" columnstretch="0,1">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_5">
+                     <property name="text">
+                      <string>Walking Alg</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_4">
+                     <property name="text">
+                      <string>Planner</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QComboBox" name="comboBox_walk_algorithm">
+                     <item>
+                      <property name="text">
+                       <string>Open Loop</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Open + Imp</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Algorithm 1</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Algorithm 2</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Algorithm 3</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="comboBox_walk_planner">
+                     <item>
+                      <property name="text">
+                       <string>Diamond</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>WTF Plan</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_17">
+                     <item>
+                      <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,1">
+                       <item row="5" column="0">
+                        <widget class="QLabel" name="label_10">
+                         <property name="text">
+                          <string>IMP time</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="label_8">
+                         <property name="text">
+                          <string>Height</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="label_6">
+                         <property name="text">
+                          <string>X</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="0">
+                        <widget class="QLabel" name="label_9">
+                         <property name="text">
+                          <string>Theta</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="label_7">
+                         <property name="text">
+                          <string>Y</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_x"/>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_y"/>
+                       </item>
+                       <item row="3" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_height"/>
+                       </item>
+                       <item row="4" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_theta"/>
+                       </item>
+                       <item row="5" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_imp_time"/>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <item>
+                      <widget class="QPushButton" name="button_walk_init">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>35</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Init Walking</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="button_walk_start">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>35</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Walk</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="button_walk_stop">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>35</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>STOP Walking</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,1">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="label_11">
+                         <property name="text">
+                          <string>Recov time</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_recov_time"/>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_recog_ctrl">
+              <property name="title">
+               <string>Recog Control</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_6">
+               <item row="0" column="0">
+                <layout class="QGridLayout" name="gridLayout_recog_ctrl" rowstretch="0" columnstretch="0">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="horizontalSpacing">
+                  <number>8</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>5</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QPushButton" name="pushButton">
+                   <property name="text">
+                    <string>PushButton</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>

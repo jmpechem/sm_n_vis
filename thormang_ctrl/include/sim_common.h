@@ -23,6 +23,7 @@
 #include "vrep_common/simRosSynchronousTrigger.h"
 //math library
 #include "Walking_Controller.h"
+#include "Upperbody_Controller.h"
 
 #include <termios.h>
 #include <iostream>
@@ -85,7 +86,14 @@ class simulation{
    bool _Init_walking_flag;
    bool _Walking_flag;
 
+   bool _Joint_flag;
+   bool _CLIK_flag;
+
  public:
    WalkingCtrl _WalkingCtrl;
+   UpperCtrl   _UpperCtrl;
 
+   int 	       _index;
+   VectorXD    _target_q;
+   MatrixXD    _target_x;
 };

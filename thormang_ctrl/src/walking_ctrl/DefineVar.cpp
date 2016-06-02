@@ -187,5 +187,62 @@ namespace math_function{
         new_target = temp*(target-reference.translation());
 
     }
+    void
+		GetPhi(HTransform& RotationMtx1, HTransform& active_R1, Vector6D& ctrl_pos_ori, Vector3D& phi)
+	{
+
+		Matrix3D active_R = active_R1.linear();
+
+		Matrix3D x_rot,y_rot,z_rot,d_rot;
+		x_rot.setZero();
+		y_rot.setZero();
+		z_rot.setZero();
+		d_rot.setZero();
+
+		x_rot = Rotate_with_X(ctrl_pos_ori(3));
+		y_rot = Rotate_with_Y(ctrl_pos_ori(4));
+		z_rot = Rotate_with_Z(ctrl_pos_ori(5));
+		d_rot = z_rot*y_rot*x_rot*active_R;
+
+		// Get SkewSymmetric
+		Matrix3D s1_skew, s2_skew, s3_skew;
+		s1_skew.setZero();
+		s2_skew.setZero();
+		s3_skew.setZero();
+
+		Matrix3D RotationMtx = RotationMtx1.linear();
+
+		Skew(RotationMtx.col(0),s1_skew);
+		Skew(RotationMtx.col(1),s2_skew);
+		Skew(RotationMtx.col(2),s3_skew);
+
+		Vector3D s1f, s2f, s3f;
+		s1f.setZero();
+		s2f.setZero();
+		s3f.setZero();
+
+		s1f = s1_skew * d_rot.col(0);
+		s2f = s2_skew * d_rot.col(1);
+		s3f = s3_skew * d_rot.col(2);
+
+		phi = (s1f + s2f + s3f) * (-1.0/2.0);
+	}
+	VectorXD
+		ClampMaxAbs(VectorXD a, double b){
+		VectorXD c;
+		VectorXD d;
+		d.resize(7);
+		d = a;
+		for (int i=0; i<7; i++)
+			d(i) = abs(a(i));
+		double temp =d.maxCoeff();
+			if (temp <= b)
+				c = a;
+			else{
+				c= b*a/temp;
+				cout<< "Warning: Singularity" << endl; 
+			}
+		return c;
+	}
 
 }

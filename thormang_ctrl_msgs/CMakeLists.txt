@@ -10,6 +10,9 @@ add_message_files(
   FILES
   JointSet.msg
   JointState.msg
+  RecogCmd.msg
+  TaskCmd.msg
+  WalkingCmd.msg
 )
 
 

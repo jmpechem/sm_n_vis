@@ -51,6 +51,10 @@ bool QNode::init() {
     // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
     joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
+    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("thormang_ctrl/task_cmd",5);
+    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("thormang_ctrl/recog_cmd",5);
+    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
+
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
 
     isConnected = true;
@@ -71,6 +75,10 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
     joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
+    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("thormang_ctrl/task_cmd",5);
+    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("thormang_ctrl/recog_cmd",5);
+    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
+
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
 
     isConnected = true;
@@ -110,6 +118,22 @@ void QNode::send_joint_ctrl(int id, double angle)
 
         joint_ctrl_publisher.publish(msg);
     }
+}
+
+
+void QNode::send_walking_cmd(thormang_ctrl_msgs::WalkingCmd& walking_msg)
+{
+    walking_cmd_publisher.publish(walking_msg);
+}
+
+void QNode::send_recog_cmd(thormang_ctrl_msgs::RecogCmd& recog_msg)
+{
+    recog_cmd_publisher.publish(recog_msg);
+}
+
+void QNode::send_task_cmd(thormang_ctrl_msgs::TaskCmd& task_msg)
+{
+    task_cmd_publisher.publish(task_msg);
 }
 
 void QNode::jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr &msg)

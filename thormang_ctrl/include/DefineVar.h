@@ -64,4 +64,6 @@ namespace math_function{
     void Globalframe(HTransform& trunk, HTransform& reference, HTransform& new_trunk);
     void Rot2euler(Matrix3D Rot, Vector3D & angle);
     void Globalposition(Vector3D& target, HTransform& reference, Vector3D& new_target);
+    void GetPhi(HTransform& RotationMtx, HTransform& active_R, Vector6D& ctrl_pos_ori, Vector3D& phi);
+    VectorXD ClampMaxAbs(VectorXD a, double b);
 }

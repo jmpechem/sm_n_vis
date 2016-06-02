@@ -18,12 +18,20 @@ file(GLOB WALKING_SRC
   "src/walking_ctrl/*.cpp"
   "src/*.cpp"
 )
+file(GLOB UPPER_SRC
+  "src/Upperbody_ctrl/*.cpp"
+  "src/*.cpp"
+)
 add_library(thormang_ctrl_lib
    ${WALKING_SRC}
+)
+add_library(thormang_ctrl_lib2
+   ${UPPER_SRC}
 )
 add_executable(thormang_ctrl src/thormang_ctrl.cpp)
 target_link_libraries(thormang_ctrl
    ${catkin_LIBRARIES}
    thormang_ctrl_lib
+   thormang_ctrl_lib2
 )
 SET(CMAKE_BUILD_TYPE Debug)
