@@ -87,6 +87,7 @@ public:
     ros::ServiceServer motorServer;
 
     rt_dynamixel_msgs::MotorSettingRequest motorRequest;
+    rt_dynamixel_msgs::MotorSettingResponse motorResponse;
 
     RTROSMotorSettingService(ros::NodeHandle &nh);
     virtual ~RTROSMotorSettingService()

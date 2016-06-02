@@ -71,8 +71,7 @@ Q_SIGNALS:
 
 private:
 	int init_argc;
-	char** init_argv;
-	ros::Publisher chatter_publisher;
+    char** init_argv;
     ros::Publisher smach_publisher;
     ros::Publisher joint_ctrl_publisher;
 
@@ -80,6 +79,7 @@ private:
 
     QStringListModel logging_model;
 
+    bool isConnected;
     void jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr& msg);
 
 };

@@ -12,6 +12,7 @@
 #include <QtGui>
 #include <QMessageBox>
 #include <iostream>
+#include <QString>
 #include "../include/dyros_black_ui/main_window.hpp"
 
 /*****************************************************************************
@@ -30,6 +31,7 @@ using namespace Qt;
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 	: QMainWindow(parent)
 	, qnode(argc,argv)
+    , isConnected(false)
 {
 	ui.setupUi(this); // Calling this incidentally connects all ui's triggers to on_...() callbacks in this class.
     QObject::connect(ui.actionAbout_Qt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt())); // qApp is a global variable for the application
@@ -68,7 +70,77 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
         jointID.push_back(i+1);
     }
 
+    // -- State
+
+    autoMissionSelectVisible(0);
+    QObject::connect(ui.button_power_on, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_auto, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_auto_door_init, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_door_open, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_door_push, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_door_reach, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_door_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_door_start, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_auto_valve_approach, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_valve_close, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_valve_init, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_valve_reach, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_valve_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_valve_start, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_manual, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_manual_joint_ctrl, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_manual_task_ctrl, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_mode_change, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+
     // -- Joint Control Set
+    for (int i = 0; i < 32; i++)
+    {
+        button_joint_ctrl[i][0] = new QPushButton("-1");
+        button_joint_ctrl[i][1] = new QPushButton("+1");
+        button_joint_ctrl[i][2] = new QPushButton("SET");
+        doubleSpin_joint_ctrl[i] = new QDoubleSpinBox;
+
+        QString text = tr("-- [%1] --").arg(i+1);
+        label_joint_ctrl[i] = new QLabel(text);
+        //labels_joint_ctrl_ids[i].setText(text);
+
+        button_joint_ctrl[i][0]->setMaximumWidth(40);
+        button_joint_ctrl[i][1]->setMaximumWidth(40);
+        button_joint_ctrl[i][2]->setMaximumWidth(60);
+
+        button_joint_ctrl[i][0]->setObjectName(tr("%1").arg(i+1));
+        button_joint_ctrl[i][1]->setObjectName(tr("%1").arg(i+1));
+        button_joint_ctrl[i][2]->setObjectName(tr("%1").arg(i+1));
+
+        doubleSpin_joint_ctrl[i]->setMaximumWidth(80);
+        doubleSpin_joint_ctrl[i]->setValue(0.0);
+        doubleSpin_joint_ctrl[i]->setMinimum(-20.0);
+        doubleSpin_joint_ctrl[i]->setMaximum(20.0);
+
+        label_joint_ctrl[i]->setMaximumWidth(60);
+        label_joint_ctrl[i]->setAlignment(Qt::AlignCenter);
+
+
+        ui.gridLayout_joint_ctrl->addWidget(button_joint_ctrl[i][0], i, 0, Qt::AlignTop);
+        ui.gridLayout_joint_ctrl->addWidget(label_joint_ctrl[i]    , i, 1, Qt::AlignTop);
+        ui.gridLayout_joint_ctrl->addWidget(button_joint_ctrl[i][1], i, 2, Qt::AlignTop);
+        ui.gridLayout_joint_ctrl->addWidget(doubleSpin_joint_ctrl[i] , i, 3, Qt::AlignTop);
+        ui.gridLayout_joint_ctrl->addWidget(button_joint_ctrl[i][2], i, 4, Qt::AlignTop);
+
+        QObject::connect(button_joint_ctrl[i][0], SIGNAL(clicked()), this, SLOT(jointCtrlMinusClicked()));
+        QObject::connect(button_joint_ctrl[i][1], SIGNAL(clicked()), this, SLOT(jointCtrlPlusClicked()));
+        QObject::connect(button_joint_ctrl[i][2], SIGNAL(clicked()), this, SLOT(jointCtrlSetClicked()));
+    }
+
+    updateUI();
+
 }
 
 MainWindow::~MainWindow() {}
@@ -84,6 +156,35 @@ void MainWindow::showNoMasterMessage() {
     close();
 }
 
+void MainWindow::autoMissionSelectVisible(int mission)
+{
+    ui.button_auto_valve_approach->setVisible(mission==1);
+    ui.button_auto_valve_close->setVisible(mission==1);
+    ui.button_auto_valve_init->setVisible(mission==1);
+    ui.button_auto_valve_reach->setVisible(mission==1);
+    ui.button_auto_valve_ready->setVisible(mission==1);
+    ui.button_auto_door_init->setVisible(mission==2);
+    ui.button_auto_door_open->setVisible(mission==2);
+    ui.button_auto_door_push->setVisible(mission==2);
+    ui.button_auto_door_reach->setVisible(mission==2);
+    ui.button_auto_door_ready->setVisible(mission==2);
+}
+void MainWindow::updateUI()
+{
+    if(isConnected == true)
+    {
+        ui.groupBox_state->setEnabled(true);
+        ui.groupBox_joint_ctrl->setEnabled(true);
+        ui.groupBox_task_ctrl->setEnabled(true);
+    }
+    else
+    {
+        ui.groupBox_state->setEnabled(false);
+        ui.groupBox_joint_ctrl->setEnabled(false);
+        ui.groupBox_task_ctrl->setEnabled(false);
+    }
+}
+
 /*
  * These triggers whenever the button is clicked, regardless of whether it
  * is already checked or not.
@@ -95,6 +196,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
 			showNoMasterMessage();
 		} else {
 			ui.button_connect->setEnabled(false);
+            isConnected = true;
 		}
 	} else {
 		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
@@ -105,14 +207,21 @@ void MainWindow::on_button_connect_clicked(bool check ) {
 			ui.line_edit_master->setReadOnly(true);
 			ui.line_edit_host->setReadOnly(true);
 			ui.line_edit_topic->setReadOnly(true);
+            isConnected = true;
 		}
 	}
+    updateUI();
 }
 
+/*
 
 void MainWindow::on_manuButton_clicked(bool check )
 {
     qnode.send_transition("manu_on");
+}
+void MainWindow::on_autoButton_clicked(bool check)
+{
+    qnode.send_transition("auto_on");
 }
 
 void MainWindow::on_button_joint_control_clicked(bool check)
@@ -124,7 +233,8 @@ void MainWindow::on_button_power_on_clicked(bool check)
 {
     qnode.send_transition("power_on");
 }
-
+*/
+/*
 void MainWindow::on_button_plus_clicked(bool check)
 {
     qnode.send_joint_ctrl(1,1.0); // degree
@@ -134,7 +244,7 @@ void MainWindow::on_button_minus_clicked(bool check)
 {
     qnode.send_joint_ctrl(1,-1.0);
 }
-
+*/
 void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	bool enabled;
 	if ( state == 0 ) {
@@ -145,6 +255,75 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	ui.line_edit_master->setEnabled(enabled);
 	ui.line_edit_host->setEnabled(enabled);
 	//ui.line_edit_topic->setEnabled(enabled);
+}
+
+
+void MainWindow::stateButtonClicked()
+{
+    QString objName = sender()->objectName();
+    std::string state;
+    if(objName.compare("button_power_on") == 0)  {
+        state = "power_on";
+    } else if (objName.compare("button_auto") == 0) {
+        state = "auto_on";
+    } else if (objName.compare("button_auto_valve_start") == 0) {
+        state = "mission1";
+        autoMissionSelectVisible(1);
+    } else if (objName.compare("button_auto_valve_approach") == 0) {
+        state = "v_approach";
+    } else if (objName.compare("button_auto_valve_close") == 0) {
+        state = "v_close";
+    } else if (objName.compare("button_auto_valve_init") == 0) {
+        state = "v_init";
+    } else if (objName.compare("button_auto_valve_reach") == 0) {
+        state = "v_reach";
+    } else if (objName.compare("button_auto_valve_ready") == 0) {
+        state = "v_ready";
+    } else if (objName.compare("button_auto_door_start") == 0) {
+        state = "mission2";
+        autoMissionSelectVisible(2);
+    } else if (objName.compare("button_auto_door_init") == 0) {
+        state = "d_init";
+    } else if (objName.compare("button_auto_door_open") == 0) {
+        state = "d_open";
+    } else if (objName.compare("button_auto_door_push") == 0) {
+        state = "d_push";
+    } else if (objName.compare("button_auto_door_reach") == 0) {
+        state = "d_reach";
+    } else if (objName.compare("button_auto_door_ready") == 0) {
+        state = "d_ready";
+    } else if (objName.compare("button_manual") == 0) {
+        state = "manu_on";
+    } else if (objName.compare("button_manual_joint_ctrl") == 0) {
+        state = "activate_jctrl";
+    } else if (objName.compare("button_manual_task_ctrl") == 0) {
+        state = "activate_tctrl";
+    } else if (objName.compare("button_mode_change") == 0) {
+        state = "cmd_modechg";
+    }
+    qnode.send_transition(state);
+}
+
+void MainWindow::jointCtrlMinusClicked()
+{
+    int id = sender()->objectName().toInt();
+
+    qnode.send_joint_ctrl(id,-1.0); // degree
+}
+
+void MainWindow::jointCtrlPlusClicked()
+{
+    int id = sender()->objectName().toInt();
+
+    qnode.send_joint_ctrl(id,1.0); // degree
+}
+
+void MainWindow::jointCtrlSetClicked()
+{
+    int id = sender()->objectName().toInt();
+    double deg = doubleSpin_joint_ctrl[id-1]->value();
+
+    qnode.send_joint_ctrl(id, deg); // degree
 }
 
 /*****************************************************************************

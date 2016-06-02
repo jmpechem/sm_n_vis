@@ -17,6 +17,10 @@
 #include "ui_main_window.h"
 #include "qnode.hpp"
 #include <QPushButton>
+#include <QVarLengthArray>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
 
 /*****************************************************************************
 ** Namespace
@@ -42,19 +46,48 @@ public:
 
 	void closeEvent(QCloseEvent *event); // Overloaded function
 	void showNoMasterMessage();
+    void autoMissionSelectVisible(int mission);
+    void updateUI();
 
 public Q_SLOTS:
 	/******************************************
 	** Auto-connections (connectSlotsByName())
 	*******************************************/
     void on_actionAbout_triggered();
-    void on_button_connect_clicked(bool check );
-    void on_manuButton_clicked(bool check );
+    void on_button_connect_clicked(bool check);
+
+    /*
+    void on_button_manual_clicked(bool check);
+    void on_button_manual_task_ctrl_clicked(bool check);
+    void on_button_manual_joint_ctrl_clicked(bool check);
+
+    void on_button_auto_clicked(bool check);
+    void on_button_auto_door_clicked(bool check);
+    void on_button_auto_door_init_clicked(bool check);
+    void on_button_auto_door_open_clicked(bool check);
+    void on_button_auto_door_push_clicked(bool check);
+    void on_button_auto_door_reach_clicked(bool check);
+    void on_button_auto_door_ready_clicked(bool check);
+    void on_button_auto_door_start_clicked(bool check);
+
+    void on_button_auto_valve_clicked(bool check);
+
     void on_button_joint_control_clicked(bool check);
+
     void on_button_power_on_clicked(bool check);
-    void on_button_minus_clicked(bool check);
-    void on_button_plus_clicked(bool check);
+    */
+//    void on_button_minus_clicked(bool check);
+//    void on_button_plus_clicked(bool check);
 	void on_checkbox_use_environment_stateChanged(int state);
+
+
+    /******************************************
+    ** Code based UI connections
+    *******************************************/
+    void stateButtonClicked();
+    void jointCtrlMinusClicked();
+    void jointCtrlPlusClicked();
+    void jointCtrlSetClicked();
 
     /******************************************
     ** Manual connections
@@ -66,7 +99,22 @@ private:
 	Ui::MainWindowDesign ui;
 	QNode qnode;
     std::vector<int> jointID;
+    bool isConnected;
 
+
+    // -- UI
+    // ---- Joint Ctrl
+
+    QPushButton *button_joint_ctrl[32][3];
+    QDoubleSpinBox *doubleSpin_joint_ctrl[32];
+    QLabel *label_joint_ctrl[32];
+    /*
+    QVarLengthArray<QPushButton, 32> buttons_minus5;
+    QVarLengthArray<QPushButton, 32> buttons_minus1;
+    QVarLengthArray<QLabel, 32> labels_joint_ctrl_ids;
+    QVarLengthArray<QPushButton, 32> buttons_plus1;
+    QVarLengthArray<QPushButton, 32> buttons_plus5;
+    */
 };
 /*
 class QJointControlButtonFrame : public QFrame {

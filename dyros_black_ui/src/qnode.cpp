@@ -29,7 +29,8 @@ namespace dyros_black_ui {
 
 QNode::QNode(int argc, char** argv ) :
 	init_argc(argc),
-	init_argv(argv)
+    init_argv(argv),
+    isConnected(false)
 	{}
 
 QNode::~QNode() {
@@ -47,13 +48,12 @@ bool QNode::init() {
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	ros::NodeHandle n;
-	// Add your ros communications here.
-	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
     joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
 
-
+    isConnected = true;
 	start();
 	return true;
 }
@@ -68,12 +68,12 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	ros::NodeHandle n;
-	// Add your ros communications here.
-	chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
     joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
 
+    isConnected = true;
 	start();
 	return true;
 }
@@ -93,17 +93,23 @@ void QNode::run() {
 
 void QNode::send_transition(std::string str)
 {
-    std_msgs::String msg;
-    msg.data = str;
-    smach_publisher.publish(msg);
+    if(isConnected)
+    {
+        std_msgs::String msg;
+        msg.data = str;
+        smach_publisher.publish(msg);
+    }
 }
 void QNode::send_joint_ctrl(int id, double angle)
 {
-    thormang_ctrl_msgs::JointSet msg;
-    msg.angle = angle;
-    msg.id = id;
+    if(isConnected)
+    {
+        thormang_ctrl_msgs::JointSet msg;
+        msg.angle = angle;
+        msg.id = id;
 
-    joint_ctrl_publisher.publish(msg);
+        joint_ctrl_publisher.publish(msg);
+    }
 }
 
 void QNode::jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr &msg)

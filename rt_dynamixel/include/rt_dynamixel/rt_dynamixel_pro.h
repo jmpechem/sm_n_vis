@@ -340,6 +340,8 @@ namespace DXL_PRO {
         void setIDList(int motorNum, dxl_pro_data *motorList);      ///< Set ID List for whole control.
 
         // non control loop function
+
+        int getHomingOffset(int index, int nValue, long *value, int* error);
         int setHomingOffset(int index, int nValue, int* error);
         // non control loop function
         int setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error);

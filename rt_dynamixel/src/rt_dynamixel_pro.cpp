@@ -337,7 +337,7 @@ int rt_dynamixel::RxPacket(unsigned char *rxpacket)
     return result;
 }
 
-int rt_dynamixel::TxRxPacket(unsigned char *txpacket, unsigned char *rxpacket, int *error)
+int rt_dynamixel:: TxRxPacket(unsigned char *txpacket, unsigned char *rxpacket, int *error)
 {
     int result = COMM_TXFAIL;
 
@@ -816,7 +816,7 @@ void RTDynamixelPro::setIDList(int motorNum, dxl_pro_data * motorList)
 
 int RTDynamixelPro::setHomingOffset(int index, int nValue, int* error)
 {
-    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    if(checkControlLoopEnabled("set homing offset"))  { return 1; }
     rttLoopStartTime = rt_timer_read();
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
@@ -825,14 +825,24 @@ int RTDynamixelPro::setHomingOffset(int index, int nValue, int* error)
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nValue));
     _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nValue));
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nValue));
-    Write(vMotorData[index].id, 13, _nParam, _pbParams, error);
+    return Write(vMotorData[index].id, 13, _nParam, _pbParams, error);
+}
+
+int RTDynamixelPro::getHomingOffset(int index, int nValue, long *value, int* error)
+{
+    if(checkControlLoopEnabled("homing offset"))  { return 1; }
+    rttLoopStartTime = rt_timer_read();
+    rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
+
+    return ReadDWord(vMotorData[index].id, 13, value, error);
+
 }
 
 
 // non control loop function
 int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocityPGain, int* error)
 {
-    if(checkControlLoopEnabled("velocity gain"))  { return 1; }
+    if(checkControlLoopEnabled("get velocity gain"))  { return 1; }
     rttLoopStartTime = rt_timer_read();
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
@@ -841,7 +851,7 @@ int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocity
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nVelocityIGain));
     _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nVelocityPGain));
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nVelocityPGain));
-    Write(vMotorData[index].id, 586, _nParam, _pbParams, error);
+    return Write(vMotorData[index].id, 586, _nParam, _pbParams, error);
 }
 
 int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
@@ -853,7 +863,7 @@ int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
     unsigned int _nParam = 0;
     _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nPositionPGain));
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nPositionPGain));
-    Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
+    return Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
 }
 
 int RTDynamixelPro::setAimRadian(int index, double radian, int *error)
@@ -879,7 +889,7 @@ int RTDynamixelPro::setAimRadian(int index, double radian, int *error)
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(position));
     _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(position));
     _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(position));
-    Write(vMotorData[index].id, 596, _nParam, _pbParams, error);
+    return Write(vMotorData[index].id, 596, _nParam, _pbParams, error);
 
 }
 

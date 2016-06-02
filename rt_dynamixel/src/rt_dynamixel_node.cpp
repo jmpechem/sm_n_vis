@@ -38,6 +38,8 @@ int main(int argc, char **argv)
 
     // Get initial pose and set default settings
     if(dynamixel_motor_init() == false) return -1;
+    // dynamixel_motor_init();
+
 
     // Enable ROS Service, Pub and Sub
     RTROSPublisher rtRosPublisher(nh);

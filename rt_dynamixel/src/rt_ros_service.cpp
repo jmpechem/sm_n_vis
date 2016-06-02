@@ -1,4 +1,4 @@
-#include "rt_ros_service.h"
+    #include "rt_ros_service.h"
 
 //RTIME control_period = 25e5;
 
@@ -100,7 +100,7 @@ bool RTROSMotorSettingService::motorSet(rt_dynamixel_msgs::MotorSettingRequest &
 
     RT_TASK rttMotorSetTask;
     rt_task_create(&rttMotorSetTask,"dxl motorset service",0,7,T_JOINABLE);
-    res.result = -1;
+    motorResponse.result = -1;
 
     motorRequest = req;
     rt_task_start(&rttMotorSetTask, &motor_set_proc, (void*)this);
@@ -108,7 +108,8 @@ bool RTROSMotorSettingService::motorSet(rt_dynamixel_msgs::MotorSettingRequest &
 
     rt_task_delete(&rttMotorSetTask);
 
-    res.result = req.mode;
+    res = motorResponse;
+    //res.result = req.mode;
 
     for(int i=0; i<4; i++)
     {
@@ -213,13 +214,38 @@ void motor_set_proc(void *arg)
         for (int i=0; i<4; i++)
         {
             dxlDevice[i].setAllTorque(pObj->motorRequest.value);
+            pObj->motorResponse.result = pObj->motorRequest.mode;
         }
         break;
 
     case rt_dynamixel_msgs::MotorSettingRequest::SET_GOAL_POSITION:
-        channel = dxlID2Addr[pObj->motorRequest.id].channel;
-        index = dxlID2Addr[pObj->motorRequest.id].index;
-        dxlDevice[channel].setAimRadian(index,pObj->motorRequest.fvalue,&error);
+        if(check_vaild_dxl_from_id(pObj->motorRequest.id))
+        {
+            channel = dxlID2Addr[pObj->motorRequest.id].channel;
+            index = dxlID2Addr[pObj->motorRequest.id].index;
+            dxlDevice[channel].setAimRadian(index,pObj->motorRequest.fvalue,&error);
+            pObj->motorResponse.result = pObj->motorRequest.mode;
+        }
+        break;
+
+    case rt_dynamixel_msgs::MotorSettingRequest::GET_HOMING_OFFSET:
+        if(check_vaild_dxl_from_id(pObj->motorRequest.id))
+        {
+            channel = dxlID2Addr[pObj->motorRequest.id].channel;
+            index = dxlID2Addr[pObj->motorRequest.id].index;
+            dxlDevice[channel].getHomingOffset(index,pObj->motorRequest.value,&pObj->motorResponse.value,&error);
+            pObj->motorResponse.result = pObj->motorRequest.mode;
+            //pObj->motorResponse
+        }
+        break;
+
+    case rt_dynamixel_msgs::MotorSettingRequest::SET_HOMING_OFFSET:
+        if(check_vaild_dxl_from_id(pObj->motorRequest.id))
+        {
+            channel = dxlID2Addr[pObj->motorRequest.id].channel;
+            index = dxlID2Addr[pObj->motorRequest.id].index;
+            pObj->motorResponse.result = pObj->motorRequest.mode;
+        }
         break;
 
     default:
