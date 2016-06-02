@@ -1,9 +1,0 @@
-# a comment - this is ignored
-*.cpp~
-*.h~
-*.xml~
-*.rviz~
-*.txt~
-*.launch~
-*.yaml~
-*.sh~
