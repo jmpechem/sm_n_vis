@@ -16,6 +16,9 @@
 
 #include "thormang_ctrl_msgs/JointSet.h"
 #include "thormang_ctrl_msgs/JointState.h"
+#include "thormang_ctrl_msgs/WalkingCmd.h"
+#include "thormang_ctrl_msgs/RecogCmd.h"
+#include "thormang_ctrl_msgs/TaskCmd.h"
 
 //math library
 #include "Walking_Controller.h"
@@ -34,9 +37,13 @@ class realrobot{
  public:
    realrobot(); // constructor for initialize node
 
+   // --------- CALLBACK
    void JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint); // current joint value callback
    void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr& smach);
    void UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr& joint);
+   void WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg);
+   void TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg);
+   void RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg);
    //void ftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft); // current left ft sensor value callback
 
    void change_dxl_mode(int mode);
@@ -62,6 +69,10 @@ class realrobot{
    ros::Publisher dxlJointSetPub;
    ros::Subscriber dxlJointSub;
 
+   ros::Subscriber walkingCmdSub;
+   ros::Subscriber taskCmdSub;
+   ros::Subscriber recogCmdSub;
+
    ros::Publisher smachPub;
    ros::Subscriber smachSub;
 
@@ -69,6 +80,7 @@ class realrobot{
    ros::Subscriber jointCtrlSub;
    bool jointCtrlMsgRecv;
 
+   thormang_ctrl_msgs::WalkingCmd walkingCmdMsg;
    thormang_ctrl_msgs::JointSet jointCtrlMsg;
    rt_dynamixel_msgs::JointSet jointSetMsg;
 

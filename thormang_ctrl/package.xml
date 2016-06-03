@@ -12,11 +12,15 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>vrep_common</build_depend>
+  <build_depend>rt_dynamixel_msgs</build_depend>
+  <build_depend>thormang_ctrl_msgs</build_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>vrep_common</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>rt_dynamixel_msgs</run_depend>
+  <run_depend>thormang_ctrl_msgs</run_depend>
 
 
   <export>

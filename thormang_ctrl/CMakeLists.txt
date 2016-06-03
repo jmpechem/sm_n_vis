@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 2.8.3)
 project(thormang_ctrl)
 
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
   roscpp
-  sensor_msgs
-  std_msgs
   vrep_common
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  rt_dynamixel_msgs
+  thormang_ctrl_msgs
 )
 catkin_package()
 

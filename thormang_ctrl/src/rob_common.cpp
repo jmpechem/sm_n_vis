@@ -14,6 +14,10 @@ realrobot::realrobot() : uiUpdateCount(0), isFirstBoot(true)
     dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
 
+    walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd",1,&realrobot::WalkingCmdCallback,this);
+    taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd",1,&realrobot::TaskCmdCallback,this);
+    recogCmdSub = nh.subscribe("thormang_ctrl/recog_cmd",1,&realrobot::RecogCmdCallback,this);
+
     jointStateUIPub = nh.advertise<thormang_ctrl_msgs::JointState>("thormang_ctrl/joint_state",1);
     jointCtrlSub = nh.subscribe("thormang_ctrl/joint_ctrl",1,&realrobot::UIJointCtrlCallback,this);
 
@@ -63,6 +67,23 @@ void realrobot::SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &sm
 {
     smach_state = smach->active_states[0];
 }
+
+
+void realrobot::WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg)
+{
+    walkingCmdMsg = *msg;
+}
+
+void realrobot::TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg)
+{
+
+}
+
+void realrobot::RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg)
+{
+
+}
+
 
 void realrobot::change_dxl_mode(int mode)
 {
