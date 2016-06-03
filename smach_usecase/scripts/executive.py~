@@ -428,7 +428,7 @@ class Wall_Push(smach.State):
 def cb(data):
     global trans_tag
     trans_tag = data.data
-    rospy.loginfo(data.data)
+#    rospy.loginfo(data.data)
 #    rospy.loginfo(trans_tag)
 
 

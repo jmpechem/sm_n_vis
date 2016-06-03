@@ -119,7 +119,7 @@ class Valve_Mission(smach.State):
 	def __init__(self):
 	    smach.State.__init__(self, outcomes=['v_init','v_ready','v_approach','v_reach','v_close','loop'])
 	def execute(self, userdata):
-	    if trans_tag == 'v_init':
+	    if trans_tag == 'v_init':	    
 	       return 'v_init'
 	    elif trans_tag == 'v_ready':
 		return 'v_ready'

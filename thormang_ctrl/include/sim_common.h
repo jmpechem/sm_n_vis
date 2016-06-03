@@ -15,7 +15,8 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
-
+#include <std_msgs/String.h>
+#include <smach_msgs/SmachContainerStatus.h>
 // Used API services:
 #include "vrep_common/simRosEnablePublisher.h"
 #include "vrep_common/simRosEnableSubscriber.h"
@@ -39,6 +40,7 @@ class simulation{
    void JointCallback(const sensor_msgs::JointState::ConstPtr& joint); // vrep current joint value callback
    void LftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft); // vrep current left ft sensor value callback
    void RftCallback(const vrep_common::ForceSensorData::ConstPtr& Rft); // vrep current left ft sensor value callback
+   void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &smach);
 //   vrep_common::JointSetStateData Initialize_handler(ros::ServiceClient vrepHandleClient);
    void vrep_start();
    void vrep_initialize();
@@ -52,6 +54,8 @@ class simulation{
    void vrep_end();
    void vrep_stop();
 
+   bool check_state_changed();
+
  private:
    ros::NodeHandle nh; // node handle for simlation Class  
    vrep_common::JointSetStateData JointSetValue; // Vrep desired joint value(for sending to vrep simulator)
@@ -62,6 +66,10 @@ class simulation{
    ros::ServiceClient start_simulation;
    ros::ServiceClient end_simulation;
    ros::Publisher vrepJointSetPub;
+   ros::Publisher smachPub;
+   ros::Subscriber smachSub;
+   string smach_state;
+   string before_state;
    bool simulationRunning;
    float simulationTime; // current simulation time
    ros::ServiceClient vrepHandleClient;
@@ -88,6 +96,7 @@ class simulation{
 
    bool _Joint_flag;
    bool _CLIK_flag;
+
 
  public:
    WalkingCtrl _WalkingCtrl;
