@@ -160,5 +160,14 @@ void realrobot::writedevice()
             set_aim_position(jointCtrlMsg.id,aimPos);
         }
     }
+    else
+    {
+        for(int i=0; i< total_dof; i++)
+        {
+            jointSetMsg.angle[i] = _desired_q(i);
+        }
+        dxlJointSetPub.publish(jointSetMsg);
+
+    }
 }
 

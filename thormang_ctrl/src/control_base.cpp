@@ -2,7 +2,11 @@
 #include "control_base.h"
 
 // Constructor
-controlBase::controlBase() : uiUpdateCount(0), isFirstBoot(true)
+controlBase::controlBase() :
+    uiUpdateCount(0),
+    isFirstBoot(true),
+    _Init_walking_flag(false),
+    _Walking_flag(false)
 {
     total_dof = 28;
 

@@ -15,7 +15,7 @@ int main(int argc, char **argv)
   controlBase *ctrObj = new realrobot;
   // controlBase *ctrObj = new simulation;
 
-  ros::Rate r(100);
+  ros::Rate r(300);
 
   while(ros::ok())
   {
