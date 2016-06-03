@@ -1,10 +1,7 @@
 #include "rob_common.h"
 
-realrobot::realrobot() : uiUpdateCount(0), isFirstBoot(true)
+realrobot::realrobot()
 {
-
-    total_dof = 28; //
-
     dxlMode = rt_dynamixel_msgs::ModeSettingRequest::SETTING;
     dxlTorque = 0;
 
@@ -14,26 +11,8 @@ realrobot::realrobot() : uiUpdateCount(0), isFirstBoot(true)
     dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
 
-    walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd",1,&realrobot::WalkingCmdCallback,this);
-    taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd",1,&realrobot::TaskCmdCallback,this);
-    recogCmdSub = nh.subscribe("thormang_ctrl/recog_cmd",1,&realrobot::RecogCmdCallback,this);
-
-    jointStateUIPub = nh.advertise<thormang_ctrl_msgs::JointState>("thormang_ctrl/joint_state",1);
-    jointCtrlSub = nh.subscribe("thormang_ctrl/joint_ctrl",1,&realrobot::UIJointCtrlCallback,this);
-
-    smachPub = nh.advertise<std_msgs::String>("transition",1);
-    smachSub = nh.subscribe("Jimin_machine/smach/container_status",1,&realrobot::SmachCallback,this);
-
-    parameter_initialize();
     make_id_inverse_list();
 }
-
-void realrobot::UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr &joint)
-{
-    jointCtrlMsg = *joint;
-    jointCtrlMsgRecv = true;
-}
-
 void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint)
 {
     /*
@@ -62,28 +41,6 @@ void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint
     if(isFirstBoot)
     {isFirstBoot = false;}
 }
-
-void realrobot::SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &smach)
-{
-    smach_state = smach->active_states[0];
-}
-
-
-void realrobot::WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg)
-{
-    walkingCmdMsg = *msg;
-}
-
-void realrobot::TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg)
-{
-
-}
-
-void realrobot::RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg)
-{
-
-}
-
 
 void realrobot::change_dxl_mode(int mode)
 {
@@ -152,19 +109,7 @@ void realrobot::make_id_inverse_list()
     jointSetMsg.angle.resize(total_dof);
 }
 
-void realrobot::parameter_initialize()
-{
-    q.resize(total_dof); q.setZero();
-    q_dot.resize(total_dof); q_dot.setZero();
-    torque.resize(total_dof); torque.setZero();
-    LFT.setZero();  RFT.setZero(); Gyro.setZero();
-    _desired_q.resize(total_dof); _desired_q.setZero();
-}
 
-void realrobot::readdevice()
-{
-    ros::spinOnce();
-}
 
 void realrobot::update()
 {
@@ -254,43 +199,3 @@ void realrobot::writedevice()
     }
 }
 
-
-int realrobot::getch()
-{
-        fd_set set;
-        struct timeval timeout;
-        int rv;
-        char buff = 0;
-        int len = 1;
-        int filedesc = 0;
-        FD_ZERO(&set);
-        FD_SET(filedesc, &set);
-
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 100;
-
-        rv = select(filedesc + 1, &set, NULL, NULL, &timeout);
-
-        struct termios old = {0};
-        if (tcgetattr(filedesc, &old) < 0)
-            ROS_ERROR("tcsetattr()");
-        old.c_lflag &= ~ICANON;
-        old.c_lflag &= ~ECHO;
-        old.c_cc[VMIN] = 1;
-        old.c_cc[VTIME] = 0;
-        if (tcsetattr(filedesc, TCSANOW, &old) < 0)
-            ROS_ERROR("tcsetattr ICANON");
-
-        if(rv == -1)
-        { }
-        else if(rv == 0)
-          {}
-        else
-            read(filedesc, &buff, len );
-
-        old.c_lflag |= ICANON;
-        old.c_lflag |= ECHO;
-        if (tcsetattr(filedesc, TCSADRAIN, &old) < 0)
-            ROS_ERROR ("tcsetattr ~ICANON");
-        return (buff);
-}
