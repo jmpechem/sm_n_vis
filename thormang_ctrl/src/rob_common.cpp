@@ -113,44 +113,7 @@ void realrobot::make_id_inverse_list()
 
 void realrobot::update()
 {
-    key_cmd = getch();
 }
-
-void realrobot::compute()
-{
-    if (key_cmd == 'i')
-    {
-        ROS_INFO("Init Walking");
-        _Init_walking_flag = true;
-        _Walking_flag = true;
-        _WalkingCtrl._initialize();
-    }
-    else if (key_cmd == 'w')
-    {
-        ROS_INFO("Walking Command");
-        _Walking_flag = true;
-        _Init_walking_flag = false;
-        _WalkingCtrl._initialize();
-    }
-    else if (key_cmd == 'q')
-    {
-       ROS_INFO("q trigger");
-  // vrep_stop();
-    }
-
-    if(_Init_walking_flag == true)
-    {
-        _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
-        _WalkingCtrl.Init_walking_pose(_desired_q);
-    }
-    else if (_Walking_flag == true)
-    {
-         _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
-         _WalkingCtrl.compute(_desired_q);
-    }
-
-}
-
 void realrobot::reflect()
 {
     if(++uiUpdateCount > 10)

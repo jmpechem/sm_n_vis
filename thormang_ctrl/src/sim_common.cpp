@@ -17,6 +17,9 @@ simulation::simulation(){
    Lftsub = nh.subscribe("vrep/LFT",100,&simulation::LftCallback,this);
    Rftsub = nh.subscribe("vrep/RFT",100,&simulation::RftCallback,this);
    vrepJointSetPub = nh.advertise<vrep_common::JointSetStateData>("vrep/JointSet",100);   
+
+   vrep_start();
+   vrep_initialize();
 }
 void simulation::vrep_initialize()
 {     

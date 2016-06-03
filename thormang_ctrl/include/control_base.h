@@ -33,7 +33,7 @@ class controlBase
 
 public:
     controlBase();
-
+    virtual ~controlBase(){}
     // Default User Call function
     void parameter_initialize(); // initialize all parameter function(q,qdot,force else...)
     virtual void readdevice(); // read device means update all subscribed sensor data and user command

@@ -22,7 +22,6 @@ public:
    void make_id_inverse_list();
 
    void update(); // update controller based on readdevice
-   void compute(); // compute algorithm and update all class object
    void reflect(); // reflect next step actuation such as motor angle else
    void writedevice(); // publish to actuate devices
 

@@ -4,7 +4,7 @@
 // Constructor
 controlBase::controlBase() : uiUpdateCount(0), isFirstBoot(true)
 {
-    total_dof = 32;
+    total_dof = 28;
 
     walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd",1,&controlBase::WalkingCmdCallback,this);
     taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd",1,&controlBase::TaskCmdCallback,this);
@@ -121,7 +121,7 @@ void controlBase::UpperBodyCheckState()
             //_UpperCtrl.Set_Initialize();
 
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
@@ -183,7 +183,7 @@ void controlBase::UpperBodyCheckState()
             _UpperCtrl.Set_Initialize();
 
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
@@ -208,7 +208,7 @@ void controlBase::UpperBodyCheckState()
             _UpperCtrl.Set_Initialize();
 
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
@@ -220,8 +220,8 @@ void controlBase::UpperBodyCheckState()
 
             _target_x.resize(2,8);
             _target_x.setZero();
-            _target_x.row(0) <<  0, 0.07, 0.1, 5*DEGREE, 0, 0, 2.0, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
-            _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 2.0, 0;
+            _target_x.row(0) <<  0, 0.07, 0.1, 5*DEGREE, 0, 0, 5.0, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
+            _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 5.0, 0;
 
             _UpperCtrl.SET_IK_Target(_target_x);
             _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
