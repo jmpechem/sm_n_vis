@@ -2,7 +2,6 @@
 # modified by Suhan Park (psh117@gmail.com)
 # -- Bug fixed: driver load on boot time
 # -- You must uncheck 8250 pci driver before kernel build (Linux Kernel 3.4 and newer)
-
 KERNEL_SRC = /lib/modules/`uname -r`/build
 
 all: build
