@@ -13,9 +13,6 @@ class Stand_By(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['power_on','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  rospy.loginfo('Executing state Stand_By')
-	  rospy.loginfo(trans_tag)
 	  if trans_tag == "power_on":
 	     return 'power_on'
           else:
@@ -26,7 +23,6 @@ class Power_On(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['auto_on','manu_on','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  rospy.loginfo('Executing state Power_On')
 	  rospy.loginfo(trans_tag)
           if trans_tag == "auto_on":
@@ -42,7 +38,6 @@ class Auto(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['mission1','mission2','mission3','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  rospy.loginfo('Executing state Auto')
 	  rospy.loginfo(trans_tag)
           if trans_tag == "mission1":
@@ -59,7 +54,6 @@ class Manual(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['activate_jctrl','activate_tctrl','activate_recog','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  rospy.loginfo('Executing state Manual')
 	  rospy.loginfo(trans_tag)
           if trans_tag == "activate_jctrl":
@@ -78,7 +72,6 @@ class JointCtrl(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['jctrl_back','cmd_modechg','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  if trans_tag == "jctrl_back":
 	     return 'jctrl_back'
           elif trans_tag == "cmd_modechg":
@@ -91,7 +84,6 @@ class TaskCtrl(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['tctrl_back','cmd_modechg','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  if trans_tag == "tctrl_back":
 	     return 'tctrl_back'
           elif trans_tag == "cmd_modechg":
@@ -103,7 +95,6 @@ class Recog(smach.State):
       def __init__(self):
 	  smach.State.__init__(self, outcomes=['recog_back','cmd_modechg','loop'])
       def execute(self, userdata):
-          rospy.sleep(1.0)
 	  if trans_tag == "recog_back":
 	     return 'recog_back'
           elif trans_tag == "cmd_modechg":
@@ -114,13 +105,12 @@ class Recog(smach.State):
 #define state Mode_Chg
 class Mode_Chg(smach.State):
 	def __init__(self):
-	    smach.State.__init__(self, outcomes=['auto_to_manu','manu_to_auto','loop'])
+	    smach.State.__init__(self, outcomes=['manu_on','auto_on','loop'])
 	def execute(self, userdata):
-	    rospy.sleep(1.0)
-	    if trans_tag == 'auto_to_manu':
-		return 'auto_to_manu'
-	    elif trans_tag == 'manu_to_auto':
-		return 'manu_to_auto'
+	    if trans_tag == 'manu_on':
+		return 'manu_on'
+	    elif trans_tag == 'auto_on':
+		return 'auto_on'
 	    else:
 		return 'loop'
 
@@ -129,7 +119,6 @@ class Valve_Mission(smach.State):
 	def __init__(self):
 	    smach.State.__init__(self, outcomes=['v_init','v_ready','v_approach','v_reach','v_close','loop'])
 	def execute(self, userdata):
-	    rospy.sleep(1.)
 	    if trans_tag == 'v_init':
 	       return 'v_init'
 	    elif trans_tag == 'v_ready':
@@ -146,13 +135,12 @@ class Valve_Mission(smach.State):
 #define state Valve_Init
 class Valve_Init(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd_ready','cmd_approach','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['v_ready','v_approach','cmd_modechg','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  if trans_tag == "cmd_ready":
-	     return 'cmd_ready'
-          elif trans_tag == "cmd_approach":
-	     return 'cmd_approach'
+	  if trans_tag == "v_ready":
+	     return 'v_ready'
+          elif trans_tag == "v_approach":
+	     return 'v_approach'
 	  elif trans_tag == "cmd_modechg":
 	     return 'cmd_modechg'
 	  else:
@@ -160,11 +148,10 @@ class Valve_Init(smach.State):
 #define state Valve_Ready
 class Valve_Ready(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd_reach','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['v_reach','cmd_modechg','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  if trans_tag == 'cmd_reach':
-	     return 'cmd_reach'
+	  if trans_tag == 'v_reach':
+	     return 'v_reach'
 	  elif trans_tag == 'cmd_modechg':
 	     return 'cmd_modechg'
 	  else:
@@ -172,11 +159,10 @@ class Valve_Ready(smach.State):
 #define state Valve_Reach
 class Valve_Reach(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd_close','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['v_close','cmd_modechg','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  if trans_tag == 'cmd_close':
-	     return 'cmd_close'
+	  if trans_tag == 'v_close':
+	     return 'v_close'
 	  elif trans_tag == 'cmd_modechg':
 	     return 'cmd_modechg'
 	  else:
@@ -184,11 +170,10 @@ class Valve_Reach(smach.State):
 #define state Valve_Close
 class Valve_Close(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd_init','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['v_init','cmd_modechg','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  if trans_tag == 'cmd_init':
-	     return 'cmd_init'
+	  if trans_tag == 'v_init':
+	     return 'v_init'
 	  elif trans_tag == 'cmd_modechg':
 	     return 'cmd_modechg'
 	  else:
@@ -196,11 +181,10 @@ class Valve_Close(smach.State):
 #define State Valve_Approach
 class Valve_Approach(smach.State):
       def __init__(self):
-	  smach.State.__init__(self, outcomes=['cmd_init','cmd_modechg','loop'])
+	  smach.State.__init__(self, outcomes=['v_init','cmd_modechg','loop'])
       def execute(self, userdata):
-	  rospy.sleep(1.0)
-	  if trans_tag == 'cmd_init':
-	     return 'cmd_init'
+	  if trans_tag == 'v_init':
+	     return 'v_init'
 	  elif trans_tag == 'cmd_modechg':
 	     return 'cmd_modechg'
 	  else:
@@ -210,7 +194,6 @@ class Door_Mission(smach.State):
 	def __init__(self):
 	    smach.State.__init__(self, outcomes=['d_init','d_ready','d_reach','d_open','d_push','loop'])
 	def execute(self,userdata):
-	    rospy.sleep(1.0)
 	    if trans_tag == 'd_init':
 		return 'd_init'
 	    elif trans_tag == 'd_ready':
@@ -285,7 +268,6 @@ class Wall_Mission(smach.State):
 	def __init__(self):
 	    smach.State.__init__(self, outcomes=['w_init','w_approach','w_ready','w_reach','w_grab','w_ungrab','w_rotatedrill','w_wallready','w_contact','w_cut','w_push','loop'])
 	def execute(self,userdata):
-	    rospy.sleep(1.0)
 	    if trans_tag == 'w_init':
 		return 'w_init'
 	    elif trans_tag == 'w_approach':
@@ -446,8 +428,8 @@ class Wall_Push(smach.State):
 def cb(data):
     global trans_tag
     trans_tag = data.data
-    rospy.loginfo(data.data)
-    rospy.loginfo(trans_tag)
+#    rospy.loginfo(data.data)
+#    rospy.loginfo(trans_tag)
 
 
 def main():
@@ -483,22 +465,22 @@ def main():
 			       transitions={'recog_back':'Manual','cmd_modechg':'Mode_Chg','loop':'Recog'})
 
 	# Mode_Chg state
-	smach.StateMachine.add('Mode_Chg',Mode_Chg(),transitions={'auto_to_manu':'Manual','manu_to_auto':'Auto','loop':'Mode_Chg'})
+	smach.StateMachine.add('Mode_Chg',Mode_Chg(),transitions={'manu_on':'Manual','auto_on':'Auto','loop':'Mode_Chg'})
 
 
 
 	# Valve_Mission state
 	smach.StateMachine.add('Valve_Mission', Valve_Mission(), transitions={'v_init':'Valve_Init','v_ready':'Valve_Ready','v_approach':'Valve_Approach','v_reach':'Valve_Reach','v_close':'Valve_Close','loop':'Valve_Mission'})
         # Valve_init state
-	smach.StateMachine.add('Valve_Init', Valve_Init(), transitions={'cmd_ready':'Valve_Ready','cmd_approach':'Valve_Approach','cmd_modechg':'Mode_Chg','loop':'Valve_Init'})
+	smach.StateMachine.add('Valve_Init', Valve_Init(), transitions={'v_ready':'Valve_Ready','v_approach':'Valve_Approach','cmd_modechg':'Mode_Chg','loop':'Valve_Init'})
 	# Valve_ready state
-	smach.StateMachine.add('Valve_Ready', Valve_Ready(), transitions={'cmd_reach':'Valve_Reach','cmd_modechg':'Mode_Chg','loop':'Valve_Ready'})
+	smach.StateMachine.add('Valve_Ready', Valve_Ready(), transitions={'v_reach':'Valve_Reach','cmd_modechg':'Mode_Chg','loop':'Valve_Ready'})
 	# Valve_reach state
-	smach.StateMachine.add('Valve_Reach', Valve_Reach(), transitions={'cmd_close':'Valve_Close','cmd_modechg':'Mode_Chg','loop':'Valve_Reach'})   
+	smach.StateMachine.add('Valve_Reach', Valve_Reach(), transitions={'v_close':'Valve_Close','cmd_modechg':'Mode_Chg','loop':'Valve_Reach'})   
 	# Valve_close state
-	smach.StateMachine.add('Valve_Close', Valve_Close(), transitions={'cmd_init':'Valve_Init','cmd_modechg':'Mode_Chg','loop':'Valve_Close'})   
+	smach.StateMachine.add('Valve_Close', Valve_Close(), transitions={'v_init':'Valve_Init','cmd_modechg':'Mode_Chg','loop':'Valve_Close'})   
 	# Valve_approach state
-	smach.StateMachine.add('Valve_Approach', Valve_Approach(), transitions={'cmd_init':'Valve_Init','cmd_modechg':'Mode_Chg','loop':'Valve_Approach'})   
+	smach.StateMachine.add('Valve_Approach', Valve_Approach(), transitions={'v_init':'Valve_Init','cmd_modechg':'Mode_Chg','loop':'Valve_Approach'})   
 
 	#Door_Mission state	
 	smach.StateMachine.add('Door_Mission',Door_Mission(),transitions={'d_init':'Door_Init','d_ready':'Door_Ready','d_reach':'Door_Reach','d_open':'Door_Open','d_push':'Door_Push','loop':'Door_Mission'})
