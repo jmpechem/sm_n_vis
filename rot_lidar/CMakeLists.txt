@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   laser_geometry
+  thormang_ctrl_msgs
 )
 catkin_package(
 )

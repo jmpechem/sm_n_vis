@@ -61,6 +61,7 @@ public Q_SLOTS:
     void on_button_walk_init_clicked();
     void on_button_walk_stop_clicked();
 
+    void on_button_scan_clicked();
     /******************************************
     ** Code based UI connections
     *******************************************/

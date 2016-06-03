@@ -95,9 +95,12 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     QObject::connect(ui.button_manual_joint_ctrl, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_manual_task_ctrl, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_manual_recog_ctrl,SIGNAL(clicked()),this,SLOT(stateButtonClicked()));
 
     QObject::connect(ui.button_mode_change, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
 
+
+    QObject::connect(ui.button_scan,SIGNAL(clicked()),this,SLOT(on_button_scan_clicked()));
 
     // -- Joint Control Set
     for (int i = 0; i < 32; i++)
@@ -399,7 +402,18 @@ void MainWindow::on_button_walk_stop_clicked()
     qnode.send_walking_cmd(msg);
 
 }
-
+void MainWindow::on_button_scan_clicked()
+{
+   thormang_ctrl_msgs::RecogCmd msg;
+   msg.id = 2; // id 2 means rotate lidar
+   msg.x = 0;
+   msg.y = 0;
+   msg.z = 0;
+   msg.roll = 0;
+   msg.pitch = 0;
+   msg.yaw = 0;
+   qnode.send_recog_cmd(msg);
+}
 void MainWindow::stateButtonClicked()
 {
     QString objName = sender()->objectName();
@@ -442,6 +456,8 @@ void MainWindow::stateButtonClicked()
         state = "activate_tctrl";
     } else if (objName.compare("button_mode_change") == 0) {
         state = "cmd_modechg";
+    } else if (objName.compare("button_manual_recog_ctrl") == 0) {
+        state = "activate_recog";
     }
     qnode.send_transition(state);
 }

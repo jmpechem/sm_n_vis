@@ -20,7 +20,8 @@
 #include <pcl/PCLPointCloud2.h>
 #include <std_msgs/Int32.h>
 #include <cmath>
-#define SWEEP_CMD	1
+#include "thormang_ctrl_msgs/RecogCmd.h"
+#define SWEEP_CMD	2
 
 #define LEFT		0
 #define RIGHT	 	3.14
@@ -29,7 +30,7 @@ class SNA{	// sweep and assembly class
 	SNA();
 	void cloud_cb(const sensor_msgs::PointCloud2::ConstPtr& cloud);
 	void dxl_status_cb(const dynamixel_msgs::JointState::ConstPtr& msg);
-	void command_cb(const std_msgs::Int32::ConstPtr& cmd);
+	void command_cb(const thormang_ctrl_msgs::RecogCmd::ConstPtr& cmd);
 	private:
 	ros::NodeHandle nh_;
 	ros::Subscriber cloud_; 
@@ -56,7 +57,7 @@ SNA::SNA(){
 	compare_[1] = 0.0f;
 	dxl_err_ = 0.0f;
 	cloud_ = nh_.subscribe<sensor_msgs::PointCloud2>("/cloud",100,&SNA::cloud_cb,this);
-	cmd_ = nh_.subscribe<std_msgs::Int32>("sweep_cmd",100,&SNA::command_cb,this);
+	cmd_ = nh_.subscribe<thormang_ctrl_msgs::RecogCmd>("/thormang_ctrl/recog_cmd",100,&SNA::command_cb,this);
 	dxl_status_ = nh_.subscribe("/tilt_controller/state",100,&SNA::dxl_status_cb,this);
 	assembled_cloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/assembled_cloud",100,false);
 	dxl_control_pub_ = nh_.advertise<std_msgs::Float64>("/tilt_controller/command",100,false);	
@@ -98,7 +99,7 @@ void SNA::cloud_cb(const sensor_msgs::PointCloud2::ConstPtr& cloud)
 		}
 	}
 }
-void SNA::command_cb(const std_msgs::Int32::ConstPtr& cmd)
+void SNA::command_cb(const thormang_ctrl_msgs::RecogCmd::ConstPtr& cmd)
 {
 	if(dxl_init_)
 	{
@@ -106,7 +107,7 @@ void SNA::command_cb(const std_msgs::Int32::ConstPtr& cmd)
 		dxl_control_pub_.publish(rot_cmd);
 		dxl_init_ = false;
 	}
-	else if(cmd->data == SWEEP_CMD)
+	else if(cmd->id == SWEEP_CMD)
 	{
 				
 		if(compare_[0] < compare_[1]){		
