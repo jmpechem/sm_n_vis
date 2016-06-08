@@ -5,74 +5,74 @@ import rospy
 import smach
 import smach_ros
 from std_msgs.msg import String
-trans_tag = "";
+states_of_machines = ''
 # define state Foo
 class Foo(smach.State):
     def __init__(self):
-        smach.State.__init__(self, 
-                             outcomes=['outcome1','outcome2'],
-                             input_keys=['foo_counter_in'],
-                             output_keys=['foo_counter_out'])
-
+        smach.State.__init__(self, outcomes=['outcome1','outcome2','outcome3','outcome4'])
+	
     def execute(self, userdata):
-	rospy.sleep(3.0)
+	#try:
+	msg = rospy.wait_for_message('transition',String)
+    	states_of_machines = msg.data	
+	#except rospy.ROSInterruptException: pass
         rospy.loginfo('Executing state FOO')
-        if userdata.foo_counter_in == 3:
-            #userdata.foo_counter_out = userdata.foo_counter_in + 1
+        if states_of_machines == "yes":	    
             return 'outcome1'
-        else:
+        elif states_of_machines == "no":
             return 'outcome2'
-
+	elif rospy.on_shutdown(endhook):
+	    return 'outcome4'
+	else:
+	    return 'outcome3'
 
 # define state Bar
 class Bar(smach.State):
     def __init__(self):
-        smach.State.__init__(self, 
-                             outcomes=['outcome1'],
-                             input_keys=['bar_counter_in'])
-        
+        smach.State.__init__(self, outcomes=['outcome1','outcome2'])
+
     def execute(self, userdata):
-	rospy.sleep(3.0)
+	#try:
+	msg = rospy.wait_for_message('transition',String)
+    	states_of_machines = msg.data	
+	#except rospy.ROSInterruptException: pass
         rospy.loginfo('Executing state BAR')
-        rospy.loginfo('Counter = %f'%userdata.bar_counter_in)        
-        return 'outcome1'
+	if states_of_machines == "return":
+           return 'outcome1'
+	else:
+	   return 'outcome2'
         
-def cb(data):
-    global trans_tag
-    sm.userdata.sm_counter = data.data
-    trans_tag = data.data
-    rospy.loginfo(data.data)
-    rospy.loginfo(trans_tag)
+def endhook():
+    print "shutdown time!"
 
 
 def main():
     rospy.init_node('smach_example_state_machine')
-    rospy.Subscriber("/test",String,cb)
+
     # Create a SMACH state machine
-    sm = smach.StateMachine(outcomes=['outcome4'])
-    sm.userdata.sm_counter = 0
+    sm = smach.StateMachine(outcomes=['yes','no','none','shutdown'])
 
     # Open the container
     with sm:
         # Add states to the container
         smach.StateMachine.add('FOO', Foo(), 
-                               transitions={'outcome1':'BAR', 
-                                            'outcome2':'outcome4'},
-                               remapping={'foo_counter_in':'sm_counter', 
-                                          'foo_counter_out':'sm_counter'})
+                               transitions={'outcome1':'yes', 'outcome2':'no', 'outcome3':'BAR','outcome4':'shutdown'})
         smach.StateMachine.add('BAR', Bar(), 
-                               transitions={'outcome1':'FOO'},
-                               remapping={'bar_counter_in':'sm_counter'})
+                               transitions={'outcome1':'FOO','outcome2':'BAR'})
 
-
+    sis = smach_ros.IntrospectionServer('server_name', sm, '/SM_ROOT')
+    sis.start()
     # Execute SMACH plan
-   #sis = smach_ros.IntrospectionServer('test_machine', sm, '/SM_LOAD')
-    #sis.start()
+    #msg = rospy.wait_for_message('transition',String)
+    #states_of_machines = msg.data
     outcome = sm.execute()
     rospy.spin()
-    #sis.stop()
+    sis.stop()
+    rospy.signal_shutdown('All done.')
 
 
 if __name__ == '__main__':
-    main()
-
+    try:
+	main()
+    except rospy.ROSInterruptException('rospy shutdown'):
+        pass
