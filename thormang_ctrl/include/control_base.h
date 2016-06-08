@@ -41,11 +41,11 @@ public:
     virtual void compute(); // compute algorithm and update all class object
     virtual void reflect()=0; // reflect next step actuation such as motor angle else
     virtual void writedevice()=0; // publish to actuate devices
+    double Rounding( double x, int digit );
 
     int getch();
 
-    bool check_state_changed();
-
+    bool check_state_changed();    
 protected:
     ros::NodeHandle nh;
 
@@ -63,6 +63,7 @@ protected:
 
     thormang_ctrl_msgs::WalkingCmd walkingCmdMsg;
     thormang_ctrl_msgs::JointSet jointCtrlMsg;
+    thormang_ctrl_msgs::TaskCmd  taskCmdMsg;
 
     string smach_state;
     string before_state;

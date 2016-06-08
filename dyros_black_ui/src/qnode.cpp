@@ -132,7 +132,7 @@ void QNode::send_recog_cmd(thormang_ctrl_msgs::RecogCmd& recog_msg)
 }
 
 void QNode::send_task_cmd(thormang_ctrl_msgs::TaskCmd& task_msg)
-{
+{    
     task_cmd_publisher.publish(task_msg);
 }
 

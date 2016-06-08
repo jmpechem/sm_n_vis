@@ -401,6 +401,11 @@ void MainWindow::on_button_walk_stop_clicked()
 
     qnode.send_walking_cmd(msg);
 
+    // temp stop state
+    std::string state;
+    state = "shutdown";
+    qnode.send_transition(state);
+
 }
 void MainWindow::on_button_scan_clicked()
 {
@@ -486,11 +491,144 @@ void MainWindow::jointCtrlSetClicked()
 
 void MainWindow::taskCtrlMinusClicked()
 {
+    int id = sender()->objectName().toInt();
+    double pos = doubleSpin_task_ctrl[id-1]->value();
+    thormang_ctrl_msgs::TaskCmd task_msg;
+    task_msg.x = 0.0f;
+    task_msg.y = 0.0f;
+    task_msg.z = 0.0f;
+    task_msg.roll = 0.0f;
+    task_msg.pitch = 0.0f;
+    task_msg.yaw = 0.0f;
+    if(id <= 6)
+    {
+        task_msg.arm = task_msg.LEFT_ARM;
+        task_msg.rel = task_msg.REL;
+        switch(id)
+          {
+            case 1:
+                task_msg.x = pos;
+                break;
+            case 2:
+            task_msg.y = pos;
+                break;
+            case 3:
+                task_msg.z = pos;
+                break;
+            case 4:
+                task_msg.roll = pos;
+                break;
+            case 5:
+                task_msg.pitch = pos;
+                break;
+            case 6:
+                task_msg.yaw = pos;
+                break;
+            default:
+                break;
+          }
+
+
+    }
+    else if(id >= 7)
+    {
+        task_msg.arm = task_msg.RIGHT_ARM;
+        task_msg.rel = task_msg.REL;
+        switch(id)
+          {
+            case 7:
+                task_msg.x = pos;
+                break;
+            case 8:
+                task_msg.y = pos;
+                break;
+            case 9:
+                task_msg.z = pos;
+                break;
+            case 10:
+                task_msg.roll = pos;
+                break;
+            case 11:
+                task_msg.pitch = pos;
+                break;
+            case 12:
+                task_msg.yaw = pos;
+                break;
+            default:
+                break;
+          }
+    }
+    qnode.send_task_cmd(task_msg);
+    std::string state = "TaskCtrl";
+    qnode.send_transition(state);
 
 }
 void MainWindow::taskCtrlPlusClicked()
 {
+  int id = sender()->objectName().toInt();
+  double pos = doubleSpin_task_ctrl[id-1]->value();
+  thormang_ctrl_msgs::TaskCmd task_msg;
+  if(id <= 6)
+  {
+      task_msg.arm = task_msg.LEFT_ARM;
+      task_msg.rel = task_msg.REL;
+      switch(id)
+        {
+          case 1:
+              task_msg.x = pos;
+              break;
+          case 2:
+              task_msg.y = pos;
+              break;
+          case 3:
+              task_msg.z = pos;
+              break;
+          case 4:
+              task_msg.roll = pos;
+              break;
+          case 5:
+              task_msg.pitch = pos;
+              break;
+          case 6:
+              task_msg.yaw = pos;
+              break;
+          default:
+              break;
+        }
 
+
+  }
+  else if(id >= 7)
+  {
+      task_msg.arm = task_msg.RIGHT_ARM;
+      task_msg.rel = task_msg.REL;
+      switch(id)
+        {
+          case 7:
+              task_msg.x = pos;
+              break;
+          case 8:
+              task_msg.y = pos;
+              break;
+          case 9:
+              task_msg.z = pos;
+              break;
+          case 10:
+              task_msg.roll = pos;
+              break;
+          case 11:
+              task_msg.pitch = pos;
+              break;
+          case 12:
+              task_msg.yaw = pos;
+              break;
+          default:
+              break;
+        }
+  }
+  qnode.send_task_cmd(task_msg);
+  std::string state = "TaskCtrl";
+  qnode.send_transition(state);
 }
 
 /*****************************************************************************

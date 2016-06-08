@@ -62,7 +62,15 @@ void simulation::compute()
 }
 void simulation::reflect() // publish statemachine state and else
 {
-
+  thormang_ctrl_msgs::JointState msg;
+  for(int i=0;i<total_dof;i++)
+  {
+      msg.id.push_back(i);
+      msg.angle.push_back(controlBase::Rounding(q(i),3));
+      msg.velocity.push_back(q_dot(i));
+      msg.current.push_back(torque(i));
+  }
+  jointStateUIPub.publish(msg);
 }
 void simulation::writedevice()
 {
@@ -123,9 +131,11 @@ string JointName[] = {"WaistPitch","WaistYaw",
                 q(i) = joint->position[j];
                 q_dot(i) = joint->velocity[j];
                 torque(i) = joint->effort[j];
+
             }
         }
     }
+
 }
 void simulation::LftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft)
 {
