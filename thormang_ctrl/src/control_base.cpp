@@ -104,6 +104,20 @@ void controlBase::WalkingCheckState()
 
 void controlBase::UpperBodyLoop()
 {
+    //// Auto Mission /////
+    if (smach_state == "Valve_Close")
+    {
+        if(_cnt == 0) {
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+        else if(_cnt == 1.0*_UpperCtrl._Hz){
+            _UpperCtrl._cnt = 0;
+            _Joint_flag = false;
+            _CLIK_flag = true;
+        }
+    }
+
     if (_Joint_flag)
     {
         _UpperCtrl.Set_Joint_Value(q);
@@ -114,6 +128,8 @@ void controlBase::UpperBodyLoop()
         _UpperCtrl.Set_Joint_Value(q);
         _UpperCtrl.IK_compute(_desired_q);
     }
+
+    _cnt++;
 }
 
 void controlBase::UpperBodyCheckState()
@@ -124,7 +140,6 @@ void controlBase::UpperBodyCheckState()
         if (smach_state == "Valve_Mission") // smach_state
         {
             ROS_INFO("Joint CTRL for UpperBody");
-            _UpperCtrl.Set_Initialize();
 
             _index = 0;
             _target_q(_index++) = 0;
@@ -159,34 +174,15 @@ void controlBase::UpperBodyCheckState()
             _target_q(_index++) = -25*DEGREE;
             _target_q(_index++) = -2*DEGREE;
 
-            //_UpperCtrl.Set_Initialize();
-
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
         }
-        else if (key_cmd == 's')
-        {
-            ROS_INFO("CLIK CTRL for UpperBody (Singularity)");
-            _UpperCtrl.Set_Initialize();
-
-            _target_x.resize(2,8);
-            _target_x.setZero();
-            _target_x.row(0) <<  0, 0, 0.3, 0*DEGREE, 0, 0, 1.0, 1; // x,y,z,a,b,r,duration, Right(1) or Left(0)
-            _target_x.row(1) <<  0.0, 0, 0.3,  0*DEGREE, 0, 0, 1.0, 1;
-
-            _UpperCtrl.SET_IK_Target(_target_x);
-            _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.03, 0.01); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
-
-            _Joint_flag = false;
-            _CLIK_flag = true;
-        }
         else if (smach_state == "Valve_Init") // Valve Init
         {
             ROS_INFO("Valve Init");
-            _UpperCtrl.Set_Initialize();
 
             _index = 0;
             _target_q(_index++) = 0;
@@ -224,7 +220,7 @@ void controlBase::UpperBodyCheckState()
             _UpperCtrl.Set_Initialize();
 
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
@@ -232,7 +228,6 @@ void controlBase::UpperBodyCheckState()
         else if (smach_state == "Valve_Ready") // Valve Ready
         {
             ROS_INFO("Valve Ready");
-            _UpperCtrl.Set_Initialize();
 
             _target_q = q;
 
@@ -246,10 +241,8 @@ void controlBase::UpperBodyCheckState()
             _target_q(_index++) = 180*DEGREE;
             _target_q(_index++) = 0*DEGREE;
 
-            _UpperCtrl.Set_Initialize();
-
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
+            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
 
             _Joint_flag = true;
             _CLIK_flag = false;
@@ -257,12 +250,11 @@ void controlBase::UpperBodyCheckState()
         else if (smach_state == "Valve_Reach") // Valve Reach
         {
             ROS_INFO("Valve Reach");
-            _UpperCtrl.Set_Initialize();
 
             _target_x.resize(2,8);
             _target_x.setZero();
-            _target_x.row(0) <<  0, 0.07, 0.1, 5*DEGREE, 0, 0, 5.0, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
-            _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 5.0, 0;
+            _target_x.row(0) <<  0, 0.07, 0.1, 5*DEGREE, 0, 0, 1.0, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
+            _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 1.0, 0;
 
             _UpperCtrl.SET_IK_Target(_target_x);
             _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
@@ -272,39 +264,18 @@ void controlBase::UpperBodyCheckState()
         }
         else if (smach_state == "Valve_Close") // Valve Close
         {
+            _target_q=q;
+            _target_q(LA_BEGIN+6) = _target_q(LA_BEGIN+6) - 390*DEGREE;
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
 
-        }                        
-        else if (key_cmd == 'b') // Left Hand - 1cm up(z)
-        {
-            ROS_INFO("Left Hand Up");
-            _UpperCtrl.Set_Initialize();
-
-            _target_x.resize(2,8);
+            _target_x.resize(1,8);
             _target_x.setZero();
-            _target_x.row(0) <<  0, 0, 0.02, 0, 0, 0, 0.5, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
+            _target_x.row(0) <<-0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0;
 
             _UpperCtrl.SET_IK_Target(_target_x);
             _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
-
-            _Joint_flag = false;
-            _CLIK_flag = true;
         }
-        else if (key_cmd == 'n') // Left Hand - 1cm down(z)
-        {
-            ROS_INFO("Left Hand down");
-            _UpperCtrl.Set_Initialize();
-
-            _target_x.resize(2,8);
-            _target_x.setZero();
-            _target_x.row(0) <<  0, 0, -0.02, 0, 0, 0, 0.5, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
-
-            _UpperCtrl.SET_IK_Target(_target_x);
-            _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
-
-            _Joint_flag = false;
-            _CLIK_flag = true;
-        }
-
     }
 
     if (taskCmdMsg.subtask==1)
@@ -317,11 +288,10 @@ void controlBase::UpperBodyCheckState()
             double run_time = 0.0f;
             run_time = 5.0;
             std::cout << taskCmdMsg.x << taskCmdMsg.y << taskCmdMsg.z << taskCmdMsg.roll << taskCmdMsg.pitch << taskCmdMsg.yaw << run_time << taskCmdMsg.arm << std::endl;
-            _target_x.row(0) <<  taskCmdMsg.x, taskCmdMsg.y, taskCmdMsg.z, taskCmdMsg.roll, taskCmdMsg.pitch, taskCmdMsg.yaw, run_time, taskCmdMsg.arm; // x,y,z,a,b,r,duration, Right(1) or Left(0)
+            _target_x.row(0) <<  taskCmdMsg.x*0.01, taskCmdMsg.y*0.01, taskCmdMsg.z*0.01, taskCmdMsg.roll*DEGREE, taskCmdMsg.pitch*DEGREE, taskCmdMsg.yaw*DEGREE, run_time, taskCmdMsg.arm; // x,y,z,a,b,r,duration, Right(1) or Left(0)
 
             _UpperCtrl.SET_IK_Target(_target_x);
             _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
-
             _Joint_flag = false;
             _CLIK_flag = true;
             taskCmdMsg.subtask=taskCmdMsg.NONE;
@@ -395,6 +365,8 @@ bool controlBase::check_state_changed()
     if(before_state != smach_state)
     {
         before_state = smach_state;
+        _UpperCtrl.Set_Initialize();
+        _cnt = 0;
         return true;
     }
     return false;

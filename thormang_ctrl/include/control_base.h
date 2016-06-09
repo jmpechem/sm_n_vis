@@ -123,6 +123,7 @@ protected:
     int total_dof; //
 
     int         _index;
+    int         _cnt;
     VectorXD    _target_q;
     MatrixXD    _target_x;
 

@@ -2,7 +2,7 @@
 
 void UpperPara::set_user_value()
 {
-	_Hz = 400.0;
+    _Hz = 333;
 }
 
 void UpperPara::Upperpara_initialize()

@@ -60,7 +60,7 @@ void UpperCtrl::IK_solver(VectorXD& output)
 			MatrixXD J_T = _Rarm.J.transpose();
 			MatrixXD I;
 			I.setIdentity(6,6);
-			double a = _lambda*pow(1-_w/_w0,2);
+            double a = _lambda*pow(1-_w/_w0,2);
 			MatrixXD J_Damped;
 			J_Damped = _Rarm.J*_Rarm.J.transpose()+a*I;
 			J_Damped = J_Damped.inverse();
@@ -84,9 +84,9 @@ void UpperCtrl::IK_solver(VectorXD& output)
 			MatrixXD J_T = _Larm.J.transpose();
 			MatrixXD I;
 			I.setIdentity(6,6);
-			double a = _lambda*pow(1-_w/_w0,2);
+            double a = _lambda*pow(1-_w/_w0,2);
 			MatrixXD J_Damped;
-			J_Damped = _Rarm.J*_Larm.J.transpose()+a*I;
+            J_Damped = _Larm.J*_Larm.J.transpose()+a*I;
 			J_Damped = J_Damped.inverse();
 
 			cout << "Singularity Region: " << _w << endl;
