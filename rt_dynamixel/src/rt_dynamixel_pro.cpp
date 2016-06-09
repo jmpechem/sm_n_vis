@@ -1202,7 +1202,7 @@ int RTDynamixelPro::getAllStatus()
         vMotorData[i].current = (int16_t)(
             DXL_MAKEWORD(pSyncData[i].pucTable[10], pSyncData[i].pucTable[11]));
 
-        vMotorData[i].updated = dxl_pro_data::UPDATED;
+        vMotorData[i].updated = pSyncData[i].iError;
         printErrorCode((int)pucIDList[i], pSyncData[i].iError);
     }
     for(; i<nMotorNum; i++)

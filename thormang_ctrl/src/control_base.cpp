@@ -40,6 +40,7 @@ controlBase::controlBase() :
 
     jointStateMsgPtr->angle.resize(total_dof);
     jointStateMsgPtr->velocity.resize(total_dof);
+    jointStateMsgPtr->error.resize(total_dof);
     jointStateMsgPtr->current.resize(total_dof);
     jointStateMsgPtr->id.resize(total_dof);
 
@@ -373,6 +374,21 @@ void controlBase::compute()
     UpperBodyLoop();
 }
 
+void controlBase::reflect()
+{
+    if(++uiUpdateCount > 10)
+    {
+        uiUpdateCount = 0;
+        for(int i=0; i<total_dof; i++)
+        {
+            jointStateMsgPtr->angle[i] = q(i);
+            jointStateMsgPtr->velocity[i] = q_dot(i);
+            jointStateMsgPtr->current[i] = torque(i);
+        }
+
+        jointStateUIPub.publish(jointStateMsgPtr);
+    }
+}
 // Common functions
 bool controlBase::check_state_changed()
 {

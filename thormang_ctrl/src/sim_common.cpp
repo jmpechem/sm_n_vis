@@ -81,17 +81,7 @@ void simulation::compute()
     }
     controlBase::compute();
 }
-void simulation::reflect() // publish statemachine state and else
-{
-    for(int i=0;i<total_dof;i++)
-    {
-        jointStateMsgPtr->id[i] = jointID[i];
-        jointStateMsgPtr->angle[i] = (q(i));
-        jointStateMsgPtr->velocity[i] = (q_dot(i));
-        jointStateMsgPtr->current[i] = (torque(i));
-    }
-    jointStateUIPub.publish(jointStateMsgPtr);
-}
+
 void simulation::writedevice()
 {
     for(int i=0;i<total_dof;i++)

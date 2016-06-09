@@ -558,8 +558,9 @@ void MainWindow::taskCtrlMinusClicked()
                 break;
           }
     }
-    task_msg.subtask = task_msg.ARM_TASK;
-    qnode.send_task_cmd(task_msg);        
+    qnode.send_task_cmd(task_msg);
+    std::string state = "TaskCtrl";
+    qnode.send_transition(state);
 
 }
 void MainWindow::taskCtrlPlusClicked()
@@ -625,8 +626,9 @@ void MainWindow::taskCtrlPlusClicked()
               break;
         }
   }
-  task_msg.subtask = task_msg.ARM_TASK;
   qnode.send_task_cmd(task_msg);
+  std::string state = "TaskCtrl";
+  qnode.send_transition(state);
 }
 
 /*****************************************************************************
@@ -645,10 +647,28 @@ void MainWindow::updateLoggingView() {
 void MainWindow::updateJointView() {
     for(int i=0;i<qnode.joint_msg.id.size(); i++)
     {
-        QTableWidgetItem *newItem = new QTableWidgetItem(tr("%1").arg(
-                                                            qnode.joint_msg.angle[i]));
-
+        QTableWidgetItem *newItem = new QTableWidgetItem(
+                    QString::number(qnode.joint_msg.angle[i] * 57.295791433,'f',2));
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
+        newItem = new QTableWidgetItem(
+                    QString::number(qnode.joint_msg.current[i],'f',2));
+        ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 3, newItem);
+        /*
+        newItem = new QTableWidgetItem(
+                    QString::number(qnode.joint_msg.current[i], 'f',3));
+        ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 3, newItem);
+        */
+        /*
+        ui.motor_table->item(qnode.joint_msg.id[i]-1, 1)->setText(
+                    QString::number(qnode.joint_msg.angle[i] * 57.295791433,'f',2));
+
+        ui.motor_table->item(qnode.joint_msg.id[i]-1, 2)->setText(
+                    QString::number(qnode.joint_msg.velocity[i] * 57.295791433,'f',2));
+
+        ui.motor_table->item(qnode.joint_msg.id[i]-1, 3)->setText(
+                    QString::number(qnode.joint_msg.current[i], 'f',3));
+*/
+        //ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
 
     }
 }

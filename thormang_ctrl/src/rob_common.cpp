@@ -18,7 +18,8 @@ realrobot::realrobot()
 
     for(int i=0;i<total_dof; i++)
     {
-        dxlJointSetMsgPtr->id[i] = jointIDs[i];
+        jointStateMsgPtr->id[i] = jointID[i];
+        dxlJointSetMsgPtr->id[i] = jointID[i];
     }
     rtNextTime = rt_timer_read() + 3e6; // 3ms
 
@@ -101,19 +102,13 @@ void realrobot::update()
 }
 void realrobot::reflect()
 {
-    if(++uiUpdateCount > 10)
+    // update additional information
+    for(int i=0; i<total_dof; i++)
     {
-        uiUpdateCount = 0;
-        for(int i=0; i<total_dof; i++)
-        {
-            jointStateMsgPtr->id[i] = jointID[i];
-            jointStateMsgPtr->angle[i] = (q(i) * 57.295791433);
-            jointStateMsgPtr->velocity[i] = (q_dot(i) * 57.295791433);
-            jointStateMsgPtr->current[i] = (torque(i));
-        }
-
-        jointStateUIPub.publish(jointStateMsgPtr);
+        jointStateMsgPtr->error[i] = dxlJointStatePtr->updated[i];
     }
+
+    controlBase::reflect();
 }
 
 void realrobot::writedevice()
@@ -158,7 +153,7 @@ void realrobot::writedevice()
 void realrobot::wait()
 {
     rtNowTime = rt_timer_read();
-    while( rtNowTime > rtNextTime )
+    while( rtNowTime < rtNextTime )
     {
         //rt_task_sleep()
         rtNowTime = rt_timer_read();

@@ -1,14 +1,16 @@
 # Constants
+uint8 SET_HOMING_OFFSET=17
+uint8 GET_HOMING_OFFSET=18
 uint8 SET_TORQUE_ENABLE=19
 uint8 SET_GOAL_POSITION=20
 
 int32 mode
 int32 id
-int32 value
+int64 value
 float64 fvalue
 ---
 int32 result
-
+int64 value
 
 
 

@@ -20,8 +20,14 @@ include_directories(
 # Xenomai
   /usr/xenomai/include -D_GNU_SOURCE -D_REENTRANT -D__XENO__
 )
+
+file(GLOB_RECURSE HeaderFiles "include/*.h")
+add_custom_target(thormang_ctrl_headers SOURCES ${HeaderFiles})
+
 file(GLOB BRIDGE_SRC
-  "src/*.cpp"
+  "src/control_base.cpp"
+  "src/sim_common.cpp"
+  "src/rob_common.cpp"
 )
 file(GLOB WALKING_SRC
   "src/walking_ctrl/*.cpp"

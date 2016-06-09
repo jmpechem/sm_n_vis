@@ -42,7 +42,7 @@ dxl_pro_data dxlLists[4][10] = {
         {28, H54}
     },    {
         // Index: 2: 3-Right Lower body
-
+/*
         {15, H54},    // Fatal
         {17, H54},    // Fatal
         {19, H54},    // Warning
@@ -50,23 +50,17 @@ dxl_pro_data dxlLists[4][10] = {
         {23, H54},
         {25, H54},
         {27, H54}
-        /*
-                {15, H54},    // Fatal
-        {17, H54},    // Fatal
-        {19, H54},    // Warning
-        {21, H54},    // Warning
-        {23, H54},
-        {25, H54},    // Fatal
-        {27, H54}
                 */
     },    {
         // Index: 3: 4-Left Lower body
+        /*
         {16, H54},
         {18, H54},
         {20, H54},
         {22, H54},
         {24, H54},
         {26, H54}
+                */
     }
 };   // Max 4channels, 10 motors
 #endif
