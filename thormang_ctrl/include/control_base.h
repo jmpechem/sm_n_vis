@@ -9,6 +9,7 @@
 
 // ROS Library
 #include <ros/ros.h>
+#include <rosrt/rosrt.h>
 
 // ROS Messages
 #include <std_msgs/String.h>
@@ -28,6 +29,9 @@
 #include "Walking_Controller.h"
 #include "Upperbody_Controller.h"
 
+extern const string JointName[28];
+extern const int jointIDs[28];
+
 class controlBase
 {
 
@@ -37,7 +41,7 @@ public:
     // Default User Call function
     void parameter_initialize(); // initialize all parameter function(q,qdot,force else...)
     virtual void readdevice(); // read device means update all subscribed sensor data and user command
-    virtual void update()=0; // update controller based on readdevice
+    virtual void update(); // update controller based on readdevice
     virtual void compute(); // compute algorithm and update all class object
     virtual void reflect()=0; // reflect next step actuation such as motor angle else
     virtual void writedevice()=0; // publish to actuate devices
@@ -45,10 +49,24 @@ public:
 
     int getch();
 
-    bool check_state_changed();    
+    bool check_state_changed();
 protected:
     ros::NodeHandle nh;
 
+    rosrt::Subscriber<thormang_ctrl_msgs::WalkingCmd> walkingCmdSub;
+    rosrt::Subscriber<thormang_ctrl_msgs::TaskCmd> taskCmdSub;
+    rosrt::Subscriber<thormang_ctrl_msgs::RecogCmd> recogCmdSub;
+
+    rosrt::Publisher<std_msgs::String> smachPub;
+    rosrt::Subscriber<smach_msgs::SmachContainerStatus> smachSub;
+
+    rosrt::Publisher<thormang_ctrl_msgs::JointState> jointStateUIPub;
+    rosrt::Subscriber<thormang_ctrl_msgs::JointSet> jointCtrlSub;
+
+    // rosrt implement
+    thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
+    std_msgs::StringPtr smachMsgPtr;
+    /*
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
     ros::Subscriber recogCmdSub;
@@ -58,6 +76,7 @@ protected:
 
     ros::Publisher jointStateUIPub;
     ros::Subscriber jointCtrlSub;
+    */
     bool jointCtrlMsgRecv;
 
 
@@ -109,12 +128,15 @@ protected:
 
 private:
 
+    void make_id_inverse_list();
+    /*
     // Callback functions
     void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr& smach);
     void UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr& joint);
     void WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg);
     void TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg);
     void RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg);
+    */
 };
 
 

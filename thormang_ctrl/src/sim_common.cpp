@@ -2,40 +2,34 @@
 
 simulation::simulation(){
 
-   simulationRunning = true;
-   simulationTime=0.0f; // set initial simulation time
-   subInfo = nh.subscribe("/vrep/info",100,&simulation::infoCallback,this);
-   vrepHandleClient = nh.serviceClient<vrep_common::simRosGetObjectHandle>("/vrep/simRosGetObjectHandle");
-   client_startsync = nh.serviceClient<vrep_common::simRosSynchronous>("vrep/simRosSynchronous");
-   srv_startsync.request.enable = 1;
-   client_startTrig = nh.serviceClient<vrep_common::simRosSynchronousTrigger>("vrep/simRosSynchronousTrigger");
+    simulationRunning = true;
+    simulationTime=0.0f; // set initial simulation time
+    subInfo = nh.subscribe("/vrep/info",100,&simulation::infoCallback,this);
+    vrepHandleClient = nh.serviceClient<vrep_common::simRosGetObjectHandle>("/vrep/simRosGetObjectHandle");
+    client_startsync = nh.serviceClient<vrep_common::simRosSynchronous>("vrep/simRosSynchronous");
+    srv_startsync.request.enable = 1;
+    client_startTrig = nh.serviceClient<vrep_common::simRosSynchronousTrigger>("vrep/simRosSynchronousTrigger");
 
-   start_simulation = nh.serviceClient<vrep_common::simRosStartSimulation>("vrep/simRosStartSimulation");
-   end_simulation = nh.serviceClient<vrep_common::simRosStopSimulation>("vrep/simRosStopSimulation");
+    start_simulation = nh.serviceClient<vrep_common::simRosStartSimulation>("vrep/simRosStartSimulation");
+    end_simulation = nh.serviceClient<vrep_common::simRosStopSimulation>("vrep/simRosStopSimulation");
 
-   Jointsub = nh.subscribe("vrep/JointState",100,&simulation::JointCallback,this);
-   Lftsub = nh.subscribe("vrep/LFT",100,&simulation::LftCallback,this);
-   Rftsub = nh.subscribe("vrep/RFT",100,&simulation::RftCallback,this);
-   vrepJointSetPub = nh.advertise<vrep_common::JointSetStateData>("vrep/JointSet",100);   
+    Jointsub = nh.subscribe("vrep/JointState",100,&simulation::JointCallback,this);
+    Lftsub = nh.subscribe("vrep/LFT",100,&simulation::LftCallback,this);
+    Rftsub = nh.subscribe("vrep/RFT",100,&simulation::RftCallback,this);
+    vrepJointSetPub = nh.advertise<vrep_common::JointSetStateData>("vrep/JointSet",100);
 
-   vrep_start();
-   vrep_initialize();
+    vrep_start();
+    vrep_initialize();
 }
 void simulation::vrep_initialize()
 {     
- string JointName[] = {"WaistPitch","WaistYaw",
-                         "R_ShoulderPitch","R_ShoulderRoll","R_ShoulderYaw","R_ElbowRoll","R_WristYaw","R_WristRoll","R_HandYaw",
-                         "L_ShoulderPitch","L_ShoulderRoll","L_ShoulderYaw","L_ElbowRoll","L_WristYaw","L_WristRoll","L_HandYaw",
-                         "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
-                         "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
-
-     vrep_common::JointSetStateData data;
+    vrep_common::JointSetStateData data;
     data.values.data.resize(total_dof);
-     vrep_common::simRosGetObjectHandle srv;   
-     for (int i=0; i<total_dof; i++)
-     {
+    vrep_common::simRosGetObjectHandle srv;
+    for (int i=0; i<total_dof; i++)
+    {
         srv.request.objectName = JointName[i];
-	std::cout << srv.request.objectName << std::endl;
+        std::cout << srv.request.objectName << std::endl;
         if (vrepHandleClient.call(srv))
         {
             data.handles.data.push_back(srv.response.handle);
@@ -43,13 +37,13 @@ void simulation::vrep_initialize()
             data.values.data[i] = 0.0*DEGREE;
         }
     }
-   JointSetValue = data;
-   client_startsync.call(srv_startsync);
+    JointSetValue = data;
+    client_startsync.call(srv_startsync);
 
 }
 void simulation::update() 
 {
-	key_cmd = getch();
+    key_cmd = getch();
 
 }
 void simulation::compute()
@@ -62,44 +56,43 @@ void simulation::compute()
 }
 void simulation::reflect() // publish statemachine state and else
 {
-  thormang_ctrl_msgs::JointState msg;
-  for(int i=0;i<total_dof;i++)
-  {
-      msg.id.push_back(i);
-      msg.angle.push_back(controlBase::Rounding(q(i),3));
-      msg.velocity.push_back(q_dot(i));
-      msg.current.push_back(torque(i));
-  }
-  jointStateUIPub.publish(msg);
+    for(int i=0;i<total_dof;i++)
+    {
+        jointStateMsgPtr->id[i] = jointID[i];
+        jointStateMsgPtr->angle[i] = (q(i));
+        jointStateMsgPtr->velocity[i] = (q_dot(i));
+        jointStateMsgPtr->current[i] = (torque(i));
+    }
+    jointStateUIPub.publish(jointStateMsgPtr);
 }
 void simulation::writedevice()
 {
-  for(int i=0;i<total_dof;i++)
-     JointSetValue.values.data[i] = _desired_q(i);
+    for(int i=0;i<total_dof;i++)
+        JointSetValue.values.data[i] = _desired_q(i);
 
-  vrepJointSetPub.publish(JointSetValue);
-  client_startTrig.call(srv_startTrig);
-  
+    vrepJointSetPub.publish(JointSetValue);
+    client_startTrig.call(srv_startTrig);
+
 }
 
 void simulation::vrep_end()
 {  
-  srv_startsync.request.enable = 0;
-  client_startsync.call(srv_startsync);
-   
- 
-  ROS_INFO("end of Simulation end trigger");
+    srv_startsync.request.enable = 0;
+    client_startsync.call(srv_startsync);
+
+
+    ROS_INFO("end of Simulation end trigger");
 }
 void simulation::vrep_start()
 {
-     vrep_common::simRosStartSimulation start;
-     start_simulation.call(start);
+    vrep_common::simRosStartSimulation start;
+    start_simulation.call(start);
 
 }
 void simulation::vrep_stop()
 {
-  vrep_common::simRosStopSimulation stop;
-  end_simulation.call(stop);
+    vrep_common::simRosStopSimulation stop;
+    end_simulation.call(stop);
 
 }
 
@@ -109,17 +102,10 @@ void simulation::infoCallback(const vrep_common::VrepInfo::ConstPtr& info)
 {
     simulationTime=info->simulationTime.data;
     simulationRunning=(info->simulatorState.data&1)!=0;
-   // cout << simulationRunning << endl;
+    // cout << simulationRunning << endl;
 }
 void simulation::JointCallback(const sensor_msgs::JointState::ConstPtr& joint)
 {
-string JointName[] = {"WaistPitch","WaistYaw",
-                         "R_ShoulderPitch","R_ShoulderRoll","R_ShoulderYaw","R_ElbowRoll","R_WristYaw","R_WristRoll","R_HandYaw",
-                         "L_ShoulderPitch","L_ShoulderRoll","L_ShoulderYaw","L_ElbowRoll","L_WristYaw","L_WristRoll","L_HandYaw",
-                         "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
-                         "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
-
-
     for(int i=0; i<total_dof; i++)
     {
         string target_joint = JointName[i];
@@ -135,7 +121,6 @@ string JointName[] = {"WaistPitch","WaistYaw",
             }
         }
     }
-
 }
 void simulation::LftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft)
 {

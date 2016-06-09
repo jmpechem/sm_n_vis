@@ -19,7 +19,7 @@ public:
    void change_dxl_mode(int mode);
    void set_torque(int value);
    void set_aim_position(int id, double radian);
-   void make_id_inverse_list();
+   //void make_id_inverse_list();
 
    void update(); // update controller based on readdevice
    void reflect(); // reflect next step actuation such as motor angle else

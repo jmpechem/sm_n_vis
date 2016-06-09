@@ -11,18 +11,10 @@ realrobot::realrobot()
     dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
 
-    make_id_inverse_list();
+    //make_id_inverse_list();
 }
 void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint)
 {
-    /*
-    string JointName[] = {"WaistPitch","WaistYaw",
-                             "R_ShoulderPitch","R_ShoulderRoll","R_ShoulderYaw","R_ElbowRoll","R_WristYaw","R_WristRoll","R_HandYaw",
-                             "L_ShoulderPitch","L_ShoulderRoll","L_ShoulderYaw","L_ElbowRoll","L_WristYaw","L_WristRoll","L_HandYaw",
-                             "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
-                             "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
-    */
-
     for(int i=0; i<total_dof; i++)
     {
         for (int j=0; j<joint->id.size(); j++)
@@ -89,6 +81,7 @@ void realrobot::set_torque(int value)
         }
 }
 
+/*
 void realrobot::make_id_inverse_list()
 {
 
@@ -108,7 +101,7 @@ void realrobot::make_id_inverse_list()
     }
     jointSetMsg.angle.resize(total_dof);
 }
-
+*/
 
 
 void realrobot::update()
@@ -119,16 +112,15 @@ void realrobot::reflect()
     if(++uiUpdateCount > 10)
     {
         uiUpdateCount = 0;
-        thormang_ctrl_msgs::JointState msg;
         for(int i=0; i<total_dof; i++)
         {
-            msg.id.push_back(jointID[i]);
-            msg.angle.push_back(q(i) * 57.295791433);
-            msg.velocity.push_back(q_dot(i) * 57.295791433);
-            msg.current.push_back(torque(i));
+            jointStateMsgPtr->id[i] = jointID[i];
+            jointStateMsgPtr->angle[i] = (q(i) * 57.295791433);
+            jointStateMsgPtr->velocity[i] = (q_dot(i) * 57.295791433);
+            jointStateMsgPtr->current[i] = (torque(i));
         }
 
-        jointStateUIPub.publish(msg);
+        jointStateUIPub.publish(jointStateMsgPtr);
     }
 }
 

@@ -3,6 +3,7 @@ project(thormang_ctrl)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rosrt
   vrep_common
   std_msgs
   sensor_msgs
@@ -32,6 +33,10 @@ add_library(thormang_ctrl_lib
 )
 
 add_executable(thormang_ctrl src/thormang_ctrl.cpp)
+
+target_link_libraries(thormang_ctrl_lib
+   ${catkin_LIBRARIES}
+)
 target_link_libraries(thormang_ctrl
    ${catkin_LIBRARIES}
    thormang_ctrl_lib

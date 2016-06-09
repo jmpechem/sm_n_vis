@@ -1,6 +1,19 @@
 
 #include "control_base.h"
 
+
+const string JointName[28] = {"WaistPitch","WaistYaw",
+                             "R_ShoulderPitch","R_ShoulderRoll","R_ShoulderYaw","R_ElbowRoll","R_WristYaw","R_WristRoll","R_HandYaw",
+                             "L_ShoulderPitch","L_ShoulderRoll","L_ShoulderYaw","L_ElbowRoll","L_WristYaw","L_WristRoll","L_HandYaw",
+                             "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
+                             "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
+
+const int jointIDs[28] = {28, 27,
+                 1,3,5,7,9,11,13,
+                 2,4,6,8,10,12,14,
+                 15,17,19,21,23,25,
+                 16,18,20,22,24,26};
+
 // Constructor
 controlBase::controlBase() :
     uiUpdateCount(0),
@@ -8,8 +21,28 @@ controlBase::controlBase() :
     _Init_walking_flag(false),
     _Walking_flag(false)
 {
+
+    rosrt::init();
+
     total_dof = 28;
 
+    walkingCmdSub.initialize(3, nh, "thormang_ctrl/walking_cmd");
+    taskCmdSub.initialize(3, nh, "thormang_ctrl/task_cmd");
+    recogCmdSub.initialize(3, nh, "thormang_ctrl/recog_cmd");
+    jointCtrlSub.initialize(3, nh, "thormang_ctrl/joint_ctrl");
+    smachSub.initialize(3, nh, "Jimin_machine/smach/container_status");
+
+    jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
+    smachPub.initialize(nh, "transition",1,1,std_msgs::String());
+
+    jointStateMsgPtr = jointStateUIPub.allocate();
+    smachMsgPtr = smachPub.allocate();
+
+    jointStateMsgPtr->angle.resize(total_dof);
+    jointStateMsgPtr->velocity.resize(total_dof);
+    jointStateMsgPtr->current.resize(total_dof);
+    jointStateMsgPtr->id.resize(total_dof);
+    /*
     walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd",1,&controlBase::WalkingCmdCallback,this);
     taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd",1,&controlBase::TaskCmdCallback,this);
     recogCmdSub = nh.subscribe("thormang_ctrl/recog_cmd",1,&controlBase::RecogCmdCallback,this);
@@ -19,9 +52,23 @@ controlBase::controlBase() :
 
     smachPub = nh.advertise<std_msgs::String>("transition",1);
     smachSub = nh.subscribe("Jimin_machine/smach/container_status",1,&controlBase::SmachCallback,this);
+    */
 
+    make_id_inverse_list();
     parameter_initialize();
 }
+
+
+void controlBase::make_id_inverse_list()
+{
+    jointInvID.resize(50);
+    for(int i=0;i<total_dof; i++)
+    {
+        jointID.push_back(jointIDs[i]);
+        jointInvID[jointIDs[i]] = i;
+    }
+}
+
 
 void controlBase::WalkingLoop()
 {
@@ -289,6 +336,37 @@ void controlBase::UpperBodyCheckState()
     }
 }
 
+void controlBase::update()
+{
+
+    thormang_ctrl_msgs::WalkingCmdConstPtr walkingMsgPtr = walkingCmdSub.poll();
+    if(walkingMsgPtr)   // Data recv
+    {
+        walkingCmdMsg = *walkingMsgPtr;
+    }
+    thormang_ctrl_msgs::TaskCmdConstPtr taskMsgPtr = taskCmdSub.poll();
+    if(taskMsgPtr)
+    {
+        taskCmdMsg = *taskMsgPtr;
+    }
+    thormang_ctrl_msgs::RecogCmdConstPtr recogMsgPtr = recogCmdSub.poll();
+    if(recogMsgPtr)
+    {
+        // Recog message received
+    }
+    thormang_ctrl_msgs::JointSetConstPtr jointSetMsgPtr = jointCtrlSub.poll();
+    if(jointSetMsgPtr)
+    {
+        jointCtrlMsg = *jointSetMsgPtr;
+        jointCtrlMsgRecv = true;
+    }
+   smach_msgs::SmachContainerStatusConstPtr smachMsgPtr = smachSub.poll();
+    if(smachMsgPtr)
+    {
+        smach_state = smachMsgPtr->active_states[0];
+    }
+}
+
 void controlBase::compute()
 {
     // Update
@@ -374,6 +452,7 @@ double controlBase::Rounding( double x, int digit )
 }
 
 
+/*
 // Callback
 void controlBase::UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr &joint)
 {
@@ -400,4 +479,4 @@ void controlBase::RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& m
 {
 
 }
-
+*/
