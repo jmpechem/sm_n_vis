@@ -283,25 +283,7 @@ void controlBase::UpperBodyCheckState()
         else if (smach_state == "Valve_Close") // Valve Close
         {
 
-        }                
-        if (smach_state == "TaskCtrl")
-        {
-                ROS_INFO("Task Controller for arms");
-                _UpperCtrl.Set_Initialize();
-
-                _target_x.resize(2,8);
-                _target_x.setZero();
-                double run_time = 0.0f;
-                run_time = 5.0;
-                std::cout << taskCmdMsg.x << taskCmdMsg.y << taskCmdMsg.z << taskCmdMsg.roll << taskCmdMsg.pitch << taskCmdMsg.yaw << run_time << taskCmdMsg.arm << std::endl;
-                _target_x.row(0) <<  taskCmdMsg.x, taskCmdMsg.y, taskCmdMsg.z, taskCmdMsg.roll, taskCmdMsg.pitch, taskCmdMsg.yaw, run_time, taskCmdMsg.arm; // x,y,z,a,b,r,duration, Right(1) or Left(0)
-
-                _UpperCtrl.SET_IK_Target(_target_x);
-                _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
-
-                _Joint_flag = false;
-                _CLIK_flag = true;
-        }
+        }                        
         else if (key_cmd == 'b') // Left Hand - 1cm up(z)
         {
             ROS_INFO("Left Hand Up");
@@ -333,6 +315,26 @@ void controlBase::UpperBodyCheckState()
             _CLIK_flag = true;
         }
 
+    }
+
+    if (taskCmdMsg.subtask==1)
+    {
+            ROS_INFO("Task Controller for arms");
+            _UpperCtrl.Set_Initialize();
+
+            _target_x.resize(2,8);
+            _target_x.setZero();
+            double run_time = 0.0f;
+            run_time = 5.0;
+            std::cout << taskCmdMsg.x << taskCmdMsg.y << taskCmdMsg.z << taskCmdMsg.roll << taskCmdMsg.pitch << taskCmdMsg.yaw << run_time << taskCmdMsg.arm << std::endl;
+            _target_x.row(0) <<  taskCmdMsg.x, taskCmdMsg.y, taskCmdMsg.z, taskCmdMsg.roll, taskCmdMsg.pitch, taskCmdMsg.yaw, run_time, taskCmdMsg.arm; // x,y,z,a,b,r,duration, Right(1) or Left(0)
+
+            _UpperCtrl.SET_IK_Target(_target_x);
+            _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
+
+            _Joint_flag = false;
+            _CLIK_flag = true;
+            taskCmdMsg.subtask=taskCmdMsg.NONE;
     }
 }
 
