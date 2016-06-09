@@ -558,9 +558,8 @@ void MainWindow::taskCtrlMinusClicked()
                 break;
           }
     }
-    qnode.send_task_cmd(task_msg);
-    std::string state = "TaskCtrl";
-    qnode.send_transition(state);
+    task_msg.subtask = task_msg.ARM_TASK;
+    qnode.send_task_cmd(task_msg);        
 
 }
 void MainWindow::taskCtrlPlusClicked()
@@ -626,9 +625,8 @@ void MainWindow::taskCtrlPlusClicked()
               break;
         }
   }
+  task_msg.subtask = task_msg.ARM_TASK;
   qnode.send_task_cmd(task_msg);
-  std::string state = "TaskCtrl";
-  qnode.send_transition(state);
 }
 
 /*****************************************************************************
