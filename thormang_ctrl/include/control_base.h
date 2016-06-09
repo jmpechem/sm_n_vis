@@ -45,6 +45,7 @@ public:
     virtual void compute(); // compute algorithm and update all class object
     virtual void reflect()=0; // reflect next step actuation such as motor angle else
     virtual void writedevice()=0; // publish to actuate devices
+    virtual void wait()=0;  // wait
     double Rounding( double x, int digit );
 
     int getch();

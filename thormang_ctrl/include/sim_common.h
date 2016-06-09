@@ -27,12 +27,15 @@ class simulation : public controlBase{
 //   vrep_common::JointSetStateData Initialize_handler(ros::ServiceClient vrepHandleClient);
    void vrep_start();
    void vrep_initialize();
+   void vrep_end();
+   void vrep_stop();
+
    void update(); // update controller based on readdevice
    void compute(); // compute algorithm and update all class object
    void reflect(); // reflect next step actuation such as motor angle else
    void writedevice(); // publish to actuate devices
-   void vrep_end();
-   void vrep_stop();
+   void wait();
+
 
  private:
 
@@ -50,6 +53,7 @@ class simulation : public controlBase{
    ros::ServiceClient vrepHandleClient;
    vrep_common::simRosSynchronousTrigger srv_startTrig; // Vrep service start trigger
 
+   ros::Rate rate;
 
  //  ros::Publisher vrepJointSetPub;
    ros::Subscriber subInfo;

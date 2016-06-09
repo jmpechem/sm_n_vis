@@ -1,6 +1,7 @@
 #include "sim_common.h"
 
-simulation::simulation(){
+simulation::simulation(): rate(300)
+{
 
     simulationRunning = true;
     simulationTime=0.0f; // set initial simulation time
@@ -21,6 +22,8 @@ simulation::simulation(){
     vrep_start();
     vrep_initialize();
 }
+
+// V-Rep Functions
 void simulation::vrep_initialize()
 {     
     vrep_common::JointSetStateData data;
@@ -41,8 +44,32 @@ void simulation::vrep_initialize()
     client_startsync.call(srv_startsync);
 
 }
-void simulation::update() 
+void simulation::vrep_end()
+{  
+    srv_startsync.request.enable = 0;
+    client_startsync.call(srv_startsync);
+
+
+    ROS_INFO("end of Simulation end trigger");
+}
+void simulation::vrep_start()
 {
+    vrep_common::simRosStartSimulation start;
+    start_simulation.call(start);
+
+}
+void simulation::vrep_stop()
+{
+    vrep_common::simRosStopSimulation stop;
+    end_simulation.call(stop);
+
+}
+
+
+// Function implement
+void simulation::update()
+{
+    controlBase::update();
     key_cmd = getch();
 
 }
@@ -75,29 +102,13 @@ void simulation::writedevice()
 
 }
 
-void simulation::vrep_end()
-{  
-    srv_startsync.request.enable = 0;
-    client_startsync.call(srv_startsync);
-
-
-    ROS_INFO("end of Simulation end trigger");
-}
-void simulation::vrep_start()
+void simulation::wait()
 {
-    vrep_common::simRosStartSimulation start;
-    start_simulation.call(start);
-
-}
-void simulation::vrep_stop()
-{
-    vrep_common::simRosStopSimulation stop;
-    end_simulation.call(stop);
-
+    rate.sleep();
 }
 
 
-
+// Callback functions
 void simulation::infoCallback(const vrep_common::VrepInfo::ConstPtr& info)
 {
     simulationTime=info->simulationTime.data;

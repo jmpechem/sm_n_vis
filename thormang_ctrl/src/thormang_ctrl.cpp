@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////
 
 #include "sim_common.h"  // if you want to use vrep use sim common
-//#include "rob_common.h" // if you want to use real robot use rob common
+#include "rob_common.h" // if you want to use real robot use rob common
 
 //
 
@@ -12,10 +12,9 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "thormang_ctrl");
   
-  //controlBase *ctrObj = new realrobot;
-   controlBase *ctrObj = new simulation;
+  controlBase *ctrObj = new realrobot;
+  // controlBase *ctrObj = new simulation;
 
-  ros::Rate r(300);
 
   while(ros::ok())
   {
@@ -24,7 +23,7 @@ int main(int argc, char **argv)
      ctrObj->compute();
      ctrObj->reflect();
      ctrObj->writedevice();
-     r.sleep();
+     ctrObj->wait();
   }
 
   delete ctrObj;

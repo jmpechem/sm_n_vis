@@ -42,17 +42,6 @@ controlBase::controlBase() :
     jointStateMsgPtr->velocity.resize(total_dof);
     jointStateMsgPtr->current.resize(total_dof);
     jointStateMsgPtr->id.resize(total_dof);
-    /*
-    walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd",1,&controlBase::WalkingCmdCallback,this);
-    taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd",1,&controlBase::TaskCmdCallback,this);
-    recogCmdSub = nh.subscribe("thormang_ctrl/recog_cmd",1,&controlBase::RecogCmdCallback,this);
-
-    jointStateUIPub = nh.advertise<thormang_ctrl_msgs::JointState>("thormang_ctrl/joint_state",1);
-    jointCtrlSub = nh.subscribe("thormang_ctrl/joint_ctrl",1,&controlBase::UIJointCtrlCallback,this);
-
-    smachPub = nh.advertise<std_msgs::String>("transition",1);
-    smachSub = nh.subscribe("Jimin_machine/smach/container_status",1,&controlBase::SmachCallback,this);
-    */
 
     make_id_inverse_list();
     parameter_initialize();
