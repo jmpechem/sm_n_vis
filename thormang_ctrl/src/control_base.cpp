@@ -341,31 +341,31 @@ void controlBase::UpperBodyCheckState()
 void controlBase::update()
 {
 
-    thormang_ctrl_msgs::WalkingCmdConstPtr walkingMsgPtr = walkingCmdSub.poll();
+    walkingMsgPtr = walkingCmdSub.poll();
     if(walkingMsgPtr)   // Data recv
     {
         walkingCmdMsg = *walkingMsgPtr;
     }
-    thormang_ctrl_msgs::TaskCmdConstPtr taskMsgPtr = taskCmdSub.poll();
+    taskMsgPtr = taskCmdSub.poll();
     if(taskMsgPtr)
     {
         taskCmdMsg = *taskMsgPtr;
     }
-    thormang_ctrl_msgs::RecogCmdConstPtr recogMsgPtr = recogCmdSub.poll();
+    recogMsgPtr = recogCmdSub.poll();
     if(recogMsgPtr)
     {
         // Recog message received
     }
-    thormang_ctrl_msgs::JointSetConstPtr jointSetMsgPtr = jointCtrlSub.poll();
+    jointSetMsgPtr = jointCtrlSub.poll();
     if(jointSetMsgPtr)
     {
         jointCtrlMsg = *jointSetMsgPtr;
         jointCtrlMsgRecv = true;
     }
-   smach_msgs::SmachContainerStatusConstPtr smachMsgPtr = smachSub.poll();
-    if(smachMsgPtr)
+    smachStatusMsgPtr = smachSub.poll();
+    if(smachStatusMsgPtr)
     {
-        smach_state = smachMsgPtr->active_states[0];
+        smach_state = smachStatusMsgPtr->active_states[0];
     }
 }
 

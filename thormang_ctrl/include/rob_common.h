@@ -33,12 +33,13 @@ private:
    ros::ServiceClient dxlModeSetClient; ///< dynamixel mode select service
    ros::ServiceClient dxlMotorSetClient; ///< dynmamixel motor setting service
 
-   ros::Publisher dxlJointSetPub;
-   ros::Subscriber dxlJointSub;
+   rosrt::Publisher<rt_dynamixel_msgs::JointSet> dxlJointSetPub;
+   rosrt::Subscriber<rt_dynamixel_msgs::JointState> dxlJointSub;
 
    bool jointCtrlMsgRecv;
 
-   rt_dynamixel_msgs::JointSet jointSetMsg;
+   // rt_dynamixel_msgs::JointSet jointSetMsg;
+   rt_dynamixel_msgs::JointSetPtr jointSetMsgPtr;
 
    // ros::Subscriber taskCtrlSub;
 

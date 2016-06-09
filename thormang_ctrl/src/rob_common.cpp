@@ -8,9 +8,18 @@ realrobot::realrobot()
     dxlModeSetClient = nh.serviceClient<rt_dynamixel_msgs::ModeSetting>("rt_dynamixel/mode");
     dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
 
-    dxlJointSetPub = nh.advertise<rt_dynamixel_msgs::JointSet>("rt_dynamixel/joint_set",1);
-    dxlJointSub = nh.subscribe("rt_dynamixel/joint_state",1,&realrobot::JointCallback,this);
+    dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
+    dxlJointSub.initialize(3, nh, "rt_dynamixel/joint_state");
 
+    jointSetMsgPtr = dxlJointSetPub.allocate();
+
+    jointSetMsgPtr->angle.resize(total_dof);
+    jointSetMsgPtr->id.resize(total_dof);
+
+    for(int i=0;i<total_dof; i++)
+    {
+        jointSetMsgPtr->id[i] = jointIDs[i];
+    }
     //make_id_inverse_list();
 }
 void realrobot::JointCallback(const rt_dynamixel_msgs::JointStateConstPtr& joint)
@@ -106,6 +115,8 @@ void realrobot::make_id_inverse_list()
 
 void realrobot::update()
 {
+    controlBase::update();
+
 }
 void realrobot::reflect()
 {
@@ -137,9 +148,9 @@ void realrobot::writedevice()
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
         for(int i=0; i< total_dof; i++)
         {
-            jointSetMsg.angle[i] = _desired_q(i);
+            jointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(jointSetMsg);
+        dxlJointSetPub.publish(jointSetMsgPtr);
     }
     else if (smach_state == "JointCtrl")
     {
@@ -156,9 +167,9 @@ void realrobot::writedevice()
     {
         for(int i=0; i< total_dof; i++)
         {
-            jointSetMsg.angle[i] = _desired_q(i);
+            jointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(jointSetMsg);
+        dxlJointSetPub.publish(jointSetMsgPtr);
 
     }
 }
