@@ -32,6 +32,7 @@ controlBase::controlBase() :
     recogCmdSub.initialize(3, nh, "thormang_ctrl/recog_cmd");
     jointCtrlSub.initialize(3, nh, "thormang_ctrl/joint_ctrl");
     smachSub.initialize(3, nh, "Jimin_machine/smach/container_status");
+    recogPointSub.initialize(3, nh, "custom_recog_point");
 
     jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
     smachPub.initialize(nh, "transition",1,1,std_msgs::String());
@@ -143,50 +144,7 @@ void controlBase::UpperBodyCheckState()
 
     if(check_state_changed())
     {
-        if (smach_state == "Valve_Mission") // smach_state
-        {
-            ROS_INFO("Joint CTRL for UpperBody");
-
-            _index = 0;
-            _target_q(_index++) = 0;
-            _target_q(_index++) = 0;
-            _target_q(_index++) = -40*DEGREE;
-            _target_q(_index++) = 75*DEGREE;
-            _target_q(_index++) = 90*DEGREE;
-            _target_q(_index++) = 35*DEGREE;
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = 60*DEGREE;
-            _target_q(_index++) = 90*DEGREE;
-
-            _target_q(_index++) = 40*DEGREE;
-            _target_q(_index++) = -75*DEGREE;
-            _target_q(_index++) = -90*DEGREE;
-            _target_q(_index++) = -35*DEGREE;
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = -60*DEGREE;
-            _target_q(_index++) = -90*DEGREE;
-
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = -2*DEGREE;
-            _target_q(_index++) = 25*DEGREE;
-            _target_q(_index++) = -50*DEGREE;
-            _target_q(_index++) = 25*DEGREE;
-            _target_q(_index++) = 2*DEGREE;
-
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = 2*DEGREE;
-            _target_q(_index++) = -25*DEGREE;
-            _target_q(_index++) = 50*DEGREE;
-            _target_q(_index++) = -25*DEGREE;
-            _target_q(_index++) = -2*DEGREE;
-
-            _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
-
-            _Joint_flag = true;
-            _CLIK_flag = false;
-        }
-        else if (smach_state == "Valve_Init") // Valve Init
+        if (smach_state == "Valve_Init") // Valve Init
         {
             ROS_INFO("Valve Init");
 
@@ -262,10 +220,10 @@ void controlBase::UpperBodyCheckState()
 
             Vector6D    vision_data;
             vision_data.setZero();
-            vision_data(0) = 48.18*0.01;//+0.04;  M
-            vision_data(1) = 17.62*0.01;//+0.02;
-            vision_data(2) = 13.25*0.01;//+0.24;
-
+            vision_data(0) = recogPoint[0]; // 48.18*0.01;//+0.04;  M
+            vision_data(1) = recogPoint[1]; // 17.62*0.01;//+0.02;
+            vision_data(2) = recogPoint[2]; // 13.25*0.01;//+0.24;
+            ROS_INFO("%f, %f, %f",recogPoint[0],recogPoint[1],recogPoint[2]);
             _target_x.row(0) << -1, vision_data(1), vision_data(2), vision_data(3), vision_data(4), vision_data(5),  5.0, 0;
             _target_x.row(1) << vision_data(0), vision_data(1), vision_data(2), 0.0, 0.0, 0.0, 5.0, 0;
 
@@ -273,7 +231,7 @@ void controlBase::UpperBodyCheckState()
             //  _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 1.0, 0;
 
             if(vision_data(0) > 0.67 || vision_data(1) > 0.35 || vision_data(1) < 0.12 || vision_data(2) > 0.187 || vision_data(2) < -0.403 ){
-
+                _UpperCtrl.Set_Initialize();
                 _target_q = q;
 
                 _index = LA_BEGIN;
@@ -292,10 +250,9 @@ void controlBase::UpperBodyCheckState()
                 _Joint_flag = true;
                 _CLIK_flag = false;
 
-                _Joint_flag = true;
-                _CLIK_flag = false;
             }
             else{
+                _UpperCtrl.Set_Initialize();
                 _UpperCtrl.SET_IK_Target(_target_x);
                 _UpperCtrl.SET_IK_Parameter(100.0, false, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
 
@@ -386,6 +343,14 @@ void controlBase::update()
     if(smachStatusMsgPtr)
     {
         smach_state = smachStatusMsgPtr->active_states[0];
+    }
+    recogPointPtr = recogPointSub.poll();
+    if(recogPointPtr)
+    {
+        for(int i=0; i<6; i++)
+        {
+            recogPoint[i] = recogPointPtr->data[i];
+        }
     }
 }
 

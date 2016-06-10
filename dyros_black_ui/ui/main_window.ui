@@ -270,7 +270,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_status">
        <attribute name="title">
@@ -566,6 +566,9 @@
                        <property name="text">
                         <string>Door</string>
                        </property>
+                       <property name="checkable">
+                        <bool>false</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -660,6 +663,9 @@
                        </property>
                        <property name="text">
                         <string>Valve</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>false</bool>
                        </property>
                       </widget>
                      </item>
@@ -1095,11 +1101,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Missions</string>
-       </attribute>
-      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Manual</string>
@@ -1411,6 +1412,70 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_estop">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>159</red>
+            <green>158</green>
+            <blue>158</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="text">
+       <string>E-STOP</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
    </layout>

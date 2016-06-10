@@ -150,19 +150,11 @@ void realrobot::writedevice()
         }
         dxlJointSetPub.publish(dxlJointSetMsgPtr);
     }
-    /*
-    else if (smach_state == "JointCtrl")
+    else if (smach_state == "None")
     {
-        if(jointCtrlMsgRecv == true)
-        {
-            jointCtrlMsgRecv = false;
-            double nowPos = q(jointInvID[jointCtrlMsg.id]);
-            double aimPos = nowPos + jointCtrlMsg.angle * DEGREE;
-            ROS_INFO("Joint Shoot!");
-            set_aim_position(jointCtrlMsg.id,aimPos);
-        }
+        change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::SETTING);
+        set_torque(0);
     }
-    */
     else
     {
         for(int i=0; i< total_dof; i++)

@@ -13,6 +13,7 @@
 
 // ROS Messages
 #include <std_msgs/String.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -62,6 +63,7 @@ protected:
 
     rosrt::Publisher<thormang_ctrl_msgs::JointState> jointStateUIPub;
     rosrt::Subscriber<thormang_ctrl_msgs::JointSet> jointCtrlSub;
+    rosrt::Subscriber<std_msgs::Float32MultiArray> recogPointSub;
 
     // rosrt implement
     // Publisher Message Preallocator
@@ -74,6 +76,7 @@ protected:
     thormang_ctrl_msgs::RecogCmdConstPtr recogMsgPtr;
     thormang_ctrl_msgs::JointSetConstPtr jointSetMsgPtr;
     smach_msgs::SmachContainerStatusConstPtr smachStatusMsgPtr;
+    std_msgs::Float32MultiArrayConstPtr recogPointPtr;
     /*
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
@@ -102,6 +105,9 @@ protected:
     int uiUpdateCount;
     bool isFirstBoot;
 
+
+
+    float recogPoint[6];
 
 
     // Math

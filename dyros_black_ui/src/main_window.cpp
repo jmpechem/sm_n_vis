@@ -232,6 +232,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.gridLayout_task_ctrl->addWidget(label_task_ctrl[12] , 6, 0, Qt::AlignTop);
 
     ui.gridLayout_task_ctrl->setColumnStretch(1,1);
+
+    //ui.button_estop->text()
     updateUI();
 
 }
@@ -421,6 +423,13 @@ void MainWindow::on_button_scan_clicked()
    msg.yaw = 0;
    qnode.send_recog_cmd(msg);
 }
+void MainWindow::on_button_estop_clicked()
+{
+    std::string state;
+    state = "shutdown";
+    qnode.send_transition(state);
+}
+
 void MainWindow::stateButtonClicked()
 {
     QString objName = sender()->objectName();
@@ -655,6 +664,7 @@ void MainWindow::updateJointView() {
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
         newItem = new QTableWidgetItem(
                     QString::number(qnode.joint_msg.current[i],'f',2));
+
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 2, newItem);
         newItem = new QTableWidgetItem(
                     QString::number(qnode.joint_msg.error[i]));
