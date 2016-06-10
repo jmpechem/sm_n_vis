@@ -1,6 +1,6 @@
 #include "sim_common.h"
 
-simulation::simulation(): rate(300)
+simulation::simulation(): rate(333.33)
 {
 
     simulationRunning = true;

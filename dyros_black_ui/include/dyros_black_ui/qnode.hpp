@@ -22,6 +22,8 @@
 #include <QStringListModel>
 #include <vector>
 
+#include "std_msgs/Float32MultiArray.h"
+
 #include "thormang_ctrl_msgs/JointSet.h"
 #include "thormang_ctrl_msgs/JointState.h"
 #include "thormang_ctrl_msgs/RecogCmd.h"
@@ -69,11 +71,13 @@ public:
     void send_task_cmd(thormang_ctrl_msgs::TaskCmd& task_msg);
 
     thormang_ctrl_msgs::JointState joint_msg;
+    std_msgs::Float32MultiArray recog_info_msg;
 
 
 Q_SIGNALS:
 
     void jointStateUpdated();
+    void recogInfoUpdated();
     void loggingUpdated();
     void rosShutdown();
 
@@ -88,11 +92,13 @@ private:
     ros::Publisher recog_cmd_publisher;
 
     ros::Subscriber joint_state_subscirber;
+    ros::Subscriber recog_point_subscriber;
 
     QStringListModel logging_model;
 
     bool isConnected;
     void jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr& msg);
+    void recogInfoCallback(const std_msgs::Float32MultiArrayConstPtr& msg);
 
 };
 

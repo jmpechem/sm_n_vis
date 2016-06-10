@@ -56,6 +56,7 @@ bool QNode::init() {
     walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
 
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+    recog_point_subscriber = n.subscribe("custom_recog_point",1, &QNode::recogInfoCallback, this);
 
     isConnected = true;
 	start();
@@ -140,6 +141,11 @@ void QNode::jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr &msg
 {
     joint_msg = *msg;
     jointStateUpdated();
+}
+void QNode::recogInfoCallback(const std_msgs::Float32MultiArrayConstPtr& msg)
+{
+    recog_info_msg = *msg;
+    recogInfoUpdated();
 }
 
 void QNode::log( const LogLevel &level, const std::string &msg) {

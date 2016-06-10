@@ -77,6 +77,7 @@ public Q_SLOTS:
     *******************************************/
     void updateLoggingView(); // no idea why this can't connect automatically
     void updateJointView();
+    void updateRecogInfo();
 
 private:
 	Ui::MainWindowDesign ui;

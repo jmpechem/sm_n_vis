@@ -1,6 +1,6 @@
 #include "rob_common.h"
 
-realrobot::realrobot()
+realrobot::realrobot() : rate(333.33)
 {
     dxlMode = rt_dynamixel_msgs::ModeSettingRequest::SETTING;
     dxlTorque = 0;
@@ -102,10 +102,18 @@ void realrobot::update()
 }
 void realrobot::reflect()
 {
+    if(!dxlJointStatePtr) return;
     // update additional information
+
     for(int i=0; i<total_dof; i++)
     {
-        jointStateMsgPtr->error[i] = dxlJointStatePtr->updated[i];
+        for (int j=0; j<dxlJointStatePtr->id.size(); j++)
+        {
+            if(jointID[i] == dxlJointStatePtr->id[j])
+            {
+                jointStateMsgPtr->error[i] = dxlJointStatePtr->updated[j];
+            }
+        }
     }
 
     controlBase::reflect();
@@ -118,6 +126,11 @@ void realrobot::writedevice()
         //ROS_INFO("POWER ON!");
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::SETTING);
         set_torque(1);
+        for(int i=0; i< total_dof; i++)
+        {
+            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+        }
+        dxlJointSetPub.publish(dxlJointSetMsgPtr);
     }
     else if (smach_state == "Auto")
     {
@@ -128,6 +141,16 @@ void realrobot::writedevice()
         }
         dxlJointSetPub.publish(dxlJointSetMsgPtr);
     }
+    else if (smach_state == "Manual")
+    {
+        change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
+        for(int i=0; i< total_dof; i++)
+        {
+            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+        }
+        dxlJointSetPub.publish(dxlJointSetMsgPtr);
+    }
+    /*
     else if (smach_state == "JointCtrl")
     {
         if(jointCtrlMsgRecv == true)
@@ -139,6 +162,7 @@ void realrobot::writedevice()
             set_aim_position(jointCtrlMsg.id,aimPos);
         }
     }
+    */
     else
     {
         for(int i=0; i< total_dof; i++)
@@ -146,17 +170,29 @@ void realrobot::writedevice()
             dxlJointSetMsgPtr->angle[i] = _desired_q(i);
         }
         dxlJointSetPub.publish(dxlJointSetMsgPtr);
-
     }
 }
 
 void realrobot::wait()
 {
+    rate.sleep();
+    /*
+    static int asdf = 0;
+    asdf++;
+    if(asdf>=299)
+    {
+        ROS_INFO("1s");
+        asdf=0;
+    }
+    */
+    //ROS_INFO("LOOP");
+    /*
     rtNowTime = rt_timer_read();
     while( rtNowTime < rtNextTime )
     {
         //rt_task_sleep()
         rtNowTime = rt_timer_read();
+        usleep(10);
     }
-    rtNextTime = rtNowTime;
+    rtNextTime = rtNowTime;*/
 }

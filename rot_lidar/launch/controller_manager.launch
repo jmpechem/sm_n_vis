@@ -7,9 +7,9 @@
             serial_ports:
                 pan_tilt_port:
                     port_name: "/dev/ttyUSB0"
-                    baud_rate: 100000
+                    baud_rate: 57600
                     min_motor_id: 1
-                    max_motor_id: 25
+                    max_motor_id: 50
                     update_rate: 100
         </rosparam>
     </node>

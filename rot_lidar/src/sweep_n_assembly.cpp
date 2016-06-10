@@ -2,7 +2,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/ros/conversions.h>
+#include <pcl/conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/common/transforms.h>
@@ -23,8 +23,8 @@
 #include "thormang_ctrl_msgs/RecogCmd.h"
 #define SWEEP_CMD	2
 
-#define LEFT		0
-#define RIGHT	 	3.14
+#define LEFT		0.785
+#define RIGHT	 	2.355
 class SNA{	// sweep and assembly class
 	public:
 	SNA();

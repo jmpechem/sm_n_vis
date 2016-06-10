@@ -29,8 +29,8 @@
 #include "Walking_Controller.h"
 #include "Upperbody_Controller.h"
 
-extern const string JointName[28];
-extern const int jointIDs[28];
+extern const string JointName[40];
+extern const int jointIDs[40];
 
 class controlBase
 {

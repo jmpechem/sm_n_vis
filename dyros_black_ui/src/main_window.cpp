@@ -45,8 +45,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 	** Logging
 	**********************/
     ui.view_logging->setModel(qnode.loggingModel());
-    QObject::connect(&qnode, SIGNAL(jointStateUpdated()), this, SLOT(updateJointView()));
     QObject::connect(&qnode, SIGNAL(loggingUpdated()), this, SLOT(updateLoggingView()));
+
+    QObject::connect(&qnode, SIGNAL(jointStateUpdated()), this, SLOT(updateJointView()));
+    QObject::connect(&qnode, SIGNAL(recogInfoUpdated()), this, SLOT(updateRecogInfo()));
 
     /*********************
     ** Auto Start
@@ -492,7 +494,7 @@ void MainWindow::jointCtrlSetClicked()
 void MainWindow::taskCtrlMinusClicked()
 {
     int id = sender()->objectName().toInt();
-    double pos = doubleSpin_task_ctrl[id-1]->value();
+    double pos = -doubleSpin_task_ctrl[id-1]->value();
     thormang_ctrl_msgs::TaskCmd task_msg;
     task_msg.x = 0.0f;
     task_msg.y = 0.0f;
@@ -558,9 +560,8 @@ void MainWindow::taskCtrlMinusClicked()
                 break;
           }
     }
+    task_msg.subtask = task_msg.ARM_TASK;
     qnode.send_task_cmd(task_msg);
-    std::string state = "TaskCtrl";
-    qnode.send_transition(state);
 
 }
 void MainWindow::taskCtrlPlusClicked()
@@ -626,9 +627,8 @@ void MainWindow::taskCtrlPlusClicked()
               break;
         }
   }
+  task_msg.subtask = task_msg.ARM_TASK;
   qnode.send_task_cmd(task_msg);
-  std::string state = "TaskCtrl";
-  qnode.send_transition(state);
 }
 
 /*****************************************************************************
@@ -647,30 +647,36 @@ void MainWindow::updateLoggingView() {
 void MainWindow::updateJointView() {
     for(int i=0;i<qnode.joint_msg.id.size(); i++)
     {
+        double degree = qnode.joint_msg.angle[i] * 57.295791433;
+        if (fabs(degree) < 0.01) degree = 0.0; // +, - preventing
+
         QTableWidgetItem *newItem = new QTableWidgetItem(
-                    QString::number(qnode.joint_msg.angle[i] * 57.295791433,'f',2));
+                    QString::number(degree,'f',2));
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
         newItem = new QTableWidgetItem(
                     QString::number(qnode.joint_msg.current[i],'f',2));
-        ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 3, newItem);
-        /*
+        ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 2, newItem);
         newItem = new QTableWidgetItem(
-                    QString::number(qnode.joint_msg.current[i], 'f',3));
+                    QString::number(qnode.joint_msg.error[i]));
+
+        if(qnode.joint_msg.error[i] != 0)
+        {
+           newItem->setBackgroundColor(Qt::yellow);
+        }
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 3, newItem);
-        */
-        /*
-        ui.motor_table->item(qnode.joint_msg.id[i]-1, 1)->setText(
-                    QString::number(qnode.joint_msg.angle[i] * 57.295791433,'f',2));
-
-        ui.motor_table->item(qnode.joint_msg.id[i]-1, 2)->setText(
-                    QString::number(qnode.joint_msg.velocity[i] * 57.295791433,'f',2));
-
-        ui.motor_table->item(qnode.joint_msg.id[i]-1, 3)->setText(
-                    QString::number(qnode.joint_msg.current[i], 'f',3));
-*/
-        //ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 1, newItem);
-
     }
+}
+
+void MainWindow::updateRecogInfo() {
+
+    ui.line_edit_scan_x->setText(QString::number(qnode.recog_info_msg.data[0] * 100,'f',2) + " cm");
+    ui.line_edit_scan_y->setText(QString::number(qnode.recog_info_msg.data[1] * 100,'f',2) + " cm");
+    ui.line_edit_scan_z->setText(QString::number(qnode.recog_info_msg.data[2] * 100,'f',2) + " cm");
+
+    ui.line_edit_scan_roll->setText(QString::number(qnode.recog_info_msg.data[3],'f',2));
+    ui.line_edit_scan_pitch->setText(QString::number(qnode.recog_info_msg.data[4],'f',2));
+    ui.line_edit_scan_yaw->setText(QString::number(qnode.recog_info_msg.data[5],'f',2));
+
 }
 
 /*****************************************************************************

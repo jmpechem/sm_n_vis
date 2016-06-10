@@ -9,11 +9,11 @@ void UpperPara::Upperpara_initialize()
 {
 	_cnt = 0;
 
-	_q.resize(28);
+    _q.resize(32);
 	_q.setZero();
-	_desired_q.resize(28);
+    _desired_q.resize(32);
 	_desired_q.setZero();
-	_target_q.resize(28);
+    _target_q.resize(32);
 	_target_q.setZero();
 
 	_duration = 0.0;

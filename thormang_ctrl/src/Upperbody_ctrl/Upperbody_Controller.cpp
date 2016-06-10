@@ -1,8 +1,8 @@
 #include "Upperbody_Controller.h"
 
-UpperCtrl::UpperCtrl(){};
-UpperCtrl::~UpperCtrl(){};
-#define  JOINT_NUM 28
+UpperCtrl::UpperCtrl(){}
+UpperCtrl::~UpperCtrl(){}
+#define  JOINT_NUM 32
 
 template<typename _Matrix_Type_>
 _Matrix_Type_ pinv(const _Matrix_Type_ &a, double epsilon =std::numeric_limits<double>::epsilon())
@@ -19,7 +19,7 @@ void UpperCtrl::IK_compute(VectorXD& output)
 	if (_target_state < _target_num && _cnt == _pre_time+_current_task_time) {
 		SET_IK_Initialize();
 		SET_IK_Local_Target();
-		output.resize(28);
+        output.resize(JOINT_NUM);
 		output = _q;
 	}
 	if (_cnt <= _task_time)

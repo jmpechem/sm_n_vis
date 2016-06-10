@@ -57,7 +57,8 @@ void Match_Filter::dxlCB(const dynamixel_msgs::JointState::ConstPtr& enc){
 	enc_tf_.setOrigin(tf::Vector3(0.0,0.0,0.0));
 	tf::Quaternion q;
 	//q.setRPY(dxl_enc_,0,0); // lidar mx28 axis aligned
-	q.setRPY(0,0,dxl_enc_-M_PI/2); // lidar mx28 axis perpendicular
+//	q.setRPY(0,0,-dxl_enc_+M_PI/2); // lidar mx28 axis perpendicular
+	q.setRPY(0,0,-dxl_enc_+M_PI/2); // lidar mx28 axis perpendicular
 	enc_tf_.setRotation(q);
 	enc_br_.sendTransform(tf::StampedTransform(enc_tf_, ros::Time::now(), "ChestLidar", "dxl_link"));	
 	
@@ -75,16 +76,17 @@ void Match_Filter::scanCB(const sensor_msgs::LaserScan::ConstPtr& scan){
 
 //	lidar mx28 axis perpendicular modeg
 	tf::Quaternion q1;
-	q1.setRPY(M_PI/2,0,0);
+	q1.setRPY(0,0,0);
 	tf::Transform m1(q1);
 	tf::Quaternion q2(enc_tf_.getRotation().x(),enc_tf_.getRotation().y(),enc_tf_.getRotation().z(),enc_tf_.getRotation().w());
 	tf::Transform m2(q2);
-	tf::Transform m3;	
-	m3 = m2*m1; // rotate lidar axis and revolute mx28 axis
-	rot_tf.transform.rotation.x = m3.getRotation().x();
-	rot_tf.transform.rotation.y = m3.getRotation().y();
-	rot_tf.transform.rotation.z = m3.getRotation().z();
-	rot_tf.transform.rotation.w = m3.getRotation().w();
+
+	tf::Transform m4;
+	m4 = m2*m1; // rotate lidar axis and revolute mx28 axis
+	rot_tf.transform.rotation.x = m4.getRotation().x();
+	rot_tf.transform.rotation.y = m4.getRotation().y();
+	rot_tf.transform.rotation.z = m4.getRotation().z();
+	rot_tf.transform.rotation.w = m4.getRotation().w();
 	
 	tf2::doTransform(cloud_in,cloud_out,rot_tf);
 	point_cloud_pub_.publish(cloud_out);		

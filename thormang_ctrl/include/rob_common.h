@@ -48,6 +48,8 @@ private:
    int dxlMode; ///< current dynamixel mode
    int dxlTorque;
 
+   ros::Rate rate;
+
    RTIME rtNowTime;
    RTIME rtNextTime;
 

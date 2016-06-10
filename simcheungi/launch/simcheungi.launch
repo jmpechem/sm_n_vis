@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find thormang_biped)/launch/display.launch" />
+  <include file="$(find move_model)/launch/move_model.launch" />
+</launch>
