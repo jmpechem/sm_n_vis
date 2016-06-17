@@ -10,9 +10,9 @@ void WalkingPara::set_user_value()
     _T_temp = 3.0*Hz;
     _T_Imp = 0.1*Hz;
 
-    _gyro_frame_flag = true;
-    _com_control_flag = true;
-    _landing_flag = true;
+    _gyro_frame_flag = false;
+    _com_control_flag = false;
+    _landing_flag = false;
 
 
     _ZMP_left_offset = 0.0;

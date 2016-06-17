@@ -33,6 +33,8 @@
 extern const string JointName[40];
 extern const int jointIDs[40];
 
+enum body_select {UPPER, WALKING, HEAD};
+
 class controlBase
 {
 
@@ -140,6 +142,9 @@ protected:
     void WalkingLoop();
     void UpperBodyCheckState();
     void UpperBodyLoop();
+
+    void updateDesired(body_select body, VectorXD &update_q);
+
 
 private:
 

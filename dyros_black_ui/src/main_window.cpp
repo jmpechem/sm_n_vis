@@ -665,6 +665,22 @@ void MainWindow::updateJointView() {
         newItem = new QTableWidgetItem(
                     QString::number(qnode.joint_msg.current[i],'f',2));
 
+        const int lowThres = 3.0;
+        const int highThres = 10.0;
+        double c = fabs(qnode.joint_msg.current[i]);
+        if(c < lowThres)
+        {
+            newItem->setBackgroundColor(QColor(255,255,255 / lowThres * (lowThres - c)));
+        }
+        else if(c > highThres)
+        {
+            newItem->setBackgroundColor(QColor(255,0,0));
+        }
+        else
+        {
+            newItem->setBackgroundColor(QColor(255,255 / (highThres-lowThres) * ((highThres-lowThres) - c + lowThres), 0));
+        }
+
         ui.motor_table->setItem(qnode.joint_msg.id[i]-1, 2, newItem);
         newItem = new QTableWidgetItem(
                     QString::number(qnode.joint_msg.error[i]));

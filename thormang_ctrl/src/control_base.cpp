@@ -6,7 +6,17 @@ const string JointName[40] = {"WaistPitch","WaistYaw",
                               "R_ShoulderPitch","R_ShoulderRoll","R_ShoulderYaw","R_ElbowRoll","R_WristYaw","R_WristRoll","R_HandYaw",
                               "L_ShoulderPitch","L_ShoulderRoll","L_ShoulderYaw","L_ElbowRoll","L_WristYaw","L_WristRoll","L_HandYaw",
                               "R_HipYaw","R_HipRoll","R_HipPitch","R_KneePitch","R_AnklePitch","R_AnkleRoll",
-                              "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll"};
+                              "L_HipYaw","L_HipRoll","L_HipPitch","L_KneePitch","L_AnklePitch","L_AnkleRoll",
+                              "HeadYaw", "HeadPitch", "R_Gripper", "L_Gripper"};
+
+
+
+int jointOccupancy[40] = {UPPER, UPPER,
+                         UPPER, UPPER, UPPER, UPPER, UPPER, UPPER, UPPER,
+                         UPPER, UPPER, UPPER, UPPER, UPPER, UPPER, UPPER,
+                         WALKING, WALKING, WALKING, WALKING, WALKING, WALKING,
+                         WALKING, WALKING, WALKING, WALKING, WALKING, WALKING,
+                         HEAD, HEAD, UPPER, UPPER};
 
 const int jointIDs[40] = {28, 27,
                           1,3,5,7,9,11,13,
@@ -69,16 +79,30 @@ void controlBase::make_id_inverse_list()
 
 void controlBase::WalkingLoop()
 {
+    VectorXD output_q;
+    output_q.resize(28);
+    VectorXD input_q;
+    input_q.resize(28);
+
+    for (int i=0; i<28 ; i++)
+        input_q(i) = q(i);
+
     if(_Init_walking_flag == true)
     {
-        _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
-        _WalkingCtrl.Init_walking_pose(_desired_q);
+        _WalkingCtrl.getdata(input_q,LFT,RFT,Gyro);
+        _WalkingCtrl.Init_walking_pose(output_q);
+        // _desired_q.setZero();
+        updateDesired(WALKING, output_q);
     }
     else if (_Walking_flag == true)
     {
-        _WalkingCtrl.getdata(q,LFT,RFT,Gyro);
-        _WalkingCtrl.compute(_desired_q);
+        _WalkingCtrl.getdata(input_q,LFT,RFT,Gyro);
+        _WalkingCtrl.compute(output_q);
+        // _desired_q.setZero();
+        updateDesired(WALKING, output_q);
     }
+
+
 }
 
 void controlBase::WalkingCheckState()
@@ -128,15 +152,32 @@ void controlBase::UpperBodyLoop()
     if (_Joint_flag)
     {
         _UpperCtrl.Set_Joint_Value(q);
-        _UpperCtrl.FK_compute(_desired_q);
+        VectorXD output_q;
+        output_q.resize(total_dof);
+        _UpperCtrl.FK_compute(output_q);
+        updateDesired(UPPER, output_q);
     }
     else if (_CLIK_flag)
     {
         _UpperCtrl.Set_Joint_Value(q);
-        _UpperCtrl.IK_compute(_desired_q);
+        VectorXD output_q;
+        output_q.resize(total_dof);
+        _UpperCtrl.IK_compute(output_q);
+        updateDesired(UPPER, output_q);
     }
 
     _cnt++;
+}
+
+void controlBase::updateDesired(body_select body, VectorXD &update_q)
+{
+    for(int i=0; i<total_dof; i++)
+    {
+        if(jointOccupancy[i] == body)
+        {
+            _desired_q(i) = update_q(i);
+        }
+    }
 }
 
 void controlBase::UpperBodyCheckState()
@@ -365,8 +406,9 @@ void controlBase::compute()
 
 
     // Loop
-    WalkingLoop();
+
     UpperBodyLoop();
+    WalkingLoop();
 }
 
 void controlBase::reflect()
