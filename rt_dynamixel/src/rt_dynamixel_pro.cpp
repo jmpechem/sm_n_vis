@@ -847,10 +847,10 @@ int RTDynamixelPro::setVelocityGain(int index, int nVelocityIGain, int nVelocity
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
     unsigned int _nParam = 0;
-    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nVelocityIGain));
-    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nVelocityIGain));
-    _pbParams[_nParam++] = DXL_LOBYTE(DXL_HIWORD(nVelocityPGain));
-    _pbParams[_nParam++] = DXL_HIBYTE(DXL_HIWORD(nVelocityPGain));
+    _pbParams[_nParam++] = DXL_LOBYTE(nVelocityIGain);
+    _pbParams[_nParam++] = DXL_HIBYTE(nVelocityIGain);
+    _pbParams[_nParam++] = DXL_LOBYTE(nVelocityPGain);
+    _pbParams[_nParam++] = DXL_HIBYTE(nVelocityPGain);
     return Write(vMotorData[index].id, 586, _nParam, _pbParams, error);
 }
 
@@ -861,8 +861,8 @@ int RTDynamixelPro::setPositionGain(int index, int nPositionPGain, int* error)
     rttLoopTimeoutTime = rttLoopStartTime + 5e6; // 5ms
     unsigned char _pbParams[10];
     unsigned int _nParam = 0;
-    _pbParams[_nParam++] = DXL_LOBYTE(DXL_LOWORD(nPositionPGain));
-    _pbParams[_nParam++] = DXL_HIBYTE(DXL_LOWORD(nPositionPGain));
+    _pbParams[_nParam++] = DXL_LOBYTE(nPositionPGain);
+    _pbParams[_nParam++] = DXL_HIBYTE(nPositionPGain);
     return Write(vMotorData[index].id, 594, _nParam, _pbParams, error);
 }
 
@@ -972,6 +972,8 @@ void RTDynamixelPro::setPIGains(int nVelocityIGain, int nVelocityPGain, int nPos
         }
         SyncWrite(586, 4, _pbParams, _nParam); // 586 = Velocity I Gain
     }
+
+    rt_task_sleep(10e6);    // 10 ms wait
 
     for (int i = 0; i<2; i++)
     {
@@ -1224,7 +1226,7 @@ int RTDynamixelPro::getAllStatus()
 
 
 
-RTIME control_period = 30e5;
+RTIME control_period = 50e5;
 // dxl_control for rt call
 void dxl_control(void* parent)
 {
@@ -1243,7 +1245,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (28e5); // 90%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (45e5); // 90%
 
 
             if(pRTDynamixelObj->bControlWriteEnable)

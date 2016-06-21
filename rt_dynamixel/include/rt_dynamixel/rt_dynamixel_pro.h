@@ -222,7 +222,7 @@ namespace DXL_PRO {
         int32_t velocity;
         int16_t current;
 
-        enum update { UPDATED=1, LOST=255 };
+        enum update { UPDATED=0, LOST=128 };
 
         double aim_radian;
 

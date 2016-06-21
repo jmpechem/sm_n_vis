@@ -12,6 +12,21 @@ void Robot_State::ZMP_real(Vector6D& FT_L,Vector6D& FT_R,Vector3D& L_posi,Vector
     ZMP_real_val(0) = -sum(0)/(FT_L(2)+FT_R(2));
     ZMP_real_val(1) = sum(1)/(FT_L(2)+FT_R(2));
     ZMP_real_val(2) = 0.0;
+
+    Vector2D Left_ZMP;
+    Left_ZMP(0) = FT_L(4)/FT_L(2);
+    Left_ZMP(1) = FT_L(3)/FT_L(2);
+    Left_ZMP(0) = Left_ZMP(0)+L_posi(0);
+    Left_ZMP(1) = Left_ZMP(1)+L_posi(1);
+
+    Vector2D Right_ZMP;
+    Right_ZMP(0) = FT_R(4)/FT_R(2);
+    Right_ZMP(1) = FT_R(3)/FT_R(2);
+    Right_ZMP(0) = Right_ZMP(0)+R_posi(0);
+    Right_ZMP(1) = Right_ZMP(1)+R_posi(1);
+
+    ZMP_real_val(0) = (Left_ZMP(0)*FT_L(2)+Right_ZMP(0)*FT_R(2))/(FT_L(2)+FT_R(2));
+    ZMP_real_val(1) = (Left_ZMP(1)*FT_L(2)+Right_ZMP(1)*FT_R(2))/(FT_L(2)+FT_R(2));
 }
 
 
@@ -99,13 +114,13 @@ void Robot_State::updateFT(Vector6D &RFT,Vector6D &LFT)
     Vector6D RFT_filtered;
     RFT_filtered.setZero();
 
-	
+
     for (int i=0; i<6; i++)
     {
         LFT_filtered(i) = ((k_ft-2*d_ft/Ts)*_LFT_imp_prev2(i)+2*k_ft*_LFT_imp_prev(i)+(2*d_ft/Ts+k_ft)*LFT(i)-(4*m_ft/(Ts*Ts)-2*d_ft/Ts+k_ft)*_LFT2_imp_prev2(i)-(-8*m_ft/(Ts*Ts)+2*k_ft)*_LFT2_imp_prev(i))/(4*m_ft/(Ts*Ts)+2*d_ft/Ts+k_ft);
         RFT_filtered(i) = ((k_ft-2*d_ft/Ts)*_RFT_imp_prev2(i)+2*k_ft*_RFT_imp_prev(i)+(2*d_ft/Ts+k_ft)*RFT(i)-(4*m_ft/(Ts*Ts)-2*d_ft/Ts+k_ft)*_RFT2_imp_prev2(i)-(-8*m_ft/(Ts*Ts)+2*k_ft)*_RFT2_imp_prev(i))/(4*m_ft/(Ts*Ts)+2*d_ft/Ts+k_ft);
     }
-	
+
     for(int i=0 ; i<6; i++)
     {
         _LFT_imp_prev2(i) = _LFT_imp_prev(i);
@@ -142,10 +157,10 @@ void Robot_State::Robot_state_update()
     _T_Trunk_global.translation().setZero();
 
 
-    lJ_R(_q,_J_RFoot_global[0],_J_RFoot_global[1],_J_RFoot_global[2],_J_RFoot_global[3],_J_RFoot_global[4],_J_RFoot_global[5]);
-    lJ_L(_q,_J_LFoot_global[0],_J_LFoot_global[1],_J_LFoot_global[2],_J_LFoot_global[3],_J_LFoot_global[4],_J_LFoot_global[5]);
+  //  lJ_R(_q,_J_RFoot_global[0],_J_RFoot_global[1],_J_RFoot_global[2],_J_RFoot_global[3],_J_RFoot_global[4],_J_RFoot_global[5]);
+  //  lJ_L(_q,_J_LFoot_global[0],_J_LFoot_global[1],_J_LFoot_global[2],_J_LFoot_global[3],_J_LFoot_global[4],_J_LFoot_global[5]);
 
-    Jacobian_global(_q);
+   // Jacobian_global(_q);
 
     Link_COM_update();
 
@@ -156,18 +171,18 @@ void Robot_State::Robot_state_update()
 
     COM_update();
 
-    COM_Jacobian_update();
+    //COM_Jacobian_update();
 
-    Inertia_Matrix_Calculate();
+   // Inertia_Matrix_Calculate();
 
     /////////////Local ÁöÁö¹ß·Î ¹Ù²ãÁØŽÙ/////////////////////////////////
     ////////////žžŸà _Gyro falg°¡ trueÀÌžé, ÁöÁö¹ßÀÇ orientationÀº ¿äžž 0°¡ µÇ°í ·Ñ ÇÇÄ¡ŽÂ °¢µµ ÁžÀçÇÒŒö ÀÖÀœ.
     ///////////žžŸà Gyro falg°¡ falseÀÌžé ÁöÁö¹ßÀÇ orientationÀº ¹«Á¶°Ç ŽÙ 0 (·Ñ ÇÇÄ¡ ¿ä)
     change_support_frame();
 
-    Contactforce_update();
+   // Contactforce_update();
 
-    updateFT(_R_FT_global,_L_FT_global);
+   // updateFT(_R_FT_global,_L_FT_global);
 
     Rot2euler(_T_LFoot_global[5].linear(),_T_LFoot_global_euler);
     Rot2euler(_T_RFoot_global[5].linear(),_T_RFoot_global_euler);
@@ -1592,7 +1607,7 @@ void Robot_State::Robot_State_para_initialize()
         _Inertia_link[RF_BEGIN+i](2,1) = -_Inertia_link[RF_BEGIN+i](2,1);
     }
 
-  //  cout << _Inertia_link[RF_BEGIN+3] << endl;
+    cout << _Inertia_link[RF_BEGIN+3] << endl;
 
 
     Mass.resize(29);

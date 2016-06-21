@@ -1,6 +1,6 @@
 #include "rob_common.h"
 
-realrobot::realrobot() : rate(333.33)
+realrobot::realrobot() : rate(200.00)
 {
     dxlMode = rt_dynamixel_msgs::ModeSettingRequest::SETTING;
     dxlTorque = 0;

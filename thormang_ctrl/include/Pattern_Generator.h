@@ -20,8 +20,8 @@ public:
     void GlobaltoLocal_footstep();
     void ZMP_offset_planning(MatrixXD& _foot_step_localframe, MatrixXD& _foot_step_localframe_offset);
     void ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localframe_offset, MatrixXD& _Ref_ZMP, int planning_step_number);
-    void Onestep_ZMP(double T_Double1,double T_Double2, double T_Total, int step_number,VectorXD& temp_px, VectorXD& temp_py);
-
+    void Onestep_ZMP(double T_rest_init, double T_rest_last, double T_Double1,double T_Double2, double T_Total, int step_number,VectorXD& temp_px, VectorXD& temp_py);
+    void Onestep_stop_ZMP(double _T_Total,double ZMP_x, double ZMP_y, VectorXD &temp_px,VectorXD& temp_py);
     void Ref_COM_update_local();
     void modified_PreviewControl(int td, int TT);
     void PreviewControl(int k, MatrixXD& K, double dt, int NL, double _COM_init, MatrixXD& Gx, MatrixXD& Gi, VectorXD& Gp_l, MatrixXD& A, MatrixXD& B, VectorXD& px_ref, VectorXD& py_ref, Vector3D xi, Vector3D yi, Vector3D xs, Vector3D ys, Vector3D &xd, Vector3D &yd, double ux_1 , double uy_1 , double &ux, double &uy);

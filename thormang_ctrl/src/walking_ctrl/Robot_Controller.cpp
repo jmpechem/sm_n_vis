@@ -36,7 +36,7 @@ void Robot_Control::Resolved_momentum_control()
     H_Rf = H_Rleg*J_Rfoot_inv;
 
 
-    /////////total mass, Inertia °è»ê ///////////////
+    /////////total mass, Inertia ���� ///////////////
 
     double total_mass = 0.0;
     for (int i=0; i<29; i++)
@@ -181,7 +181,7 @@ void Robot_Control::Resolved_momentum_control()
     cout << "desired trunk" << _q(22) << endl;*/
 //	cout << "td" << trunk_euler_desired(2)<< endl;
 
-    /////////////////////////Mb , hb °è»ê//////////////////////////
+    /////////////////////////Mb , hb ����//////////////////////////
 
     MatrixXD Mb, Hb;
     Mb.resize(3,6); Hb.resize(3,6);
@@ -230,7 +230,7 @@ void Robot_Control::Resolved_momentum_control()
 
     //cout << "hb1" << Hb1 << endl;
 
-    ////////////Desired momentum °ú ¹ßÀÇ constraint Œ³Á€ //////////////
+    ////////////Desired momentum �� ���� constraint ��� //////////////
     Vector3D ref_y_linear, ref_y_angular;
 
     ref_y_linear = p_ref-M_Rf*Desired_RFoot_dot-M_Lf*Desired_LFoot_dot;
@@ -349,7 +349,7 @@ void Robot_Control::Resolved_momentum_control()
         base_dot_target(i) = target_y(i);
 
 
-    /////////////°¢¹ßÀÇ °üÀý°¢ ±žÇÏ±â///////////////////////////
+    /////////////������ ������ ���ϱ�///////////////////////////
 
     Matrix6D B_f1;
     Matrix6D B_f2;
@@ -488,7 +488,7 @@ void Robot_Control::Resolved_momentum_control()
 
     //cout << "RFOOT" << Desired_RFoot_dot(2) << endl;
 
-    fprintf(fp10,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",p_ref(0),p_ref(1),p_ref(2),ref_y_angular(0),ref_y_angular(1),ref_y_angular(2),ref_y(0),ref_y(1),ref_y(2),base_dot_desired(0),base_dot_desired(1),base_dot_desired(2),base_dot_desired(3),base_dot_desired(4),base_dot_desired(5),base_dot_target(0),base_dot_target(1),base_dot_target(2),base_dot_target(3),base_dot_target(4),base_dot_target(5),R_dot(1),L_dot(1));
+   // fprintf(fp10,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",p_ref(0),p_ref(1),p_ref(2),ref_y_angular(0),ref_y_angular(1),ref_y_angular(2),ref_y(0),ref_y(1),ref_y(2),base_dot_desired(0),base_dot_desired(1),base_dot_desired(2),base_dot_desired(3),base_dot_desired(4),base_dot_desired(5),base_dot_target(0),base_dot_target(1),base_dot_target(2),base_dot_target(3),base_dot_target(4),base_dot_target(5),R_dot(1),L_dot(1));
 }
 
 
@@ -622,23 +622,23 @@ void Robot_Control::Impedance_update()
 
 void Robot_Control::Impedance_control()
 {
-    ////////////Impedance °šÁö//////////////////
+    ////////////Impedance ����//////////////////
 
     double offset_time = _T_Imp+0.4*Hz;
     double FT_Threshold = 1.0;
 
-    /////////Impedance µ¿ÀÛÇÒ ¹ß ÁöÁ€//////////////
+    /////////Impedance ������ �� ���//////////////
     Vector6D FT;
     if(_foot_step(_step_number,6) == 1)
         FT = _R_FT_global;
     else
         FT = _L_FT_global;
 
-    //////////žžŸà ŸÈÁ€ÀûÀÎ Double support œÃ°£ÀÌ µÇžé Impedance flag ²ô±â///////////////////
+    //////////���� ������� Double support �ð��� �Ǹ� Impedance flag ����///////////////////
 
 
 
-    ////////////////landing œÃÁ¡ 0.3ÃÊ ÀüºÎÅÍ µ¿ÀÛÇÏ°Ô Œ³Á€////////////////////////////
+    ////////////////landing ��� 0.3�� ������ �����ϰ� ���////////////////////////////
     if((_Impedance_flag == false) && (_cnt > _T_Start+_T_Total-_T_Double2-offset_time) && (_cnt < _T_Start+_T_Total))
     {
         if(FT(2) > FT_Threshold || FT(3) > 10.0 || FT(4) > 10.0)
@@ -677,11 +677,11 @@ void Robot_Control::Impedance_control()
     }
 
 
-    ///////////Impedance control œÃÀÛ /////////////////////////
+    ///////////Impedance control ���� /////////////////////////
     if(_Impedance_flag == true)
     {
-        double Mg = 55.3628*9.81; // ·Îº¿ ¹«°Ô
-        //////desired force moment Œ³Á€///
+        double Mg = 55.3628*9.81; // �κ� ����
+        //////desired force moment ���///
         RFT_desired.setZero();
         LFT_desired.setZero();
         if(_cnt < _T_Start+_T_Total)
@@ -720,7 +720,7 @@ void Robot_Control::Impedance_control()
             RFT_desired(2) = 0.5*Mg;
             LFT_desired(2) = 0.5*Mg;
         }
-        ///// gain Œ³Á€//////
+        ///// gain ���//////
         double kp_imp_z_L = 0.0;
         double kp_imp_alpha_L = 0.0;
         double kp_imp_beta_L = 0.0;
@@ -831,9 +831,9 @@ void Robot_Control::Impedance_control()
 
 
 
-        ///////ŸÈÀüÀåÄ¡//////
+        ///////������ġ//////
 
-        if(_foot_step(_step_number,6) == 0) // ¿Þ¹ß ÀÓÇÇ
+        if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
             //Foot_trajectory_global.LFoot.translation()(2) = _Impedance_T_L_current(2) + del_LFoot(2)/Hz;
             //Foot_trajectory_global.LFoot_euler(0) = _Impedance_T_L_current(3) + del_LFoot(3)/Hz;
@@ -889,6 +889,6 @@ void Robot_Control::Impedance_control()
 
         }
 
-        fprintf(fp8,"%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",_cnt,FT(2),RFT_desired(2),Foot_trajectory_global.RFoot.translation()(2),del_RFoot(2),FT(3),RFT_desired[3],Foot_trajectory_global.RFoot_euler(0),del_RFoot(3),_Impedance_T_R_desired_current(3),_Impedance_Ref_prev1_R(3),_Impedance_Ref_prev2_R(3));
     }
 }
+

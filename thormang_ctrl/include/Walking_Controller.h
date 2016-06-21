@@ -22,7 +22,7 @@ public:
 
 public:
     void Init_walking_pose(VectorXD& output);
-
+    void hip_compensator();
     void Step_time_update();
     void Step_count(MatrixXD& foot_planning);
     void getdata(VectorXD& _q_robot, Vector6D& _L_Ft_robot, Vector6D& _R_Ft_robot, Vector3D& _Gyro_Base_robot);
