@@ -87,7 +87,13 @@ void WalkingCtrl::compute(VectorXD& output)
     {
         if(_cnt == 0)
         {
+<<<<<<< HEAD
             cout << "scan_data" << _scan_data << endl;
+=======
+            Vector3D _scan_data;
+            _scan_data.setZero();
+          //  _scan_data(0) = 1.0;
+>>>>>>> d9d926eb6c817a0981d921dc7d4562baa4665ed4
             plan_foot_step(_scan_data,_foot_step,_Step_Planning_flag);
             cout << "foot_Step" << _foot_step << endl;
         }
@@ -214,6 +220,7 @@ void WalkingCtrl::compute(VectorXD& output)
     {
         output = _desired_q;
     }
+<<<<<<< HEAD
 
 }
 
@@ -304,11 +311,84 @@ void WalkingCtrl::hip_compensator()
             Right_hip_angle_temp = 0.0*DEGREE;
         }
     }
+=======
+>>>>>>> d9d926eb6c817a0981d921dc7d4562baa4665ed4
 
     _desired_q(RF_BEGIN+1) = _desired_q(RF_BEGIN+1) - Right_hip_angle_temp;
     _desired_q(LF_BEGIN+1) = _desired_q(LF_BEGIN+1) + Left_hip_angle_temp;
 }
 
+<<<<<<< HEAD
+=======
+void WalkingCtrl::hip_compensator()
+{
+    double Left_Hip_angle = 3.9*DEGREE;
+    double Right_Hip_angle = 3.9*DEGREE;
+    double Left_Hip_angle_first_step = 3.9*DEGREE;
+    double Right_Hip_angle_first_step = 3.0*DEGREE;
+
+    double Left_hip_angle_temp = 0.0;
+    double Right_hip_angle_temp = 0.0;
+    double temp_time = 0.1*Hz;
+
+    if(_step_number == 0)
+    {
+        if(_foot_step(_step_number,6) == 1) // �޹�����
+        {
+            if(_cnt < _T_Start +_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Left_hip_angle_temp = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+temp_time,0.0*DEGREE,0.0,Left_Hip_angle_first_step,0.0);
+            else if(_cnt >= _T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Left_hip_angle_temp = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time,_T_Start+_T_Total-_T_rest_last,Left_Hip_angle_first_step,0.0,0.0,0.0);
+            else
+                Left_hip_angle_temp = 0.0*DEGREE;
+        }
+        else if(_foot_step(_step_number,6) == 0)
+        {
+            if(_cnt < _T_Start +_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Right_hip_angle_temp = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+temp_time,0.0*DEGREE,0.0,Right_Hip_angle_first_step,0.0);
+            else if(_cnt >= _T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Right_hip_angle_temp = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time,_T_Start+_T_Total-_T_rest_last,Right_Hip_angle_first_step,0.0,0.0,0.0);
+            else
+                Right_hip_angle_temp = 0.0*DEGREE;
+        }
+        else
+        {
+            Left_hip_angle_temp = 0.0;
+            Right_hip_angle_temp = 0.0*DEGREE;
+        }
+    }
+    else
+    {
+        if(_foot_step(_step_number,6) == 1) // �޹�����
+        {
+            if(_cnt < _T_Start +_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Left_hip_angle_temp = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+temp_time,0.0*DEGREE,0.0,Left_Hip_angle,0.0);
+            else if(_cnt >= _T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Left_hip_angle_temp = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time,_T_Start+_T_Total-_T_rest_last,Left_Hip_angle,0.0,0.0,0.0);
+            else
+                Left_hip_angle_temp = 0.0*DEGREE;
+        }
+        else if(_foot_step(_step_number,6) == 0)
+        {
+            if(_cnt < _T_Start +_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Right_hip_angle_temp = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+temp_time,0.0*DEGREE,0.0,Right_Hip_angle,0.0);
+            else if(_cnt >= _T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time)
+                Right_hip_angle_temp = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-temp_time,_T_Start+_T_Total-_T_rest_last,Right_Hip_angle,0.0,0.0,0.0);
+            else
+                Right_hip_angle_temp = 0.0*DEGREE;
+        }
+        else
+        {
+            Left_hip_angle_temp = 0.0;
+            Right_hip_angle_temp = 0.0*DEGREE;
+        }
+    }
+
+    _desired_q(RF_BEGIN+1) = _desired_q(RF_BEGIN+1) - Right_hip_angle_temp;
+    _desired_q(LF_BEGIN+1) = _desired_q(LF_BEGIN+1) + Left_hip_angle_temp;
+}
+
+>>>>>>> d9d926eb6c817a0981d921dc7d4562baa4665ed4
 
 void WalkingCtrl::Step_time_update()
 {
