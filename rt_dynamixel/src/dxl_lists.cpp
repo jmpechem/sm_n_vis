@@ -29,7 +29,8 @@ dxl_pro_data dxlLists[4][10] = {
         {7, H54},
         {9, H54},
         {11, H42},
-        {13, H42}
+        {13, H42},
+        {31, H42}
     },    {
         // Index: 1: 2-Left Upper body
         {2, H54},
@@ -39,10 +40,11 @@ dxl_pro_data dxlLists[4][10] = {
         {10, H54},
         {12, H42},
         {14, H42},
-        {28, H54}
+        {28, H54},
+        {32, H42}
     },    {
         // Index: 2: 3-Right Lower body
-/*
+
         {15, H54},    // Fatal
         {17, H54},    // Fatal
         {19, H54},    // Warning
@@ -50,17 +52,19 @@ dxl_pro_data dxlLists[4][10] = {
         {23, H54},
         {25, H54},
         {27, H54}
-                */
+
     },    {
         // Index: 3: 4-Left Lower body
-        /*
+
         {16, H54},
         {18, H54},
         {20, H54},
         {22, H54},
         {24, H54},
-        {26, H54}
-                */
+        {26, H54},
+        {29, H42},
+        {30, H42},
+
     }
 };   // Max 4channels, 10 motors
 #endif
@@ -75,7 +79,8 @@ dxl_gains dxlGains[4][10] =
         {7, 15,-1,-1},
         {9, 15,-1,-1},
         {11, 15,-1,-1},
-        {13, 15,-1,-1}
+        {13, 15,-1,-1},
+        {31, 15,-1,-1}
     },    {
         // Index: 1
         {2, 15,-1,-1},
@@ -85,25 +90,27 @@ dxl_gains dxlGains[4][10] =
         {10, 15,-1,-1},
         {12, 15,-1,-1},
         {14, 15,-1,-1},
-        {28, 15,-1,-1}
+        {28, 15,-1,-1},
+        {32, 15,-1,-1}
     },    {
         // Index: 2
-        {15, 64,500,50},
-        {17, 64,500,50},
-        {19, 64,500,50},
-        {21, 64,500,50},
-        {23, 64,500,50},
-        {25, 64,500,50},
-        {27, 64,500,50}
+        {15, 96,500,10},
+        {17, 96,500,10},
+        {19, 96,500,10},
+        {21, 96,500,10},
+        {23, 96,500,10},
+        {25, 96,500,10},
+        {27, 96,500,10}
     },    {
         // Index: 3
-        {16, 64,500,50},
-        {18, 64,500,50},
-        {20, 64,500,50},
-        {22, 64,500,50},
-        {24, 64,500,50},
-        {26, 64,500,50},
-
+        {16, 96,500,10},
+        {18, 96,500,10},
+        {20, 96,500,10},
+        {22, 96,500,10},
+        {24, 96,500,10},
+        {26, 96,500,10},
+        {29, 96,500,10},
+        {30, 96,500,10}
     }
 };
 
@@ -114,20 +121,6 @@ int nDXLCount[4] = {0, };
 
 dxl_inverse dxlID2Addr[60] = { 0, };    // max ID = 50,
 // How to use: dxlLists[dxlID2Addr[id].channel][dxlID2Addr[id].index];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 void make_dxl_count()
@@ -231,7 +224,7 @@ void motion_init_proc(void *arg)
     int nRecv[4] = {0, };
 
     ROS_INFO("Writing Settings");
-    for(int c=0; c<1; c++)
+    for(int c=0; c<2; c++)
     {
 
         for(int i=0;i<4;i++)
@@ -245,7 +238,7 @@ void motion_init_proc(void *arg)
             dxlDevice[i].setAllTorque(0);
             rt_task_sleep(5e6);
 
-            /*
+
 
             // Gain Set
             for(int j=0; j<nDXLCount[i]; j++)
@@ -253,17 +246,29 @@ void motion_init_proc(void *arg)
                 int err;
                 if(dxlDevice[i][j].id == dxlGains[i][j].id)
                 {
+                    if(dxlGains[i][j].position_p_gain  < 0) continue;
+                    if(dxlGains[i][j].velocity_i_gain  < 0) continue;
+                    if(dxlGains[i][j].velocity_p_gain  < 0) continue;
+
+                    dxlDevice[i].rttLoopStartTime = rt_timer_read();
+                    dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 5e6; // 5ms
+
                     dxlDevice[i].setPositionGain(j,dxlGains[i][j].position_p_gain, &err);
+                    rt_task_sleep(5e6);
+
+                    dxlDevice[i].rttLoopStartTime = rt_timer_read();
+                    dxlDevice[i].rttLoopTimeoutTime = dxlDevice[i].rttLoopStartTime + 5e6; // 5ms
                     dxlDevice[i].setVelocityGain(j,dxlGains[i][j].velocity_i_gain,
                                                  dxlGains[i][j].velocity_p_gain, &err);
+                    rt_task_sleep(5e6);
                 }
                 else
                 {
                     ROS_ERROR("No match between Devices ID and Gain datas");
                 }
-
             }
-            */
+
+
         }
 
     }

@@ -4,10 +4,11 @@ void Foot_Planning::plan_foot_step(Vector3D& _scan_data, MatrixXD& _foot_step, b
 {
     if(_scan_data(0) == 0 && _scan_data(1) == 0 && _scan_data(2) == 0)
     {
-        _foot_step.resize(2,7);
+        _foot_step.resize(80,7);
         _foot_step.setZero();
 
-        int i=0;
+        for (int i=0; i<40 ;i++)
+        {
         _foot_step(2*i+0,0) = 0.0;//0.2*i+0.1;	//0.0;//-0.0491398 ;//0.2*i+0.2;
         _foot_step(2*i+0,1) = -0.123978;
         _foot_step(2*i+0,2) = 0.0;
@@ -17,15 +18,14 @@ void Foot_Planning::plan_foot_step(Vector3D& _scan_data, MatrixXD& _foot_step, b
         _foot_step(2*i+1,1) = 0.123978;
         _foot_step(2*i+1,2) = 0.0;
         _foot_step(2*i+1,6) = 0;
-
-
+        }
     }
     else
     {
-        //if(_Step_Planning_flag == false)
+        if(_Step_Planning_flag == false)
             calculate_foot_step_total(_scan_data,_foot_step);
-        /*else
-            calculate_foot_step_separate(_scan_data,_foot_step);*/
+        else
+            calculate_foot_step_separate(_scan_data,_foot_step);
     }
 
     _step_total_number = _foot_step.col(1).size();

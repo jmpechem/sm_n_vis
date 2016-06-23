@@ -123,6 +123,8 @@ void controlBase::WalkingCheckState()
         _Walking_flag = true;
         _Init_walking_flag = false;
         _WalkingCtrl._initialize();
+        _WalkingCtrl.setApproachdata(walkingCmdMsg.x,walkingCmdMsg.y,walkingCmdMsg.theta);
+
     }
     else if (walkingCmdMsg.command == "stop")
     {
@@ -322,7 +324,7 @@ void controlBase::UpperBodyCheckState()
         ROS_INFO("Task Controller for arms");
         _UpperCtrl.Set_Initialize();
 
-        _target_x.resize(2,8);
+        _target_x.resize(1,8);
         _target_x.setZero();
         double run_time = 0.0f;
         run_time = 5.0;

@@ -8,7 +8,7 @@ void Pattern_generator::Heel_Toe_Motion_pattern()
     L_ankle_angle = 0.0;
     R_ankle_angle = 0.0;
 
-    Vector3D Front_init_angkle_edge; // ¹ß¹ÙŽÚ ³¡ÁöÁ¡¿¡Œ­ ¹Ù¶óº» ankleÀÇ À§Ä¡
+    Vector3D Front_init_angkle_edge; // �߹ٴ� ��������� �ٶ��� ankle�� �ġ
     Front_init_angkle_edge(0) = -0.13;
     Front_init_angkle_edge(1) = 0.0;
     Front_init_angkle_edge(2) = 0.092;
@@ -59,9 +59,9 @@ void Pattern_generator::Heel_Toe_Motion()
     L_ankle_angle = 0.0;
     R_ankle_angle = 0.0;
 
-    double Leg_max = 0.595; // ŽÙž® ÂÓÇÊ¶§ ±æÀÌ
+    double Leg_max = 0.595; // �ٸ� ���ʶ� ����
 
-    Vector3D Front_init_angkle_edge; // ¹ß¹ÙŽÚ ³¡ÁöÁ¡¿¡Œ­ ¹Ù¶óº» ankleÀÇ À§Ä¡
+    Vector3D Front_init_angkle_edge; // �߹ٴ� ��������� �ٶ��� ankle�� �ġ
     Front_init_angkle_edge(0) = -0.13;
     Front_init_angkle_edge(1) = 0.0;
     Front_init_angkle_edge(2) = 0.092;
@@ -82,7 +82,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
     if(L_leg_length >= (Leg_max*Leg_max))
     {
-        if(Foot_trajectory_global.LFoot.translation()(0) < 0.0) // ¹ßÀÌ µÚÂÊ¿¡ ÀÖŽÂ »óÈ² ¹ßžñÀÌ ŸçŒö·Î µ¹ŸÆŸßŽï
+        if(Foot_trajectory_global.LFoot.translation()(0) < 0.0) // ���� ���ʿ� �ִ� ��Ȳ �߸��� ������ ���ƾߴ�
         {
 
             cout<< "LHeelToe ON1111!" << endl;
@@ -100,7 +100,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
             Vector3D Theta_temp;
 
-            Theta_temp(0) = -(x_plus_theta-x); // ÀœŒö°¡ ºÙÀºÀÌÀ¯ŽÂ Toe ankle°ú ankle orientationÀº ºÎÈ£°¡ ¹ÝŽëÀÓ!
+            Theta_temp(0) = -(x_plus_theta-x); // ����� �������� Toe ankle�� ankle orientation� ��ȣ�� �ݴ���!
             Theta_temp(1) = -(x_plus_theta+180*DEGREE-x);
             Theta_temp(2) = -(x_plus_theta-x-180*DEGREE);
 
@@ -140,7 +140,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
             Vector3D Theta_temp;
 
-            Theta_temp(0) = -(x_plus_theta-x); // ÀœŒö°¡ ºÙÀºÀÌÀ¯ŽÂ Toe ankle°ú ankle orientationÀº ºÎÈ£°¡ ¹ÝŽëÀÓ!
+            Theta_temp(0) = -(x_plus_theta-x); // ����� �������� Toe ankle�� ankle orientation� ��ȣ�� �ݴ���!
             Theta_temp(1) = -(x_plus_theta+180*DEGREE-x);
             Theta_temp(2) = -(x_plus_theta-x-180*DEGREE);
 
@@ -163,7 +163,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
     if(R_leg_length >= (Leg_max*Leg_max))
     {
-        if(Foot_trajectory_global.RFoot.translation()(0) < 0.0) // ¹ßÀÌ µÚÂÊ¿¡ ÀÖŽÂ »óÈ² ¹ßžñÀÌ ŸçŒö·Î µ¹ŸÆŸßŽï
+        if(Foot_trajectory_global.RFoot.translation()(0) < 0.0) // ���� ���ʿ� �ִ� ��Ȳ �߸��� ������ ���ƾߴ�
         {
             cout<< "LHeelToe ON!" << endl;
             double a, b, c;
@@ -181,7 +181,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
             Vector3D Theta_temp;
 
-            Theta_temp(0) = -(x_plus_theta-x); // ÀœŒö°¡ ºÙÀºÀÌÀ¯ŽÂ Toe ankle°ú ankle orientationÀº ºÎÈ£°¡ ¹ÝŽëÀÓ!
+            Theta_temp(0) = -(x_plus_theta-x); // ����� �������� Toe ankle�� ankle orientation� ��ȣ�� �ݴ���!
             Theta_temp(1) = -(x_plus_theta+180*DEGREE-x);
             Theta_temp(2) = -(x_plus_theta-x-180*DEGREE);
 
@@ -218,7 +218,7 @@ void Pattern_generator::Heel_Toe_Motion()
 
             Vector3D Theta_temp;
 
-            Theta_temp(0) = (x_plus_theta-x); // °è»ê»ó ankle-contact pointº€ÅÍžŠ ¶È°°ÀÌ œáŒ­ ºÎÈ£ ¹ÝŽë
+            Theta_temp(0) = (x_plus_theta-x); // ������ ankle-contact point���͸� �Ȱ��� �Ἥ ��ȣ �ݴ�
             Theta_temp(1) = (x_plus_theta+180*DEGREE-x);
             Theta_temp(2) = (x_plus_theta-x-180*DEGREE);
 
@@ -337,103 +337,67 @@ void Pattern_generator::Trunk_trajectory_update()
 {
     double z_rot = _foot_step_localframe(_step_number,5);
 
+    //Trunk Position
     if(_com_control_flag == true)
     {
-        double kp;
-        if (_cnt < _T_Start+_T_Double1/4.0 && _step_number!=0)
-            kp = Cubic(_cnt,_T_Start,_T_Start+_T_Double1/4.0,0.0,0.0,1.0,0.0);
-        else
-            kp = 1;
+        double kp = 1.0;
 
-        /*if(_step_number != 0)
-            _COM_desired(2) = Cubic(_cnt,_T_Start,_T_Start+_T_Total-_T_Double2,_init_COM._COM(2),0.0,_COM_desired(2),0.0);*/
-
-        //if(_step_number == _step_total_number-1 && _cnt >= _T_Start+_T_Total)
-        //{
-        //	if(_cnt == _T_Start+_T_Total)
-        //		_init_COM._COM = _COM_real_support;
-        //	_COM_desired(2) = _init_COM._COM(2);
-        //}
-
+       // kp = Cubic(abs(_COM_desired(0)-_COM_real_support(0)),0.0,0.05,1.0,0.0,3.0,0.0);
         Trunk_trajectory.translation()(0) = _T_Trunk_support.translation()(0) + kp*(_COM_desired(0) - _COM_real_support(0));
+       // kp = Cubic(abs(_COM_desired(1)-_COM_real_support(1)),0.0,0.05,1.0,0.0,3.0,0.0);
         Trunk_trajectory.translation()(1) = _T_Trunk_support.translation()(1) + kp*(_COM_desired(1) - _COM_real_support(1));
-        Trunk_trajectory.translation()(2) = _T_Trunk_support.translation()(2) + kp*(_COM_desired(2) - _COM_real_support(2));
+       // kp = Cubic(abs(_COM_desired(2)-_COM_real_support(2)),0.0,0.05,1.0,0.0,3.0,0.0);
+        Trunk_trajectory.translation()(2) = _COM_desired(2);//_T_Trunk_support.translation()(2) + kp*(_COM_desired(2) - _COM_real_support(2));
     }
     else
     {
         Trunk_trajectory.translation()(0) = _COM_desired(0) + _COM_offset(0);
         Trunk_trajectory.translation()(1) = _COM_desired(1) + _COM_offset(1);
-        Trunk_trajectory.translation()(2) = Cubic(_cnt,_T_Start,_T_Last,_init_COM._Trunk.translation()(2),0.0,_COM_desired(2),0.0);
-
-        if(_step_number == 1)
-        {
-            cout << "init" << _init_COM._Trunk.translation();
-            cout << "trunk" << Trunk_trajectory.translation();
-        }
+        Trunk_trajectory.translation()(2) = _COM_desired(2);
     }
 
+    //Trunk orientation
     Vector3D Trunk_trajectory_euler;
 
-    if(_cnt < _T_Start+_T_Double1)
-    {
-        for(int i=0; i<3; i++)
-            Trunk_trajectory_euler(i) = Cubic(_cnt,_T_Start,_T_Start+_T_Double1,_init_COM._Trunk_euler(i),0.0,0.0,0.0);;
-    }
-
-    else if(_cnt >= _T_Start+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2)
+    if(_cnt < _T_Start_real+_T_Double1)
     {
         for(int i=0; i<2; i++)
-            Trunk_trajectory_euler(i) = Cubic(_cnt,_T_Start,_T_Last,_init_COM._Trunk_euler(i),0.0,0.0,0.0);;
+            Trunk_trajectory_euler(i) = Cubic(_cnt,_T_Start,_T_Start_real+_T_Double1,_init_COM._Trunk_euler(i),0.0,0.0,0.0);;
+        Trunk_trajectory_euler(2) = _init_COM._Trunk_euler(2);
+    }
+
+    else if(_cnt >= _T_Start_real+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2-_T_rest_last)
+    {
+        for(int i=0; i<2; i++)
+            Trunk_trajectory_euler(i) = 0.0;
 
         if(_foot_step(_step_number,6) == 2)
             Trunk_trajectory_euler(2) = _init_COM._Trunk_euler(2);
         else
-        {
-            Trunk_trajectory_euler(2) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2,_init_COM._Trunk_euler(2),0.0,z_rot/2.0,0.0);
-        }
-        Trunk_trajectory_euler.setZero();
-    }
-    else if(_cnt >= _T_Start+_T_Total-_T_Double2 && _cnt <_T_Start+_T_Total)
-    {
-        for(int i=0; i<2; i++)
-            Trunk_trajectory_euler(i) = Cubic(_cnt,_T_Start,_T_Last,_init_COM._Trunk_euler(i),0.0,0.0,0.0);;
-
-        if(_foot_step(_step_number,6) == 2)
-            Trunk_trajectory_euler(2) = _init_COM._Trunk_euler(2);
-        else
-        {
-            Trunk_trajectory_euler(2) = z_rot/2.0;
-        }
-        Trunk_trajectory_euler.setZero();
+            Trunk_trajectory_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_rest_last,_init_COM._Trunk_euler(2),0.0,z_rot/2.0,0.0);
     }
     else
     {
         for(int i=0; i<2; i++)
-            Trunk_trajectory_euler(i) = Cubic(_cnt,_T_Start,_T_Last,_init_COM._Trunk_euler(i),0.0,0.0,0.0);;
+            Trunk_trajectory_euler(i) = 0.0;
 
         if(_foot_step(_step_number,6) == 2)
             Trunk_trajectory_euler(2) = _init_COM._Trunk_euler(2);
         else
             Trunk_trajectory_euler(2) = z_rot/2.0;
-        Trunk_trajectory_euler.setZero();
     }
 
-    Trunk_trajectory_euler = _init_info._trunk_support_euler_init;
     Trunk_trajectory.linear() = Rotate_with_Z(Trunk_trajectory_euler(2))*Rotate_with_Y(Trunk_trajectory_euler(1))*Rotate_with_X(Trunk_trajectory_euler(0));
 }
 
-
-
-
 void Pattern_generator::Foot_trajectory_update()
 {
-
     Vector6D target_swing_foot;
 
     for(int i=0; i<6; i++)
         target_swing_foot(i) = _foot_step_localframe(_step_number,i);
 
-    if(_cnt < _T_Start+_T_Double1)
+    if(_cnt < _T_Start_real+_T_Double1)
     {
         Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
         Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
@@ -445,68 +409,68 @@ void Pattern_generator::Foot_trajectory_update()
         Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
         Foot_trajectory.RFoot_dot.setZero();
     }
-    else if(_cnt >= _T_Start+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2)
+    else if(_cnt >= _T_Start_real+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2-_T_rest_last)
     {
-        if(_foot_step(_step_number,6) == 1) // ¿Þ¹ß ÁöÁö
+        if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
             Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
             Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
             Foot_trajectory.LFoot_dot.setZero();
 
-            if(_cnt < _T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0)
+            if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
             {
-                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0);
-                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0,Hz);
+                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0);
+                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0,Hz);
             }
             else
             {
-                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
-                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
+                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
+                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
             }
 
             for(int i=0; i<2; i++)
             {
-                Foot_trajectory.RFoot.translation()(i) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0);
-                Foot_trajectory.RFoot_dot(i) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
+                Foot_trajectory.RFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0);
+                Foot_trajectory.RFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
             for(int i=0; i<3; i++)
             {
-                Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
+                Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
+                Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
             }
 
             Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));
         }
-        else if(_foot_step(_step_number,6) == 0) // ¿Þ¹ß ÁöÁö
+        else if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
             Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
             Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
             Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
             Foot_trajectory.RFoot_dot.setZero();
 
-            if(_cnt < _T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0)
+            if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
             {
-                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0);
-                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0,Hz);
+                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0);
+                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0,Hz);
             }
             else
             {
-                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
-                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start+_T_Double1+(_T_Total-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
+                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
+                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
             }
 
             for(int i=0; i<2; i++)
             {
-                Foot_trajectory.LFoot_dot(i) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
-                Foot_trajectory.LFoot.translation()(i) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0);
+                Foot_trajectory.LFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0);
+                Foot_trajectory.LFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
             for(int i=0; i<3; i++)
             {
-                Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start+_T_Double1,_T_Start+_T_Total-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
+                Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
+                Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
             }
 
             Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
@@ -524,9 +488,9 @@ void Pattern_generator::Foot_trajectory_update()
             Foot_trajectory.RFoot_dot.setZero();
         }
     }
-    else if(_cnt >= _T_Start+_T_Total-_T_Double2)
+    else
     {
-        if(_foot_step(_step_number,6) == 1) // ¿Þ¹ß ÁöÁö
+        if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
             Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
@@ -572,9 +536,9 @@ void Pattern_generator::Foot_trajectory_update()
 }
 
 void Pattern_generator::Ref_ZMP_update()
-{
-    ////////////////////////ZMP »ýŒºÇÒ frame Œö °è»ê //////////////////////////////////
-    int planning_step_number = 3; // œºÅÜŒö
+{	cout << "ZMP_Update" << endl;
+    ////////////////////////ZMP ������ frame �� ���� //////////////////////////////////
+    int planning_step_number = 3; // ���ܼ�
 
     int Nom_size = 0;
 
@@ -586,7 +550,7 @@ void Pattern_generator::Ref_ZMP_update()
     if(_step_number == 0)
         Nom_size = Nom_size + _T_temp+1;
 
-    ////////////////////ÃÊ±â ¹ß À§Ä¡ ¹× ¿Àž®¿£Å×ÀÌŒÇ ÀúÀå///////////////////////
+    ////////////////////�ʱ� �� �ġ �� ��������̼� ����///////////////////////
     if(_foot_step(0,6) == 1)
     {
         for(int i=0; i<2; i++)
@@ -613,7 +577,7 @@ void Pattern_generator::Ref_ZMP_update()
     }
 
 
-    ///////////////////////ZMP °è»ê œÃÀÛ////////////////////////////////
+    ///////////////////////ZMP ���� ����////////////////////////////////
     _Ref_ZMP.resize(Nom_size,2);
     _Ref_ZMP.setZero();
 
@@ -627,28 +591,13 @@ void Pattern_generator::Ref_ZMP_update()
     ZMP_offset_planning(_foot_step_localframe,_foot_step_localframe_offset);
 
     ZMP_Generator(Nom_size,_foot_step_localframe_offset,_Ref_ZMP,planning_step_number);
-
-
-    if(_step_number ==4)
-        cout << "!!!!!!!!!!!!!!number 4!!!!!!!!!!!!!" << endl;
-
-    if (_step_number == 2)
-    {
-      /*  FILE* fp10;
-        fp10 = fopen("../acquisition/temp_pref.txt","w");
-        for(int i = 0; i <Nom_size; i++)
-        {
-            fprintf(fp10,"%f\t%f\n",_Ref_ZMP(i,0),_Ref_ZMP(i,1));
-        }
-        fclose(fp10);*/
-    }
 }
 
 
 
 void Pattern_generator::Ref_COM_update_local()
 {
-
+    // �κ� ���� �� cnt=0 (ùƽ)���� ���� �Ǵ� �κ��� COM or Trunk�ġ
     if(_com_control_flag == true)
     {
         _xi(0) = _init_info._COM_support_init(0);
@@ -660,10 +609,7 @@ void Pattern_generator::Ref_COM_update_local()
         _yi(0) = _init_info._trunk_support_init.translation()(1)+_COM_offset(1);
     }
 
-    double x_err;
-    double y_err;
-
-    ///// xsžŠ œÇÁŠ COMÀž·Î Ÿ÷µ¥ÀÌÆ® ŸÈÇÒ ¶§///
+    //�κ��� step��ȯ�� com�� �ӵ� ���� ������ ������(������ �����)
     if (_cnt == _T_Start && _step_number != 0)
     {
         Vector3D COB_vel_prev;
@@ -671,11 +617,10 @@ void Pattern_generator::Ref_COM_update_local()
         Vector3D COB_acc_prev;
         Vector3D COB_acc;
 
-
-        if(_step_number == 0) //ÀÌÀü ÁöÁö¹ßÀº init_support ÀÌ¹Ç·Î
+        if(_step_number == 1) //���� ������� init_support �̹Ƿ�
         {
             Matrix3D temp;
-            temp = Rotate_with_Z(_initial_global_support_foot(5));
+            temp = Rotate_with_Z(-_initial_global_support_foot(5));
 
             COB_vel_prev(0) = _xs(1);
             COB_vel_prev(1) = _ys(1);
@@ -686,42 +631,30 @@ void Pattern_generator::Ref_COM_update_local()
             COB_acc_prev(1) = _ys(2);
             COB_acc_prev(2) = 0.0;
             COB_acc = temp*COB_acc_prev;
-        }
-        else if(_step_number != 0)
-        {
-            Matrix3D temp;
-            temp = Rotate_with_Z(_foot_step_localframe(_step_number,5)); ////////////////ŽÙœÃ »ý°¢ÇØºŒ°Í ÁÂÇ¥°è
-
-            COB_vel_prev(0) = _xs(1);
-            COB_vel_prev(1) = _ys(1);
-            COB_vel_prev(2) = 0.0;
-            COB_vel = temp*COB_vel_prev;
-
-            COB_acc_prev(0) = _xs(2);
-            COB_acc_prev(1) = _ys(2);
-            COB_acc_prev(2) = 0.0;
-            COB_acc = temp*COB_acc_prev;
-        }
-
-        if(_com_control_flag == true)
-        {
-            _xs(0) = _init_COM._COM(0);
-            _ys(0) = _init_COM._COM(1);
         }
         else
         {
-            _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0);
-            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(0);
+            Matrix3D temp;
+            temp = Rotate_with_Z(-_foot_step_localframe(_step_number-1,5)); ////////////////�ٽ� �����غ��� ��ǥ��
+
+            COB_vel_prev(0) = _xs(1);
+            COB_vel_prev(1) = _ys(1);
+            COB_vel_prev(2) = 0.0;
+            COB_vel = temp*COB_vel_prev;
+
+            COB_acc_prev(0) = _xs(2);
+            COB_acc_prev(1) = _ys(2);
+            COB_acc_prev(2) = 0.0;
+            COB_acc = temp*COB_acc_prev;
         }
+
         _xs(1) = COB_vel(0);
         _ys(1) = COB_vel(1);
         _xs(2) = COB_acc(0);
         _ys(2) = COB_acc(1);
-
-
-
     }
 
+    //COM �ġ ���
     if(_COM_update_flag == true)
     {
         if(_com_control_flag == true)
@@ -731,18 +664,20 @@ void Pattern_generator::Ref_COM_update_local()
         }
         else
         {
-            _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0);
-            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(0);
+            _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0) + _xs(1)*1.0/Hz;
+            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(0) + _ys(1)*1.0/Hz;
         }
     }
 
+    double x_err;
+    double y_err;
 
     ////PreviewControl_basic(_cnt-_init_info.t, _K, Frequency2,  16*Hz2/10, 0.6802, _Gx, _Gi, _Gp_I, _A, _BBB, &_sum_px_err, &_sum_py_err, _px_ref, _py_ref, _xi, _yi, _xs, _ys, _xd, _yd, x_err, y_err);
     modified_PreviewControl(_T_Double1, _T_Total);
     _xs=_xd;
     _ys=_yd;
 
-
+    //Reference ZMP �� ���� �ð�� ������� �������� ZMP�� �����ϱ� ������ start_time��� ���ߵ�.
     if(_step_number == 0)
         start_time = 0;
     else
@@ -751,22 +686,13 @@ void Pattern_generator::Ref_COM_update_local()
     _ZMP_desired(0) = _Ref_ZMP(_cnt-start_time,0);
     _ZMP_desired(1) = _Ref_ZMP(_cnt-start_time,1);
 
-
-    double k1 = 0.0;
-    if(_cnt == _T_Start && _step_number != 0)
-        _COM_modification.setZero();
-
-    _COM_modification(0) = 0.95*_COM_modification(0)+k1*(_ZMP_desired(0)-_ZMP_real(0));
-    _COM_modification(1) = 0.95*_COM_modification(1)+k1*(_ZMP_desired(1)-_ZMP_real(1));
-
-
     if(_com_control_flag == true)
     {
         _COM_desired(0) = _xd(0);
         _COM_desired(1) = _yd(0);
-        _COM_desired(2) = _init_info._COM_support_init(2);
-        _COM_desired(2) = Cubic(_cnt,_T_Start,_T_Start+_T_Double1,_init_COM._COM(2),0.0,_init_info._COM_support_init(2),0.0);
-
+        //_COM_desired(2) = _init_info._COM_support_init(2);
+        //_COM_desired(2) = Cubic(_cnt,_T_Start,_T_Start+_T_Double1,_init_COM._COM(2),0.0,_init_info._COM_support_init(2),0.0);
+        _COM_desired(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_COM._Trunk.translation()(2),0.0,_init_info._trunk_support_init.translation()(2),0.0);
         double k= 100.0;
         p_ref(0) = _xd(1)+k*(_xd(0)-_COM_real_support(0));
         p_ref(1) = _yd(1)+k*(_yd(0)-_COM_real_support(1));
@@ -777,14 +703,13 @@ void Pattern_generator::Ref_COM_update_local()
     {
         _COM_desired(0) = _xd(0);
         _COM_desired(1) = _yd(0);
-        _COM_desired(2) = _init_info._trunk_support_init.translation()(2);
+        _COM_desired(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_COM._Trunk.translation()(2),0.0,_init_info._trunk_support_init.translation()(2),0.0);
 
         double k= 100.0;
         p_ref(0) = _xd(1)+k*(_xd(0)-_COM_real_support(0));
         p_ref(1) = _yd(1)+k*(_yd(0)-_COM_real_support(1));
         p_ref(2) = k*(_COM_desired(2)-_COM_real_support(2));
         L_ref.setZero();
-
     }
 }
 
@@ -792,11 +717,8 @@ void Pattern_generator::Ref_COM_update_local()
 
 void Pattern_generator::modified_PreviewControl(int td, int TT)
 {
-
     if(_cnt == 0)
-    {
         equation(1.0/Hz, 16*Hz/10, _init_info._COM_support_init(2), _K, _Gi, _Gp_I, _Gx, _A, _BBB);
-    }
 
     if(_step_number == 0)
         start_time = 0;
@@ -835,8 +757,8 @@ void Pattern_generator::modified_PreviewControl(int td, int TT)
     est_zmp_error_y = C*ys_matrix;
 
     double rx, ry;
-    VectorXD permision_px_ref(16*Hz/10+1);
-    VectorXD permision_py_ref(16*Hz/10+1);
+  //  VectorXD permision_px_ref(16*Hz/10+1);
+  //  VectorXD permision_py_ref(16*Hz/10+1);
     rx = 0.0;
     ry = 0.0;
 
@@ -881,7 +803,6 @@ void Pattern_generator::modified_PreviewControl(int td, int TT)
     _ys = _yd;
 
     MatrixXD est_zmp(1,1);
-    Matrix3D temp;
     est_zmp(0,0) = C(0,0)*_xs(0)+C(0,1)*_xs(1)+C(0,2)*_xs(2);
 }
 
@@ -1025,7 +946,6 @@ void Pattern_generator::equation(double dt, int NL, double _COM_init, MatrixXD& 
 //		Gp_l.set(i,1,Gp_l_column);
         Gp_l_column = temp_Mat_inv*B_T*X_l.col(i);
     }
-
 }
 
 
@@ -1081,12 +1001,12 @@ MatrixXD Pattern_generator::dare(MatrixXD& A, MatrixXD& B, MatrixXD& R, MatrixXD
     //Z.print(_T("Z"));
     using namespace std;
 
-    std::vector<double> eigVal_real(2*n); //eigen valueÀÇ real°ª
-    std::vector<double> eigVal_img(2*n); //eigen valueÀÇ img°ª
-    std::vector<VectorXD> eigVec_real(2*n); //eigen vectorÀÇ real°ª
-    std::vector<VectorXD> eigVec_img(2*n); //eigen vectorÀÇ img°ª
+    std::vector<double> eigVal_real(2*n); //eigen value�� real��
+    std::vector<double> eigVal_img(2*n); //eigen value�� img��
+    std::vector<VectorXD> eigVec_real(2*n); //eigen vector�� real��
+    std::vector<VectorXD> eigVec_img(2*n); //eigen vector�� img��
 
-    for(int i=0;i<2*n;i++) //°ªÀÇ ÃÊ±âÈ­
+    for(int i=0;i<2*n;i++) //���� �ʱ�ȭ
     {
         eigVec_real[i].resize(2*n);
         eigVec_real[i].setZero();
@@ -1103,7 +1023,7 @@ MatrixXD Pattern_generator::dare(MatrixXD& A, MatrixXD& B, MatrixXD& R, MatrixXD
     deigVec_real.setZero();
     deigVec_img.setZero();
 
-    MatrixXD Z_evr = Z; // ÀÓœÃ ÀúÀå, rmathÀÇ evrÀ» ÇÏžé ¿øº» Z matrix°¡ º¯ÇüµÊ
+    MatrixXD Z_evr = Z; // �ӽ� ����, rmath�� evr� �ϸ� ���� Z matrix�� ������
 
     deigVal_real = Z_evr.eigenvalues().real();
     deigVal_img = Z_evr.eigenvalues().imag();
@@ -1113,7 +1033,7 @@ MatrixXD Pattern_generator::dare(MatrixXD& A, MatrixXD& B, MatrixXD& R, MatrixXD
     //Matrix3D ones = Matrix3D::Ones(3,3);
     //EigenSolver<Matrix3D> es(ones);
     //cout << "The first eigenvector of the 3x3 matrix of ones is:" << endl << es.eigenvectors().col(1) << endl;
-    //	Z_evr.evr(eigVal_real, eigVal_img, eigVec_real,eigVec_img); //right eigen vectoržŠ °è»ê
+    //	Z_evr.evr(eigVal_real, eigVal_img, eigVec_real,eigVec_img); //right eigen vector�� ����
 
 
 
@@ -1292,6 +1212,7 @@ void Pattern_generator::PreviewControl(int k, MatrixXD& K, double dt, int NL, do
 
 void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localframe_offset, MatrixXD& _Ref_ZMP, int planning_step_number)
 {
+
     _Ref_ZMP.resize(Nom_Size,2);
 
     VectorXD temp_px;
@@ -1301,7 +1222,7 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
 
     if(_step_number == 0)
     {
-        for (int i=0; i<= _T_temp; i++) //200 tick±îÁö ÁŠ·Î À¯Áö
+        for (int i=0; i<= _T_temp; i++) //200 tick���� ��� ���
         {
 
             _Ref_ZMP(i,0) = _init_info._COM_support_init(0);
@@ -1314,7 +1235,7 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
     {
         for(int i = _step_number; i<_step_total_number ; i++)
         {
-            Onestep_ZMP(_T_Double1,_T_Double2,_T_Total,i,temp_px,temp_py);
+            Onestep_ZMP(_T_rest_init,_T_rest_last,_T_Double1,_T_Double2,_T_Total,i,temp_px,temp_py);
 
             for (int j=0; j<_T_Total; j++)
             {
@@ -1335,7 +1256,7 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
     {
         for(int i=_step_number; i < _step_number+planning_step_number; i++)
         {
-            Onestep_ZMP(_T_Double1,_T_Double2,_T_Total,i,temp_px,temp_py);
+            Onestep_ZMP(_T_rest_init,_T_rest_last,_T_Double1,_T_Double2,_T_Total,i,temp_px,temp_py);
 
             for (int j=0; j<_T_Total; j++)
             {
@@ -1346,8 +1267,16 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
         }
     }
 }
-
-void Pattern_generator::Onestep_ZMP(double T_Double1, double T_Double2, double T_Total, int step_number,VectorXD& temp_px, VectorXD& temp_py)
+void Pattern_generator::Onestep_stop_ZMP(double _T_Total,double ZMP_x, double ZMP_y, VectorXD &temp_px,VectorXD& temp_py)
+{
+    // Left ������ ���� ����� ������ ����
+    for (int i=0 ; i<_T_Total ; i++)
+    {
+        temp_px(i) = ZMP_x;
+        temp_py(i) = ZMP_y;
+    }
+}
+void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, double T_Double1, double T_Double2, double T_Total, int step_number,VectorXD& temp_px, VectorXD& temp_py)
 {
     temp_px.resize(T_Total);
     temp_py.resize(T_Total);
@@ -1369,20 +1298,30 @@ void Pattern_generator::Onestep_ZMP(double T_Double1, double T_Double2, double T
 
         for(int i=0; i<T_Total; i++)
         {
-            if(i < T_Double1)
+            if(i < T_rest_init)
             {
-                temp_px(i) = _init_info._COM_support_init(0) + Kx/T_Double1*(i+1);
-                temp_py(i) = _init_info._COM_support_init(1) + Ky/T_Double1*(i+1);
+                temp_px(i) = _init_info._COM_support_init(0);
+                temp_py(i) = _init_info._COM_support_init(1);
             }
-            else if(i>= T_Double1 & i<T_Total-T_Double2)
+            else if(i >= T_rest_init && i < T_rest_init+T_Double1)
+            {
+                temp_px(i) = _init_info._COM_support_init(0) + Kx/T_Double1*(i+1-T_rest_init);
+                temp_py(i) = _init_info._COM_support_init(1) + Ky/T_Double1*(i+1-T_rest_init);
+            }
+            else if(i>= T_rest_init+T_Double1 & i< T_Total-T_rest_last-T_Double2)
             {
                 temp_px(i) = _initial_local_support_foot_offset(0);
                 temp_py(i) = _initial_local_support_foot_offset(1);
             }
+            else if(i >= T_Total-T_rest_last-T_Double2 && i< T_Total-T_rest_last)
+            {
+                temp_px(i) = _initial_local_support_foot_offset(0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+                temp_py(i) = _initial_local_support_foot_offset(1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+            }
             else
             {
-                temp_px(i) = _initial_local_support_foot_offset(0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2));
-                temp_py(i) = _initial_local_support_foot_offset(1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2));
+                temp_px(i) = temp_px(i-1);
+                temp_py(i) = temp_py(i-1);
             }
         }
     }
@@ -1396,20 +1335,30 @@ void Pattern_generator::Onestep_ZMP(double T_Double1, double T_Double2, double T
 
         for(int i=0; i<T_Total; i++)
         {
-            if(i < T_Double1)
+            if(i < T_rest_init)
             {
-                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_initial_local_support_foot(0))/2.0 + Kx/T_Double1*(i+1);
-                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_initial_local_support_foot(1))/2.0 + Ky/T_Double1*(i+1);
+                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_initial_local_support_foot(0))/2.0;
+                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_initial_local_support_foot(1))/2.0;
             }
-            else if(i>= T_Double1 & i<T_Total-T_Double2)
+            else if(i >= T_rest_init && i < T_rest_init+T_Double1)
+            {
+                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_initial_local_support_foot(0))/2.0 + Kx/T_Double1*(i+1-T_rest_init);
+                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_initial_local_support_foot(1))/2.0 + Ky/T_Double1*(i+1-T_rest_init);
+            }
+            else if(i>= T_rest_init+T_Double1 & i< T_Total-T_rest_last-T_Double2)
             {
                 temp_px(i) = _foot_step_localframe_offset(step_number-1,0);
                 temp_py(i) = _foot_step_localframe_offset(step_number-1,1);
             }
+            else if(i >= T_Total-T_rest_last-T_Double2 && i< T_Total-T_rest_last)
+            {
+                temp_px(i) = _foot_step_localframe_offset(step_number-1,0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+                temp_py(i) = _foot_step_localframe_offset(step_number-1,1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+            }
             else
             {
-                temp_px(i) = _foot_step_localframe_offset(step_number-1,0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2));
-                temp_py(i) = _foot_step_localframe_offset(step_number-1,1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2));
+                temp_px(i) = temp_px(i-1);
+                temp_py(i) = temp_py(i-1);
             }
         }
     }
@@ -1423,20 +1372,30 @@ void Pattern_generator::Onestep_ZMP(double T_Double1, double T_Double2, double T
 
         for(int i=0; i<T_Total; i++)
         {
-            if(i < T_Double1)
+            if(i < T_rest_init)
             {
-                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_foot_step_localframe(step_number-2,0))/2.0 + Kx/T_Double1*(i+1);
-                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_foot_step_localframe(step_number-2,1))/2.0 + Ky/T_Double1*(i+1);
+                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_foot_step_localframe(step_number-2,0))/2.0;
+                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_foot_step_localframe(step_number-2,1))/2.0;
             }
-            else if(i>= T_Double1 & i<T_Total-T_Double2)
+            else if(i >= T_rest_init && i < T_rest_init+T_Double1)
+            {
+                temp_px(i) = (_foot_step_localframe(step_number-1,0)+_foot_step_localframe(step_number-2,0))/2.0 + Kx/T_Double1*(i+1-T_rest_init);
+                temp_py(i) = (_foot_step_localframe(step_number-1,1)+_foot_step_localframe(step_number-2,1))/2.0 + Ky/T_Double1*(i+1-T_rest_init);
+            }
+            else if(i>= T_rest_init+T_Double1 & i< T_Total-T_rest_last-T_Double2)
             {
                 temp_px(i) = _foot_step_localframe_offset(step_number-1,0);
                 temp_py(i) = _foot_step_localframe_offset(step_number-1,1);
             }
+            else if(i >= T_Total-T_rest_last-T_Double2 && i< T_Total-T_rest_last)
+            {
+                temp_px(i) = _foot_step_localframe_offset(step_number-1,0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+                temp_py(i) = _foot_step_localframe_offset(step_number-1,1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2-T_rest_last));
+            }
             else
             {
-                temp_px(i) = _foot_step_localframe_offset(step_number-1,0) + Kx2/(T_Double2)*(i+1-(T_Total-T_Double2));
-                temp_py(i) = _foot_step_localframe_offset(step_number-1,1) + Ky2/(T_Double2)*(i+1-(T_Total-T_Double2));
+                temp_px(i) = temp_px(i-1);
+                temp_py(i) = temp_py(i-1);
             }
         }
     }
@@ -1449,7 +1408,7 @@ void Pattern_generator::ZMP_offset_planning(MatrixXD& _foot_step_localframe, Mat
 
     _foot_step_localframe_offset = _foot_step_localframe;
 
-    if(_foot_step(0,6) == 1) // ¿Þ¹ßÁöÁö
+    if(_foot_step(0,6) == 1) // �޹�����
     {
         _initial_local_support_foot_offset(1) = _initial_local_support_foot(1) + _ZMP_left_offset;
         _initial_local_swing_foot_offset(1) = _initial_local_swing_foot(1) + _ZMP_right_offset;
@@ -1462,7 +1421,7 @@ void Pattern_generator::ZMP_offset_planning(MatrixXD& _foot_step_localframe, Mat
 
     for(int i=0; i<_step_total_number; i++)
     {
-        if(_foot_step(i,6) == 0) //¿Àž¥¹ß ÁöÁö
+        if(_foot_step(i,6) == 0) //����� ����
             _foot_step_localframe_offset(i,1) += _ZMP_left_offset;
         else
             _foot_step_localframe_offset(i,1) += _ZMP_right_offset;
@@ -1475,7 +1434,7 @@ void Pattern_generator::GlobaltoLocal_footstep()
 
     if(_step_number == 0)
     {
-        if(_foot_step(_step_number,6) == 1) //¿Þ¹ßÁöÁö
+        if(_foot_step(_step_number,6) == 1) //�޹�����
         {
             reference.translation() = _init_info._XL_global_init.translation();
             reference.translation()(2) = 0;
