@@ -81,6 +81,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
 
     joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+    recog_point_subscriber = n.subscribe("custom_recog_point",1, &QNode::recogInfoCallback, this);
 
     isConnected = true;
 	start();

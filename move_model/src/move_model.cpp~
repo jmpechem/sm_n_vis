@@ -76,8 +76,8 @@ std::string jtag[35]
     "L_AnklePitch",
     "R_AnkleRoll",
     "L_AnkleRoll",
-    "WaistYaw",
     "WaistPitch",
+    "WaistYaw",
     "HeadYaw",
     "HeadPitch", // this is 32 dof real robot state
     "R_Gripper_1",
