@@ -15,6 +15,8 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <sensor_msgs/JointState.h>
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 
@@ -67,6 +69,7 @@ protected:
     rosrt::Subscriber<thormang_ctrl_msgs::JointSet> jointCtrlSub;
     rosrt::Subscriber<std_msgs::Float32MultiArray> recogPointSub;
 
+
     // rosrt implement
     // Publisher Message Preallocator
     thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
@@ -79,6 +82,7 @@ protected:
     thormang_ctrl_msgs::JointSetConstPtr jointSetMsgPtr;
     smach_msgs::SmachContainerStatusConstPtr smachStatusMsgPtr;
     std_msgs::Float32MultiArrayConstPtr recogPointPtr;
+
     /*
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
@@ -121,13 +125,21 @@ protected:
     bool _CLIK_flag;
 
 
+
+
     VectorXD q; // current q
     VectorXD q_dot; // current qdot
     VectorXD torque; // current joint toruqe
-    Vector6D LFT; // current left ft sensor values
-    Vector6D RFT; // current right ft sensor values
-    Vector3D Gyro; // current gyro sensor values
+    Vector6D leftFootFT; // current left ft sensor values
+    Vector6D rightFootFT; // current right ft sensor values
+    Vector3D gyro; // current gyro sensor values
+    Vector3D accelometer; // current accelometer values
     VectorXD _desired_q; // current desired joint values
+    VectorXD _walking_q; // temporary walking q values
+    VectorXD _upper_output_q; // upper output q values
+    VectorXD _walking_output_q; // walking output q values
+
+
     int total_dof; //
 
     int         _index;

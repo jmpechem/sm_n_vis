@@ -351,8 +351,8 @@ void Pattern_generator::Trunk_trajectory_update()
     }
     else
     {
-        Trunk_trajectory.translation()(0) = _COM_desired(0) + _COM_offset(0);
-        Trunk_trajectory.translation()(1) = _COM_desired(1) + _COM_offset(1);
+        Trunk_trajectory.translation()(0) = _COM_desired(0) - _COM_offset(0);
+        Trunk_trajectory.translation()(1) = _COM_desired(1) - _COM_offset(1);
         Trunk_trajectory.translation()(2) = _COM_desired(2);
     }
 
@@ -597,6 +597,7 @@ void Pattern_generator::Ref_ZMP_update()
 
 void Pattern_generator::Ref_COM_update_local()
 {
+    _COM_offset(0) = 0.01;
     // �κ� ���� �� cnt=0 (ùƽ)���� ���� �Ǵ� �κ��� COM or Trunk�ġ
     if(_com_control_flag == true)
     {
@@ -665,7 +666,7 @@ void Pattern_generator::Ref_COM_update_local()
         else
         {
             _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0) + _xs(1)*1.0/Hz;
-            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(0) + _ys(1)*1.0/Hz;
+            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(1) + _ys(1)*1.0/Hz;
         }
     }
 

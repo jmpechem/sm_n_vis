@@ -97,7 +97,17 @@ void UpperCtrl::IK_solver(VectorXD& output)
 		}
 		if (_cnt >= _init_info.t && _cnt < _init_info.t + _current_task_time + 1.0*_Hz) 
 		        IK_solver_basic(output);
+
 	}
+		int suhan;
+		suhan=RA_BEGIN;
+	    output(suhan++) = -40*DEGREE;
+            output(suhan++) = 75*DEGREE;
+            output(suhan++) = 90*DEGREE;
+            output(suhan++) = 35*DEGREE;
+            output(suhan++) = 0*DEGREE;
+            output(suhan++) = 60*DEGREE;
+            output(suhan++) = 90*DEGREE;
 }
 void UpperCtrl::IK_solver_basic(VectorXD& output)
 {
@@ -175,6 +185,8 @@ void UpperCtrl::IK_solver_basic(VectorXD& output)
 		_qdot_d = _Larm.J_inv * (_xdot_d + _Clik_gain*_error);
 		for (int i=0; i<7; i++)
 			output(i+LA_BEGIN) =_qdot_d(i)/_Hz +_Larm.q(i);
+
+
 	}
 }
 void UpperCtrl::SET_IK_Parameter(double CLIK_gain, bool relative_motion, bool singular, double sigularity_gain, double singularity_threshold)

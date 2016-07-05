@@ -47,6 +47,11 @@ controlBase::controlBase() :
     jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
     smachPub.initialize(nh, "transition",1,1,std_msgs::String());
 
+/*
+    imuSub.initialize(nh, "imu/imu",1,1,sensor_msgs::Imu());
+    leftFootFTSub.initialize(nh, "ati_ft_sensor/left_foot_ft",1,1,geometry_msgs::WrenchStamped());
+    rightFootFTSub.initialize(nh, "ati_ft_sensor/right_foot_ft",1,1,geometry_msgs::WrenchStamped());
+*/
     jointStateMsgPtr = jointStateUIPub.allocate();
     smachMsgPtr = smachPub.allocate();
 
@@ -79,27 +84,22 @@ void controlBase::make_id_inverse_list()
 
 void controlBase::WalkingLoop()
 {
-    VectorXD output_q;
-    output_q.resize(28);
-    VectorXD input_q;
-    input_q.resize(28);
-
     for (int i=0; i<28 ; i++)
-        input_q(i) = q(i);
+        _walking_q(i) = q(i);
 
     if(_Init_walking_flag == true)
     {
-        _WalkingCtrl.getdata(input_q,LFT,RFT,Gyro);
-        _WalkingCtrl.Init_walking_pose(output_q);
+        _WalkingCtrl.getdata(_walking_q,leftFootFT,rightFootFT,gyro);
+        _WalkingCtrl.Init_walking_pose(_walking_output_q);
         // _desired_q.setZero();
-        updateDesired(WALKING, output_q);
+        updateDesired(WALKING, _walking_output_q);
     }
     else if (_Walking_flag == true)
     {
-        _WalkingCtrl.getdata(input_q,LFT,RFT,Gyro);
-        _WalkingCtrl.compute(output_q);
+        _WalkingCtrl.getdata(_walking_q,leftFootFT,rightFootFT,gyro);
+        _WalkingCtrl.compute(_walking_output_q);
         // _desired_q.setZero();
-        updateDesired(WALKING, output_q);
+        updateDesired(WALKING, _walking_output_q);
     }
 
 
@@ -154,18 +154,14 @@ void controlBase::UpperBodyLoop()
     if (_Joint_flag)
     {
         _UpperCtrl.Set_Joint_Value(q);
-        VectorXD output_q;
-        output_q.resize(total_dof);
-        _UpperCtrl.FK_compute(output_q);
-        updateDesired(UPPER, output_q);
+        _UpperCtrl.FK_compute(_upper_output_q);
+        updateDesired(UPPER, _upper_output_q);
     }
     else if (_CLIK_flag)
     {
         _UpperCtrl.Set_Joint_Value(q);
-        VectorXD output_q;
-        output_q.resize(total_dof);
-        _UpperCtrl.IK_compute(output_q);
-        updateDesired(UPPER, output_q);
+        _UpperCtrl.IK_compute(_upper_output_q);
+        updateDesired(UPPER, _upper_output_q);
     }
 
     _cnt++;
@@ -273,7 +269,7 @@ void controlBase::UpperBodyCheckState()
             //   _target_x.row(0) <<  0, 0.07, 0.1, 5*DEGREE, 0, 0, 1.0, 0; // x,y,z,a,b,r,duration, Right(1) or Left(0)
             //  _target_x.row(1) <<  0.1, 0, 0, 0*DEGREE, 0, 0, 1.0, 0;
 
-            if(vision_data(0) > 0.67 || vision_data(1) > 0.35 || vision_data(1) < 0.12 || vision_data(2) > 0.187 || vision_data(2) < -0.403 ){
+            if(vision_data(0) > 0.67 || vision_data(1) > 0.35 || vision_data(1) < 0.12 || vision_data(2) > 0.225 || vision_data(2) < -0.403 ){
                 _UpperCtrl.Set_Initialize();
                 _target_q = q;
 
@@ -411,12 +407,25 @@ void controlBase::compute()
 
     UpperBodyLoop();
     WalkingLoop();
+
+    if(smach_state == "Valve_Reach" ||smach_state == "Valve_Ready" || smach_state == "Valve_Close")
+    {
+int suhan;
+		suhan=RA_BEGIN;
+	    _desired_q(suhan++) = -40*DEGREE;
+            _desired_q(suhan++) = 75*DEGREE;
+            _desired_q(suhan++) = 90*DEGREE;
+            _desired_q(suhan++) = 35*DEGREE;
+            _desired_q(suhan++) = 0*DEGREE;
+            _desired_q(suhan++) = 60*DEGREE;
+            _desired_q(suhan++) = 90*DEGREE;
+    }
 }
 
 void controlBase::reflect()
 {
 
-    if(++uiUpdateCount > 1)
+    if(++uiUpdateCount > 4)
     {
         uiUpdateCount = 0;
         for(int i=0; i<total_dof; i++)
@@ -449,9 +458,12 @@ void controlBase::parameter_initialize()
     q.resize(total_dof); q.setZero();
     q_dot.resize(total_dof); q_dot.setZero();
     torque.resize(total_dof); torque.setZero();
-    LFT.setZero();  RFT.setZero(); Gyro.setZero();
+    leftFootFT.setZero();  rightFootFT.setZero(); gyro.setZero();
     _desired_q.resize(total_dof); _desired_q.setZero();
     _target_q.resize(total_dof); _target_q.setZero();
+    _upper_output_q.resize(total_dof); _upper_output_q.setZero();
+    _walking_output_q.resize(28); _walking_output_q.setZero();
+    _walking_q.resize(28); _walking_q.setZero();
 }
 void controlBase::readdevice()
 {

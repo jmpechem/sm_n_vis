@@ -238,20 +238,44 @@ void WalkingCtrl::setApproachdata(double x, double y, double theta)
 
     if( abs(x) < 0.01 || abs(y) < 0.01)
         _Step_Planning_flag = true;
+
+    if(abs(x) < 0.01)
+    {
+        _T_Double1 = 0.1*Hz;
+        _T_Double2 = 0.1*Hz;
+
+        _T_Total = 4.0*Hz;
+
+        _T_temp = 3.0*Hz;
+        _T_Imp = 0.0*Hz;
+
+        _T_rest_init = 1.5*Hz;
+        _T_rest_last = 1.5*Hz;
+
+    }
+
+
+    _T_Last = _T_Total+_T_temp;
+    _T_Start = _T_temp+1;
+    _T_Start_real = _T_Start+_T_rest_init;
 }
 
 
 void WalkingCtrl::hip_compensator()
 {
-    double Left_Hip_angle = 3.9*DEGREE;
-    double Right_Hip_angle = 3.9*DEGREE;
-    double Left_Hip_angle_first_step = 3.9*DEGREE;
-    double Right_Hip_angle_first_step = 3.0*DEGREE;
+
+    double Left_Hip_angle = 3.8*DEGREE;
+    double Right_Hip_angle = 3.15*DEGREE;
+    double Left_Hip_angle_first_step = 3.8*DEGREE;
+    double Right_Hip_angle_first_step = 3.15*DEGREE;
 
     double Left_hip_angle_temp = 0.0;
     double Right_hip_angle_temp = 0.0;
     double temp_time = 0.1*Hz;
 
+    if(_step_number >= 3)
+	Right_Hip_angle = 3.3*DEGREE;
+	
     if(_step_number == 0)
     {
         if(_foot_step(_step_number,6) == 1) // �޹�����

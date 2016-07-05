@@ -7,20 +7,20 @@ void WalkingPara::set_user_value()
     _T_Double1 = 0.1*Hz;
     _T_Double2 = 0.1*Hz;
 
-    _T_Total = 2.4*Hz;
+    _T_Total = 3.0*Hz;
 
     _T_temp = 3.0*Hz;
     _T_Imp = 0.0*Hz;
 
-    _T_rest_init = 0.7*Hz;
-    _T_rest_last = 0.7*Hz;
+    _T_rest_init = 1.0*Hz;
+    _T_rest_last = 1.0*Hz;
 
     _gyro_frame_flag = false;
     _com_control_flag = false;
     _landing_flag = false;
 
-    _ZMP_left_offset = 0.02;
-    _ZMP_right_offset = -0.02;
+    _ZMP_left_offset = 0.015;
+    _ZMP_right_offset = -0.01;
 }
 
 void WalkingPara::WALKINGpara_initialize()
@@ -33,6 +33,7 @@ void WalkingPara::WALKINGpara_initialize()
 
         file[i].open(FILE_NAMES[i].c_str());
     }
+
 
     _cnt = 0;
     _step_number = 0;
