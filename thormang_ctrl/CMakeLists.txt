@@ -17,8 +17,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   include
 
-# Xenomai
-  /usr/xenomai/include -D_GNU_SOURCE -D_REENTRANT -D__XENO__
 )
 
 file(GLOB_RECURSE HeaderFiles "include/*.h")
@@ -46,12 +44,16 @@ add_executable(thormang_ctrl src/thormang_ctrl.cpp)
 target_link_libraries(thormang_ctrl_lib
    ${catkin_LIBRARIES}
 
-# Xenomai
-  -lpthread
-  -L/usr/xenomai/lib -lnative -lxenomai -lrtdm
 )
 target_link_libraries(thormang_ctrl
    ${catkin_LIBRARIES}
    thormang_ctrl_lib
 )
+
+
+add_dependencies(thormang_ctrl thormang_ctrl_msgs_generate_messages_cpp)
+add_dependencies(thormang_ctrl rt_dynamixel_msgs_generate_messages_cpp)
+add_dependencies(thormang_ctrl_lib thormang_ctrl_msgs_generate_messages_cpp)
+add_dependencies(thormang_ctrl_lib rt_dynamixel_msgs_generate_messages_cpp)
+
 SET(CMAKE_BUILD_TYPE Debug)

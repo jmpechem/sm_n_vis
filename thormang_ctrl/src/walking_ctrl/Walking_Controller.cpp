@@ -130,7 +130,7 @@ void WalkingCtrl::compute(VectorXD& output)
 
         Change_Global_Pattern();
 
-        //Impedance_controller();
+      // Impedance_controller();
 
         //Change_Local_Pattern();
 
@@ -165,7 +165,7 @@ void WalkingCtrl::compute(VectorXD& output)
 
         //Resolved_momentum_control();
 
-       // Impedance_reference_update();
+        //Impedance_reference_update();
 
         VectorXD qd;
         qd.resize(12);

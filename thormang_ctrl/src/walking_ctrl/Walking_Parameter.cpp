@@ -2,7 +2,7 @@
 
 void WalkingPara::set_user_value()
 {
-    Hz = 200.0;
+    Hz = 250.0;
     _ho = 0.05;
     _T_Double1 = 0.1*Hz;
     _T_Double2 = 0.1*Hz;
