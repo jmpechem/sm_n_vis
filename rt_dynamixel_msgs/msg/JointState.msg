@@ -3,7 +3,7 @@ uint8 LOST=128
 
 uint8[] id
 uint8[] updated # error
-float64[] angle
-float64[] velocity
-float64[] current
+float32[] angle
+float32[] velocity
+float32[] current
 

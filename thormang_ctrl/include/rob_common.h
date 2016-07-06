@@ -1,6 +1,10 @@
 
 #include "control_base.h"
 
+#include <native/task.h>
+#include <native/timer.h>
+#include <native/mutex.h>
+#include <rtdk.h>
 
 #include "rt_dynamixel_msgs/JointState.h"
 #include "rt_dynamixel_msgs/JointSet.h"
@@ -33,19 +37,12 @@ private:
    rosrt::Publisher<rt_dynamixel_msgs::JointSet> dxlJointSetPub;
    rosrt::Subscriber<rt_dynamixel_msgs::JointState> dxlJointSub;
 
-   rosrt::Subscriber<sensor_msgs::Imu> imuSub;
-   rosrt::Subscriber<geometry_msgs::WrenchStamped> leftFootFTSub;
-   rosrt::Subscriber<geometry_msgs::WrenchStamped> rightFootFTSub;
-
    bool jointCtrlMsgRecv;
 
    // rt_dynamixel_msgs::JointSet jointSetMsg;
    rt_dynamixel_msgs::JointSetPtr dxlJointSetMsgPtr;
    rt_dynamixel_msgs::JointStateConstPtr dxlJointStatePtr;
 
-   sensor_msgs::ImuConstPtr imuMsgPtr;
-   geometry_msgs::WrenchStampedConstPtr leftFootFTMsgPtr;
-   geometry_msgs::WrenchStampedConstPtr rightFootFTMsgPtr;
    // ros::Subscriber taskCtrlSub;
 
    int dxlMode; ///< current dynamixel mode
@@ -53,6 +50,8 @@ private:
 
    ros::Rate rate;
 
+   RTIME rtNowTime;
+   RTIME rtNextTime;
 
  //  ros::Publisher vrepJointSetPub;
    // ros::Subscriber gyroSub;

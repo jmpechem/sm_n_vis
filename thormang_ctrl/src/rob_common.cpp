@@ -11,11 +11,6 @@ realrobot::realrobot() : rate(200.00)
     dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
     dxlJointSub.initialize(3, nh, "rt_dynamixel/joint_state");
 
-    imuSub.initialize(3, nh, "imu/imu");
-    leftFootFTSub.initialize(3, nh, "ati_ft_sensor/left_foot_ft");
-    rightFootFTSub.initialize(3, nh, "ati_ft_sensor/right_foot_ft");
-
-
     dxlJointSetMsgPtr = dxlJointSetPub.allocate();
 
     dxlJointSetMsgPtr->angle.resize(total_dof);
@@ -26,6 +21,9 @@ realrobot::realrobot() : rate(200.00)
         jointStateMsgPtr->id[i] = jointID[i];
         dxlJointSetMsgPtr->id[i] = jointID[i];
     }
+    rtNextTime = rt_timer_read() + 3e6; // 3ms
+
+    //make_id_inverse_list();
 }
 
 void realrobot::change_dxl_mode(int mode)
@@ -101,56 +99,19 @@ void realrobot::update()
         {isFirstBoot = false;}
     }
 
-
-
-    imuMsgPtr = imuSub.poll();
-    if(imuMsgPtr)
-    {
-        gyro[0] = imuMsgPtr->angular_velocity.x;
-        gyro[1] = imuMsgPtr->angular_velocity.y;
-        gyro[2] = imuMsgPtr->angular_velocity.z;
-
-        accelometer[0] = imuMsgPtr->linear_acceleration.x;
-        accelometer[1] = imuMsgPtr->linear_acceleration.y;
-        accelometer[2] = imuMsgPtr->linear_acceleration.z;
-    }
-
-    leftFootFTMsgPtr = leftFootFTSub.poll();
-    if(leftFootFTMsgPtr)
-    {
-        leftFootFT[0] = leftFootFTMsgPtr->wrench.force.x;
-        leftFootFT[1] = leftFootFTMsgPtr->wrench.force.y;
-        leftFootFT[2] = leftFootFTMsgPtr->wrench.force.z;
-        leftFootFT[3] = leftFootFTMsgPtr->wrench.torque.x;
-        leftFootFT[4] = leftFootFTMsgPtr->wrench.torque.y;
-        leftFootFT[5] = leftFootFTMsgPtr->wrench.torque.z;
-    }
-    rightFootFTMsgPtr = rightFootFTSub.poll();
-    if(rightFootFTMsgPtr)
-    {
-        rightFootFT[0] = rightFootFTMsgPtr->wrench.force.x;
-        rightFootFT[1] = rightFootFTMsgPtr->wrench.force.y;
-        rightFootFT[2] = rightFootFTMsgPtr->wrench.force.z;
-        rightFootFT[3] = rightFootFTMsgPtr->wrench.torque.x;
-        rightFootFT[4] = rightFootFTMsgPtr->wrench.torque.y;
-        rightFootFT[5] = rightFootFTMsgPtr->wrench.torque.z;
-    }
-
 }
 void realrobot::reflect()
 {
+    if(!dxlJointStatePtr) return;
     // update additional information
 
-    if(dxlJointStatePtr)
+    for(int i=0; i<total_dof; i++)
     {
-        for(int i=0; i<total_dof; i++)
+        for (int j=0; j<dxlJointStatePtr->id.size(); j++)
         {
-            for (int j=0; j<dxlJointStatePtr->id.size(); j++)
+            if(jointID[i] == dxlJointStatePtr->id[j])
             {
-                if(jointID[i] == dxlJointStatePtr->id[j])
-                {
-                    jointStateMsgPtr->error[i] = dxlJointStatePtr->updated[j];
-                }
+                jointStateMsgPtr->error[i] = dxlJointStatePtr->updated[j];
             }
         }
     }

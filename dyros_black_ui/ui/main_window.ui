@@ -21,10 +21,16 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources/images.qrc">
-    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+    <normaloff>:/images/icon_2.png</normaloff>:/images/icon_2.png</iconset>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>24</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout">
