@@ -1,7 +1,24 @@
 #include "Walking_Controller.h"
 
-WalkingCtrl::WalkingCtrl(){}
-WalkingCtrl::~WalkingCtrl(){}
+WalkingCtrl::WalkingCtrl()
+{
+
+    for(int i=0; i<FILE_CNT;i++)
+    {
+        file[i].open(FILE_NAMES[i].c_str(),ios_base::out);
+    }
+
+}
+WalkingCtrl::~WalkingCtrl()
+{
+
+    for(int i=0; i<FILE_CNT;i++)
+    {
+        if(file[i].is_open())
+            file[i].close();
+    }
+
+}
 
 void WalkingCtrl::Init_walking_pose(VectorXD& output)
 {
@@ -87,6 +104,7 @@ void WalkingCtrl::compute(VectorXD& output)
     {
         if(_cnt == 0)
         {
+
             cout << "scan_data" << _scan_data << endl;
             plan_foot_step(_scan_data,_foot_step,_Step_Planning_flag);
             cout << "foot_Step" << _foot_step << endl;
@@ -98,11 +116,21 @@ void WalkingCtrl::compute(VectorXD& output)
          ROS_INFO("%d %d",_cnt,_step_number);
 
 
+        if(_cnt>_T_Start)
+        {
+            _q=_desired_q_notcompensate;
+        }
+
         Robot_state_update();
 
-       // Vector3D Lfoot = _T_LFoot_support[5].translation();
-       // Vector3D Rfoot = _T_RFoot_support[5].translation();
-       // ZMP_real(_L_FT_global, _R_FT_global, Lfoot, Rfoot, _ZMP_real);
+        //if(_cnt>_T_Start)
+        //{
+            //outputHipcompensation();
+        //}
+
+        Vector3D Lfoot = _T_LFoot_support[5].translation();
+        Vector3D Rfoot = _T_RFoot_support[5].translation();
+        ZMP_real(_L_FT_global, _R_FT_global, Lfoot, Rfoot, _ZMP_real);
 
 
         if(_cnt == _T_Start && _step_number != 0)
@@ -160,7 +188,11 @@ void WalkingCtrl::compute(VectorXD& output)
 
         Vector3D trunk_temp;
         Rot2euler(Trunk_trajectory.linear(),trunk_temp);
-        file[12] << _cnt << "\t" << _T_Trunk_support.translation()(2) << "\t" << _COM_desired(2) << "\t" << Trunk_trajectory.translation()(2) << "\t" << _init_info._trunk_support_init.translation()(2) << endl;
+        if(_cnt>_T_Start)
+        {
+            file[2] << _cnt << "\t" << _desired_q_notcompensate(16) << "\t" << _desired_q_notcompensate(17) << "\t" << _desired_q_notcompensate(18) << "\t" << _desired_q_notcompensate(19)<< "\t" << _desired_q_notcompensate(20)<< "\t" << _desired_q_notcompensate(21)<< "\t" << _Gyro_Base[0]<< "\t" << _Gyro_Base[1] << endl;
+        }
+        file[1]<<_cnt<< "\t" << _L_Ft(0) << "\t" << _L_Ft(1) << "\t" << _L_Ft(2) << "\t" << _L_Ft(3)<< "\t" << _L_Ft(4)<< "\t" << _L_Ft(5)<< "\t" << _R_Ft(0)<< "\t" << _R_Ft(1)<< "\t" << _R_Ft(2)<< "\t" << _R_Ft(3)<< "\t" << _R_Ft(4)<< "\t" << _R_Ft(5) << endl;
         // fprintf(fp13,"%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",_cnt,_T_Trunk_support_euler(0),_T_Trunk_support_euler(1),_T_Trunk_support_euler(2),trunk_temp(0),trunk_temp(1),trunk_temp(2),Foot_trajectory.LFoot.translation()(0),Foot_trajectory.LFoot.translation()(1),Foot_trajectory.LFoot.translation()(2));
 
         //Resolved_momentum_control();
@@ -188,8 +220,11 @@ void WalkingCtrl::compute(VectorXD& output)
         _desired_q(0) = _init_info.q(0);
         _desired_q(1) = _init_info.q(1);
 
+        _desired_q_notcompensate=_desired_q;
 
-        hip_compensator();
+
+        //hip_compensator();
+        Hipcompensation();
 
 
 
@@ -239,7 +274,7 @@ void WalkingCtrl::setApproachdata(double x, double y, double theta)
     if( abs(x) < 0.01 || abs(y) < 0.01)
         _Step_Planning_flag = true;
 
-    if(abs(x) < 0.01)
+  /*  if(abs(x) < 0.01)
     {
         _T_Double1 = 0.1*Hz;
         _T_Double2 = 0.1*Hz;
@@ -253,7 +288,7 @@ void WalkingCtrl::setApproachdata(double x, double y, double theta)
         _T_rest_last = 1.5*Hz;
 
     }
-
+*/
 
     _T_Last = _T_Total+_T_temp;
     _T_Start = _T_temp+1;
@@ -369,6 +404,203 @@ void WalkingCtrl::Step_count(MatrixXD& foot_planning)
             }
         }
     }
+}
+
+
+void WalkingCtrl::Hipcompensation()
+{
+    double a_total=-0.0012;
+    double b_total=0.00087420;
+    double alpha;   // left foot weighting factor
+    double alpha_1; // right foot weighting factor
+
+    double rq0= _desired_q(18-2);
+    double rq1= _desired_q(19-2);
+    double rq2= _desired_q(20-2);
+    double rq3= _desired_q(21-2);
+    double rq4= _desired_q(22-2);
+    double rq5= _desired_q(23-2);
+
+    double lq0= _desired_q(24-2);
+    double lq1= _desired_q(25-2);
+    double lq2= _desired_q(26-2);
+    double lq3= _desired_q(27-2);
+    double lq4= _desired_q(28-2);
+    double lq5= _desired_q(29-2);
+
+    double robotweightforce=54.592*9.81;
+
+    double fromright = cos(rq5)*sin(rq1)*1.829E-1+cos(rq4)*sin(rq5)*(3.0/1.0E1)+cos(rq0)*(cos(rq1)*cos(rq5)+sin(rq1)*(cos(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5))+sin(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5))))*(2.1E1/2.0E2)-cos(rq1)*(cos(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5))+sin(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5)))*1.829E-1+sin(rq0)*(cos(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5))-sin(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5)))*(2.1E1/2.0E2)-sin(rq3)*sin(rq4)*sin(rq5)*(3.0/1.0E1)+cos(rq3)*cos(rq4)*sin(rq5)*(3.0/1.0E1);
+    double fromleft = cos(lq5)*sin(lq1)*1.829E-1+cos(lq4)*sin(lq5)*(3.0/1.0E1)-cos(lq0)*(cos(lq1)*cos(lq5)+sin(lq1)*(cos(lq2)*(sin(lq3)*sin(lq4)*sin(lq5)-cos(lq3)*cos(lq4)*sin(lq5))+sin(lq2)*(cos(lq3)*sin(lq4)*sin(lq5)+cos(lq4)*sin(lq3)*sin(lq5))))*(2.1E1/2.0E2)-cos(lq1)*(cos(lq2)*(sin(lq3)*sin(lq4)*sin(lq5)-cos(lq3)*cos(lq4)*sin(lq5))+sin(lq2)*(cos(lq3)*sin(lq4)*sin(lq5)+cos(lq4)*sin(lq3)*sin(lq5)))*1.829E-1+sin(lq0)*(cos(lq2)*(cos(lq3)*sin(lq4)*sin(lq5)+cos(lq4)*sin(lq3)*sin(lq5))-sin(lq2)*(sin(lq3)*sin(lq4)*sin(lq5)-cos(lq3)*cos(lq4)*sin(lq5)))*(2.1E1/2.0E2)-sin(lq3)*sin(lq4)*sin(lq5)*(3.0/1.0E1)+cos(lq3)*cos(lq4)*sin(lq5)*(3.0/1.0E1);
+
+    fromright=fromright-0.5*0.17;
+    fromleft=fromleft+0.5*0.17;
+
+    alpha = -fromleft/(fromright-fromleft);
+
+    //if(alpha>=1)
+    //{
+    //	alpha=1;
+    //}
+    //if(alpha=<0)
+    //{
+    //	alpha=0;
+    //}
+
+    if(fromright<=0)
+    {
+        alpha=1;
+    }
+    if(fromleft>=0)
+    {
+        alpha=0;
+    }
+
+    //alpha=0.5;
+    //alpha=(cos(rq5)*sin(rq1)*1.829E-1+cos(rq4)*sin(rq5)*(3.0/1.0E1)+cos(rq0)*(cos(rq1)*cos(rq5)+sin(rq1)*(cos(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5))+sin(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5))))*(2.1E1/2.0E2)-cos(rq1)*(cos(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5))+sin(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5)))*1.829E-1+sin(rq0)*(cos(rq2)*(cos(rq3)*sin(rq4)*sin(rq5)+cos(rq4)*sin(rq3)*sin(rq5))-sin(rq2)*(sin(rq3)*sin(rq4)*sin(rq5)-cos(rq3)*cos(rq4)*sin(rq5)))*(2.1E1/2.0E2)-sin(rq3)*sin(rq4)*sin(rq5)*(3.0/1.0E1)+cos(rq3)*cos(rq4)*sin(rq5)*(3.0/1.0E1))/0.21;
+    alpha_1=1-alpha;
+
+    double fc_r=robotweightforce*alpha;
+    double fc_l=robotweightforce*alpha_1;
+
+    double mc_r=((abs(fromright)+0.5*0.17)*fc_r-(abs(fromleft)+0.5*0.17)*fc_l)*alpha_1;
+    double mc_l=((abs(fromright)+0.5*0.17)*fc_r-(abs(fromleft)+0.5*0.17)*fc_l)*alpha;
+
+    //double Jc2[6];
+    //double Jc3[6];
+
+    //double Jc8[6];
+    //double Jc9[6];
+
+    Vector6D Jc2;
+    Vector6D Jc3;
+    Vector6D Jc8;
+    Vector6D Jc9;
+    Jc2.setZero();
+    Jc3.setZero();
+    Jc8.setZero();
+    Jc9.setZero();
+
+    Jc2(0) = 0;
+    Jc2(1) = cos(rq2)*sin(rq1)*(3.0/1.0E1)-sin(rq1)*sin(rq2)*sin(rq3)*(3.0/1.0E1)+cos(rq2)*cos(rq3)*sin(rq1)*(3.0/1.0E1);
+    Jc2(2) = cos(rq1)*sin(rq2)*(3.0/1.0E1)+cos(rq1)*cos(rq2)*sin(rq3)*(3.0/1.0E1)+cos(rq1)*cos(rq3)*sin(rq2)*(3.0/1.0E1);
+    Jc2(3) = cos(rq1)*cos(rq2)*sin(rq3)*(3.0/1.0E1)+cos(rq1)*cos(rq3)*sin(rq2)*(3.0/1.0E1);
+    Jc2(4) = 0;
+    Jc2(5) = 0;
+
+    Jc3(0) = 0;
+    Jc3(1) = cos(rq0);
+    Jc3(2) = -cos(rq1)*sin(rq0);
+    Jc3(3) = -cos(rq1)*sin(rq0);
+    Jc3(4) = -cos(rq1)*sin(rq0);
+    Jc3(5) = cos(rq4)*(cos(rq3)*(cos(rq0)*cos(rq2)-sin(rq0)*sin(rq1)*sin(rq2))-sin(rq3)*(cos(rq0)*sin(rq2)+cos(rq2)*sin(rq0)*sin(rq1)))-sin(rq4)*(cos(rq3)*(cos(rq0)*sin(rq2)+cos(rq2)*sin(rq0)*sin(rq1))+sin(rq3)*(cos(rq0)*cos(rq2)-sin(rq0)*sin(rq1)*sin(rq2)));
+
+    Jc8(0) = 0;
+    Jc8(1) = cos(lq2)*sin(lq1)*(3.0/1.0E1)+cos(lq2)*cos(lq3)*sin(lq1)*(3.0/1.0E1)-sin(lq1)*sin(lq2)*sin(lq3)*(3.0/1.0E1);
+    Jc8(2) = cos(lq1)*sin(lq2)*(3.0/1.0E1)+cos(lq1)*cos(lq2)*sin(lq3)*(3.0/1.0E1)+cos(lq1)*cos(lq3)*sin(lq2)*(3.0/1.0E1);
+    Jc8(3) = cos(lq1)*cos(lq2)*sin(lq3)*(3.0/1.0E1)+cos(lq1)*cos(lq3)*sin(lq2)*(3.0/1.0E1);
+    Jc8(4) = 0;
+    Jc8(5) = 0;
+
+    Jc9(0) = 0;
+    Jc9(1) = cos(lq0);
+    Jc9(2) = cos(lq1)*sin(lq0);
+    Jc9(3) = cos(lq1)*sin(lq0);
+    Jc9(4) = cos(lq1)*sin(lq0);
+    Jc9(5) = cos(lq4)*(cos(lq3)*(cos(lq0)*cos(lq2)+sin(lq0)*sin(lq1)*sin(lq2))-sin(lq3)*(cos(lq0)*sin(lq2)-cos(lq2)*sin(lq0)*sin(lq1)))-sin(lq4)*(cos(lq3)*(cos(lq0)*sin(lq2)-cos(lq2)*sin(lq0)*sin(lq1))+sin(lq3)*(cos(lq0)*cos(lq2)+sin(lq0)*sin(lq1)*sin(lq2)));
+
+
+
+    //double lTau[6];
+    //double rTau[6];
+
+    Vector6D lTau;
+    Vector6D rTau;
+    lTau.setZero();
+    rTau.setZero();
+
+    rTau(0) = 0;
+    rTau(1) = cos(rq2)*sin(rq1)*(-2.6960823E1)+sin(rq1)*sin(rq2)*sin(rq3)*1.6972281E1-cos(rq2)*cos(rq3)*sin(rq1)*1.6972281E1;
+    rTau(2) = cos(rq1)*sin(rq2)*(-2.6960823E1)+pow(cos(rq0),2.0)*cos(rq1)*3.6112125645+cos(rq1)*pow(sin(rq0),2.0)*3.6112125645-cos(rq1)*cos(rq2)*sin(rq3)*1.6972281E1-cos(rq1)*cos(rq3)*sin(rq2)*1.6972281E1;
+    rTau(3) = pow(cos(rq0),2.0)*cos(rq1)*3.2487791715+cos(rq1)*pow(sin(rq0),2.0)*3.2487791715-cos(rq1)*cos(rq2)*sin(rq3)*1.6972281E1-cos(rq1)*cos(rq3)*sin(rq2)*1.6972281E1;
+    rTau(4) = pow(cos(rq0),2.0)*cos(rq1)*2.0451598605+cos(rq1)*pow(sin(rq0),2.0)*2.0451598605;
+    rTau(5) = cos(rq0)*(cos(rq4)*(cos(rq3)*(cos(rq2)*sin(rq0)+cos(rq0)*sin(rq1)*sin(rq2))-sin(rq3)*(sin(rq0)*sin(rq2)-cos(rq0)*cos(rq2)*sin(rq1)))-sin(rq4)*(cos(rq3)*(sin(rq0)*sin(rq2)-cos(rq0)*cos(rq2)*sin(rq1))+sin(rq3)*(cos(rq2)*sin(rq0)+cos(rq0)*sin(rq1)*sin(rq2))))*3.62433393E-1-sin(rq0)*(cos(rq4)*(cos(rq3)*(cos(rq0)*cos(rq2)-sin(rq0)*sin(rq1)*sin(rq2))-sin(rq3)*(cos(rq0)*sin(rq2)+cos(rq2)*sin(rq0)*sin(rq1)))-sin(rq4)*(cos(rq3)*(cos(rq0)*sin(rq2)+cos(rq2)*sin(rq0)*sin(rq1))+sin(rq3)*(cos(rq0)*cos(rq2)-sin(rq0)*sin(rq1)*sin(rq2))))*3.62433393E-1;
+
+    lTau(0) = 0;
+    lTau(1) = cos(lq2)*sin(lq1)*(-2.0857041E1)-cos(lq2)*cos(lq3)*sin(lq1)*6.892506+sin(lq1)*sin(lq2)*sin(lq3)*6.892506;
+    lTau(2) = cos(lq1)*sin(lq2)*(-2.0857041E1)-pow(cos(lq0),2.0)*cos(lq1)*3.7168927515-cos(lq1)*pow(sin(lq0),2.0)*3.7168927515-cos(lq1)*cos(lq2)*sin(lq3)*6.892506-cos(lq1)*cos(lq3)*sin(lq2)*6.892506;
+    lTau(3) = pow(cos(lq0),2.0)*cos(lq1)*(-2.5132734405)-cos(lq1)*pow(sin(lq0),2.0)*2.5132734405-cos(lq1)*cos(lq2)*sin(lq3)*6.892506-cos(lq1)*cos(lq3)*sin(lq2)*6.892506;
+    lTau(4) = pow(cos(lq0),2.0)*cos(lq1)*(-8.30546973E-1)-cos(lq1)*pow(sin(lq0),2.0)*8.30546973E-1;
+    lTau(5) = cos(lq0)*(cos(lq4)*(cos(lq3)*(cos(lq2)*sin(lq0)-cos(lq0)*sin(lq1)*sin(lq2))-sin(lq3)*(sin(lq0)*sin(lq2)+cos(lq0)*cos(lq2)*sin(lq1)))-sin(lq4)*(cos(lq3)*(sin(lq0)*sin(lq2)+cos(lq0)*cos(lq2)*sin(lq1))+sin(lq3)*(cos(lq2)*sin(lq0)-cos(lq0)*sin(lq1)*sin(lq2))))*4.6811358E-1-sin(lq0)*(cos(lq4)*(cos(lq3)*(cos(lq0)*cos(lq2)+sin(lq0)*sin(lq1)*sin(lq2))-sin(lq3)*(cos(lq0)*sin(lq2)-cos(lq2)*sin(lq0)*sin(lq1)))-sin(lq4)*(cos(lq3)*(cos(lq0)*sin(lq2)-cos(lq2)*sin(lq0)*sin(lq1))+sin(lq3)*(cos(lq0)*cos(lq2)+sin(lq0)*sin(lq1)*sin(lq2))))*4.6811358E-1;
+
+    for(int i=0; i<6; i++)
+    {
+        rTau(i)=rTau(i)+Jc2(i)*fc_r;//+Jc3(i)*mc_r;
+        lTau(i)=lTau(i)+Jc8(i)*fc_l;//+Jc9(i)*mc_l;
+    }
+    //_desired_q(18)=_desired_q(18)+(a_total*rTau[0]+b_total);
+    //_desired_q(19-2)=_desired_q(19-2)+(a_total*rTau(1)+b_total);
+    //_desired_q(20-2)=_desired_q(20-2)+(a_total*rTau(2)+b_total);
+    //_desired_q(21-2)=_desired_q(21-2)+(a_total*rTau(3)+b_total);
+    //_desired_q(22-2)=_desired_q(22-2)+(a_total*rTau(4)+b_total);
+    //_desired_q(23-2)=_desired_q(23-2)+(a_total*rTau(5)+b_total);
+
+    //_desired_q(24)=_desired_q(24)+(a_total*lTau[0]+b_total);
+    //_desired_q(25-2)=_desired_q(25-2)+(a_total*lTau(1)+b_total);
+    //_desired_q(26-2)=_desired_q(26-2)+(a_total*lTau(2)+b_total);
+    //_desired_q(27-2)=_desired_q(27-2)+(a_total*lTau(3)+b_total);
+    //_desired_q(28-2)=_desired_q(28-2)+(a_total*lTau(4)+b_total);
+    //_desired_q(29-2)=_desired_q(29-2)+(a_total*lTau(5)+b_total);
+
+    double rising=0;
+
+    double timingtiming =  1;
+
+    if(_cnt>_T_Start+_T_rest_init && _cnt<= _T_Start+_T_rest_init+_T_Double1*timingtiming)
+    {
+        rising = (_cnt-_T_Start-_T_rest_init)/(_T_Double1*timingtiming);
+    }
+    else if(_cnt> _T_Start+_T_rest_init+_T_Double1*timingtiming && _cnt<= _T_Start+_T_Total-_T_rest_last-_T_Double2*timingtiming )
+    {
+        rising =1;
+    }
+    else if( _cnt> _T_Start+_T_Total-_T_rest_last-_T_Double2*timingtiming &&  _cnt<= _T_Start+_T_Total-_T_rest_last)
+    {
+        rising = -(_cnt- (_T_Start+_T_Total-_T_rest_last))/(_T_Double2*timingtiming);
+    }
+
+    //rising=rising*1.0;
+    rising=0.6;
+
+    //_desired_q(18)=_desired_q(18)+(a_total*rTau[0]+b_total);
+    //_desired_q(19)=_desired_q(19)+(a_total*rTau[1]+b_total)*rising;
+    //_desired_q(20)=_desired_q(20)+(a_total*rTau[2]+b_total)*rising;
+    //_desired_q(21)=_desired_q(21)+(a_total*rTau[3]+b_total)*rising;
+    //_desired_q(22)=_desired_q(22)+(a_total*rTau[4]+b_total)*rising;
+    //_desired_q(23)=_desired_q(23)+(a_total*rTau[5]+b_total)*rising;
+
+    //_desired_q(24)=_desired_q(24)+(a_total*lTau[0]+b_total);
+    //_desired_q(25)=_desired_q(25)+(a_total*lTau[1]+b_total)*rising;
+    //_desired_q(26)=_desired_q(26)+(a_total*lTau[2]+b_total)*rising;
+    //_desired_q(27)=_desired_q(27)+(a_total*lTau[3]+b_total)*rising;
+    //_desired_q(28)=_desired_q(28)+(a_total*lTau[4]+b_total)*rising;
+    //_desired_q(29)=_desired_q(29)+(a_total*lTau[5]+b_total)*rising;
+
+    //_desired_q(18)=_desired_q(18)+(a_total*rTau[0]+b_total);
+    _desired_q(19-2)=_desired_q(19-2)+(a_total*rTau(1)+b_total)*rising;
+    //_desired_q(20-2)=_desired_q(20-2)+(a_total*rTau(2)+b_total)*rising;//offwhenslow
+    //_desired_q(21-2)=_desired_q(21-2)+(a_total*rTau(3)+b_total)*rising*0.3;//offwhenslow
+    //_desired_q(22-2)=_desired_q(22-2)+(a_total*rTau(4)+b_total)*rising;//offwhenslow
+    _desired_q(23-2)=_desired_q(23-2)+(a_total*rTau(5)+b_total)*rising;
+
+    //_desired_q(24)=_desired_q(24)+(a_total*lTau[0]+b_total);
+    _desired_q(25-2)=_desired_q(25-2)+(a_total*lTau(1)+b_total)*rising;
+    //_desired_q(26-2)=_desired_q(26-2)+(a_total*lTau(2)+b_total)*rising;//offwhenslow
+    //_desired_q(27-2)=_desired_q(27-2)+(a_total*lTau(3)+b_total)*rising*0.3;//offwhenslow
+    //_desired_q(28-2)=_desired_q(28-2)+(a_total*lTau(4)+b_total)*rising;//offwhenslow
+    _desired_q(29-2)=_desired_q(29-2)+(a_total*lTau(5)+b_total)*rising;
+
+
 }
 
 void WalkingCtrl::_init_state_update()
@@ -662,4 +894,7 @@ void WalkingCtrl::_initialize()
     _T_Last = _T_Total+_T_temp;
     _T_Start = _T_temp+1;
     _T_Start_real = _T_Start+_T_rest_init;
+
+    _desired_q_notcompensate.resize(28);
+    _desired_q_notcompensate.setZero();
 }

@@ -10,6 +10,7 @@
 // ROS Library
 #include <ros/ros.h>
 #include <rosrt/rosrt.h>
+#include <tf/transform_datatypes.h>
 
 // ROS Messages
 #include <std_msgs/String.h>

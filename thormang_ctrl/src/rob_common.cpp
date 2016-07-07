@@ -13,6 +13,8 @@ realrobot::realrobot() : rate(250.0)
 
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state", 1, &realrobot::jointCallback, this, ros::TransportHints().tcpNoDelay(true));
     imuSub = nh.subscribe("imu/imu", 1, &realrobot::imuCallback, this, ros::TransportHints().tcpNoDelay(true));
+    imuFilterSub = nh.subscribe("imu/filter", 1, &realrobot::imuFilterCallback, this, ros::TransportHints().tcpNoDelay(true));
+
     leftFootFTSub = nh.subscribe("ati_ft_sensor/left_foot_ft", 1, &realrobot::leftFootFTCallback, this);
     rightFootFTSub = nh.subscribe("ati_ft_sensor/right_foot_ft", 1, &realrobot::rightFootFTCallback, this);
     /*

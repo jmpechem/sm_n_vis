@@ -1,4 +1,4 @@
-#include "../DefineVar.h"
+#include "DefineVar.h"
 #include "FootPlanning.h"
 #include "Robot_State.h"
 #include "Pattern_Generator.h"
@@ -21,8 +21,9 @@ public:
 
 
 public:
+    void setApproachdata(double x, double y, double theta);
     void Init_walking_pose(VectorXD& output);
-
+    void hip_compensator();
     void Step_time_update();
     void Step_count(MatrixXD& foot_planning);
     void getdata(VectorXD& _q_robot, Vector6D& _L_Ft_robot, Vector6D& _R_Ft_robot, Vector3D& _Gyro_Base_robot);
@@ -31,4 +32,10 @@ public:
     void compute(VectorXD& output);
     void _init_state_update();
     void InverseKinematics(Vector3D P_wt, Vector3D P_wr5, Vector3D P_wl5, Matrix3D R_wt, Matrix3D R_wr5, Matrix3D R_wl5, VectorXD& qd);
+    void Hipcompensation();
+    //void outputHipcompensation();
+
+
+private:
+    VectorXD _desired_q_notcompensate;
 };

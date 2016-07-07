@@ -180,9 +180,9 @@ void Robot_State::Robot_state_update()
     ///////////žžŸà Gyro falg°¡ falseÀÌžé ÁöÁö¹ßÀÇ orientationÀº ¹«Á¶°Ç ŽÙ 0 (·Ñ ÇÇÄ¡ ¿ä)
     change_support_frame();
 
-   // Contactforce_update();
+    Contactforce_update();
 
-   // updateFT(_R_FT_global,_L_FT_global);
+    updateFT(_R_FT_global,_L_FT_global);
 
     Rot2euler(_T_LFoot_global[5].linear(),_T_LFoot_global_euler);
     Rot2euler(_T_RFoot_global[5].linear(),_T_RFoot_global_euler);

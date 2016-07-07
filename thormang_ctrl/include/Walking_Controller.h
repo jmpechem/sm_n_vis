@@ -32,4 +32,10 @@ public:
     void compute(VectorXD& output);
     void _init_state_update();
     void InverseKinematics(Vector3D P_wt, Vector3D P_wr5, Vector3D P_wl5, Matrix3D R_wt, Matrix3D R_wr5, Matrix3D R_wl5, VectorXD& qd);
+    void Hipcompensation();
+    //void outputHipcompensation();
+
+
+private:
+    VectorXD _desired_q_notcompensate;
 };
