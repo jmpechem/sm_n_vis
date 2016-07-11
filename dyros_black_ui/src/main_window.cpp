@@ -266,22 +266,12 @@ void MainWindow::autoMissionSelectVisible(int mission)
 }
 void MainWindow::updateUI()
 {
-    if(isConnected == true)
-    {
-        ui.groupBox_state->setEnabled(true);
-        ui.groupBox_joint_ctrl->setEnabled(true);
-        ui.groupBox_task_ctrl->setEnabled(true);
-        ui.groupBox_recog_ctrl->setEnabled(true);
-        ui.groupBox_walk_ctrl->setEnabled(true);
-    }
-    else
-    {
-        ui.groupBox_state->setEnabled(false);
-        ui.groupBox_joint_ctrl->setEnabled(false);
-        ui.groupBox_task_ctrl->setEnabled(false);
-        ui.groupBox_recog_ctrl->setEnabled(false);
-        ui.groupBox_walk_ctrl->setEnabled(false);
-    }
+    ui.groupBox_state->setEnabled(isConnected);
+    ui.groupBox_joint_ctrl->setEnabled(isConnected);
+    ui.groupBox_task_ctrl->setEnabled(isConnected);
+    ui.groupBox_recog_ctrl->setEnabled(isConnected);
+    ui.groupBox_walk_ctrl->setEnabled(isConnected);
+    ui.groupBox_sensor_ctrl->setEnabled(isConnected);
 }
 
 /*
@@ -430,6 +420,11 @@ void MainWindow::on_button_estop_clicked()
     std::string state;
     state = "shutdown";
     qnode.send_transition(state);
+}
+
+void MainWindow::on_button_ft_calib_clicked()
+{
+    qnode.send_ft_calib(5.0);
 }
 
 void MainWindow::stateButtonClicked()

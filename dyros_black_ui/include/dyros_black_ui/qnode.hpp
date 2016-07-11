@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "std_msgs/Float32MultiArray.h"
+#include <std_msgs/Float32.h>
 
 #include "thormang_ctrl_msgs/JointSet.h"
 #include "thormang_ctrl_msgs/JointState.h"
@@ -64,6 +65,7 @@ public:
 	QStringListModel* loggingModel() { return &logging_model; }
 	void log( const LogLevel &level, const std::string &msg);
 
+    void send_ft_calib(float time);
     void send_transition(std::string str);
     void send_joint_ctrl(int id, double angle);
     void send_walking_cmd(thormang_ctrl_msgs::WalkingCmd& walking_msg);
@@ -90,6 +92,8 @@ private:
     ros::Publisher walking_cmd_publisher;
     ros::Publisher task_cmd_publisher;
     ros::Publisher recog_cmd_publisher;
+
+    ros::Publisher ft_sensor_calib_publisher;
 
     ros::Subscriber joint_state_subscirber;
     ros::Subscriber recog_point_subscriber;
