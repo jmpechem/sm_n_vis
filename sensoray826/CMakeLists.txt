@@ -55,12 +55,9 @@ add_library(sensoray826
   src/sensoray826.cpp
 )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(sensoray826 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+file(GLOB_RECURSE HeaderFiles "include/*.h")
+add_custom_target(sensoray826_header SOURCES ${HeaderFiles})
 
-## Declare a C++ executable
 add_executable(ati_ft_sensor_node src/ati_ft_sensor.cpp)
 
 ## Add cmake target dependencies of the executable

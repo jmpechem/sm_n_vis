@@ -4,7 +4,7 @@
 
 #include "826api.h"
 
-#define PRINT_ERR(FUNC)   if ((errcode = FUNC) != S826_ERR_OK) { ROS_ERROR("\nERROR: %d\n", errcode); }
+#define PRINT_ERR(FUNC)   if ((errcode = FUNC) != S826_ERR_OK) { ROS_INFO("\nERROR: %d\n", errcode); }
 
 
 struct SLOTATTR

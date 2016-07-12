@@ -695,6 +695,7 @@ void Robot_State::Initial_state_update()
 {
     if(_cnt == 0)
     {
+        cout << "_initialize" << endl;
         _init_info._COM_support_init = _COM_real_support;
         _init_info._trunk_support_init.translation() = _T_Trunk_support.translation();
         _init_info._trunk_support_init.linear() = _T_Trunk_support.linear();

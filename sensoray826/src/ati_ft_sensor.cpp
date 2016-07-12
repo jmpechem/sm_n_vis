@@ -1,8 +1,10 @@
-#include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/WrenchStamped.h>
 #include <std_msgs/Float32.h>
 
 #include "sensoray826.h"
 
+
+const double SAMPLE_RATE = 1000; // Hz
 
 enum SLOT_TIME {NONE = 0, DEFAULT = 50};
 
@@ -41,8 +43,10 @@ class atiFTSensorROS : public sensoray826_dev
     ros::Publisher leftFootFTPublisher;
     ros::Publisher rightFootFTPublisher;
     ros::Subscriber calibSubscriber;
-    geometry_msgs::Wrench leftFootMsg;
-    geometry_msgs::Wrench rightFootMsg;
+    geometry_msgs::WrenchStamped leftFootMsg;
+    geometry_msgs::WrenchStamped rightFootMsg;
+
+    int stampCount;
 
 
     void initCalibration()
@@ -53,7 +57,7 @@ class atiFTSensorROS : public sensoray826_dev
             _calibRFTData[i] = 0.0;
         }
         _calibTimeIndex = 0;
-        _calibMaxIndex = dCalibrationTime * 1000;
+        _calibMaxIndex = dCalibrationTime * SAMPLE_RATE;
         ROS_INFO("FT sensor calibration start... time = %.1lf sec, total %d samples ", dCalibrationTime, _calibMaxIndex);
     }
 
@@ -108,8 +112,8 @@ class atiFTSensorROS : public sensoray826_dev
                 _lf -= leftFootBias[i];
                 _rf -= rightFootBias[i];
 
-                leftFootAxisData[i] = lowPassFilter(_lf, leftFootAxisData_prev[i], 0.001, 0.05);
-                rightFootAxisData[i] = lowPassFilter(_rf, rightFootAxisData_prev[i], 0.001, 0.05);
+                leftFootAxisData[i] = lowPassFilter(_lf, leftFootAxisData_prev[i], 1.0 / SAMPLE_RATE, 0.05);
+                rightFootAxisData[i] = lowPassFilter(_rf, rightFootAxisData_prev[i], 1.0/ SAMPLE_RATE,0.05);
                 leftFootAxisData_prev[i] = leftFootAxisData[i];
                 rightFootAxisData_prev[i] = rightFootAxisData[i];
             }
@@ -117,22 +121,25 @@ class atiFTSensorROS : public sensoray826_dev
     }
     void publishFTData()
     {
-        leftFootMsg.force.x = leftFootAxisData[0];
-        leftFootMsg.force.y = leftFootAxisData[1];
-        leftFootMsg.force.z = leftFootAxisData[2];
-        leftFootMsg.torque.x = leftFootAxisData[3];
-        leftFootMsg.torque.y = leftFootAxisData[4];
-        leftFootMsg.torque.z = leftFootAxisData[5];
+        leftFootMsg.wrench.force.x = leftFootAxisData[0];
+        leftFootMsg.wrench.force.y = leftFootAxisData[1];
+        leftFootMsg.wrench.force.z = leftFootAxisData[2];
+        leftFootMsg.wrench.torque.x = leftFootAxisData[3];
+        leftFootMsg.wrench.torque.y = leftFootAxisData[4];
+        leftFootMsg.wrench.torque.z = leftFootAxisData[5];
 
-        rightFootMsg.force.x = rightFootAxisData[0];
-        rightFootMsg.force.y = rightFootAxisData[1];
-        rightFootMsg.force.z = rightFootAxisData[2];
-        rightFootMsg.torque.x = rightFootAxisData[3];
-        rightFootMsg.torque.y = rightFootAxisData[4];
-        rightFootMsg.torque.z = rightFootAxisData[5];
+        rightFootMsg.wrench.force.x = rightFootAxisData[0];
+        rightFootMsg.wrench.force.y = rightFootAxisData[1];
+        rightFootMsg.wrench.force.z = rightFootAxisData[2];
+        rightFootMsg.wrench.torque.x = rightFootAxisData[3];
+        rightFootMsg.wrench.torque.y = rightFootAxisData[4];
+        rightFootMsg.wrench.torque.z = rightFootAxisData[5];
 
+        leftFootMsg.header.stamp = ros::Time::now();
+        rightFootMsg.header.stamp = leftFootMsg.header.stamp;
         leftFootFTPublisher.publish(leftFootMsg);
         rightFootFTPublisher.publish(rightFootMsg);
+        stampCount++;
     }
 
     void calibCallback(const std_msgs::Float32ConstPtr msg)
@@ -144,12 +151,16 @@ class atiFTSensorROS : public sensoray826_dev
     }
 
 public:
-    atiFTSensorROS(ros::NodeHandle &nh) : sensoray826_dev(), rate(1000), isCalibration(false)
+    atiFTSensorROS(ros::NodeHandle &nh) : sensoray826_dev(), isCalibration(false), stampCount(0), rate(SAMPLE_RATE)
     {
         // ROS publish
-        leftFootFTPublisher = nh.advertise<geometry_msgs::Wrench>("ati_ft_sensor/left_foot_ft",5);
-        rightFootFTPublisher = nh.advertise<geometry_msgs::Wrench>("ati_ft_sensor/right_foot_ft",5);
+        leftFootFTPublisher = nh.advertise<geometry_msgs::WrenchStamped>("ati_ft_sensor/left_foot_ft",5);
+        rightFootFTPublisher = nh.advertise<geometry_msgs::WrenchStamped>("ati_ft_sensor/right_foot_ft",5);
         calibSubscriber = nh.subscribe("ati_ft_sensor/calibration", 1, &atiFTSensorROS::calibCallback, this);
+
+        leftFootMsg.header.frame_id = "LeftFootFT";
+        rightFootMsg.header.frame_id = "RightFootFT";
+
 
         // daq open
         sensoray826_dev::open();
@@ -198,8 +209,13 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
 
     atiFTSensorROS ft(nh);
-    ros::Rate r(1000);
 
+    ros::Rate r(SAMPLE_RATE);
+    ROS_INFO("DAQ Initialize ...");
+    for(int i=0; i<SAMPLE_RATE; i++)
+        r.sleep();
+    
+    ROS_INFO("DAQ Initialize Done. Streaming started.");
     while(ros::ok())
     {
         ft.loop();

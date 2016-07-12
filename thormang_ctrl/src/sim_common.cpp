@@ -128,7 +128,7 @@ void simulation::LftCallback(const vrep_common::ForceSensorData::ConstPtr& Lft)
     leftFootFT(0) = Lft->force.x;
     leftFootFT(1) = Lft->force.y;
     leftFootFT(2) = Lft->force.z;
-    leftFootFT(3) = Lft->torque.x;
+    leftFootFT(3) = -Lft->torque.x;
     leftFootFT(4) = Lft->torque.y;
     leftFootFT(5) = Lft->torque.z;
 }
@@ -139,7 +139,7 @@ void simulation::RftCallback(const vrep_common::ForceSensorData::ConstPtr& Rft)
     rightFootFT(0) = Rft->force.x;
     rightFootFT(1) = Rft->force.y;
     rightFootFT(2) = Rft->force.z;
-    rightFootFT(3) = Rft->torque.x;
+    rightFootFT(3) = -Rft->torque.x;
     rightFootFT(4) = Rft->torque.y;
     rightFootFT(5) = Rft->torque.z;
 }

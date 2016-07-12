@@ -597,7 +597,7 @@ void Pattern_generator::Ref_ZMP_update()
 
 void Pattern_generator::Ref_COM_update_local()
 {
-    _COM_offset(0) = 0.01;
+    _COM_offset(0) = -0.01;
     // �κ� ���� �� cnt=0 (ùƽ)���� ���� �Ǵ� �κ��� COM or Trunk�ġ
     if(_com_control_flag == true)
     {

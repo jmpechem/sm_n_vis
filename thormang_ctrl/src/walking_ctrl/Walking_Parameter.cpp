@@ -2,7 +2,7 @@
 
 void WalkingPara::set_user_value()
 {
-    Hz = 250.0;
+    Hz = 200.0;
     _ho = 0.05;
     //_T_Double1 = 0.1*Hz;
     //_T_Double2 = 0.1*Hz;
@@ -12,22 +12,31 @@ void WalkingPara::set_user_value()
     //_T_rest_init = 1.0*Hz;
     //_T_rest_last = 1.0*Hz;
 
+    _T_Double1 = 0.1*Hz;
+    _T_Double2 = 0.1*Hz;
+
+    _T_Total = 3.6*Hz;
+
+    _T_rest_init = 1.3*Hz;
+    _T_rest_last = 1.3*Hz;
+    /*fastwalking1.0*/
+
     //_T_Double1 = 0.1*Hz;
     //_T_Double2 = 0.1*Hz;
 
-    //_T_Total = 3.0*Hz;
+    //_T_Total = 1.4*Hz;
 
-    //_T_rest_init = 1.0*Hz;
-    //_T_rest_last = 1.0*Hz;
-    /*fastwalking1.0*/
+    //_T_rest_init = 0.0*Hz;
+    //_T_rest_last = 0.0*Hz;
+    /*fastfastwalking1.0*/
 
-    _T_Double1 = 4.0*Hz;
-    _T_Double2 = 4.0*Hz;
+    //_T_Double1 = 4.0*Hz;
+    //_T_Double2 = 4.0*Hz;
 
-    _T_Total = 24.0*Hz;
+    //_T_Total = 24.0*Hz;
 
-    _T_rest_init = 3.0*Hz;
-    _T_rest_last = 3.0*Hz;
+    //_T_rest_init = 3.0*Hz;
+    //_T_rest_last = 3.0*Hz;
     /*slowwalking0.6*/
 
     _T_temp = 3.0*Hz;
@@ -39,6 +48,8 @@ void WalkingPara::set_user_value()
     _com_control_flag = false;
     _landing_flag = false;
 
+    //_ZMP_left_offset = 0.01;
+    //_ZMP_right_offset = -0.01;
     _ZMP_left_offset = 0.015;
     _ZMP_right_offset = -0.01;
 }

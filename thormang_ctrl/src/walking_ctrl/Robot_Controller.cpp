@@ -624,8 +624,11 @@ void Robot_Control::Impedance_control()
 {
     ////////////Impedance ����//////////////////
 
+    if(_cnt == 0)
+        _Impedance_flag = false;
+
     double offset_time = _T_Imp+0.4*Hz;
-    double FT_Threshold = 1.0;
+    double FT_Threshold = 50.0;
 
     /////////Impedance ������ �� ���//////////////
     Vector6D FT;
@@ -639,7 +642,7 @@ void Robot_Control::Impedance_control()
 
 
     ////////////////landing ��� 0.3�� ������ �����ϰ� ���////////////////////////////
-    if((_Impedance_flag == false) && (_cnt > _T_Start+_T_Total-_T_Double2-offset_time) && (_cnt < _T_Start+_T_Total))
+    if((_Impedance_flag == false) && (_cnt > _T_Start+_T_Total-_T_Double2-_T_rest_init-offset_time) && (_cnt < _T_Start+_T_Total))
     {
         if(FT(2) > FT_Threshold || FT(3) > 10.0 || FT(4) > 10.0)
         {
@@ -654,7 +657,7 @@ void Robot_Control::Impedance_control()
             cout << "Rfoot" << initial_state.RFoot_current << endl;
             cout << "Impedance start"<<endl;
         }
-        if(_cnt == _T_Start+_T_Total-_T_Double2-_T_Imp)
+        if(_cnt == _T_Start+_T_Total-_T_rest_init-_T_Double2-_T_Imp)
         {
             cout << "delay_landing" << endl;
             _Impedance_flag = true;
@@ -677,6 +680,9 @@ void Robot_Control::Impedance_control()
     }
 
 
+   // if(_cnt > 5)
+   //     _Impedance_flag = true;
+
     ///////////Impedance control ���� /////////////////////////
     if(_Impedance_flag == true)
     {
@@ -688,10 +694,10 @@ void Robot_Control::Impedance_control()
         {
             if(_foot_step(_step_number,6) == 1)
             {
-                if(_cnt < _T_Start+_T_Total)
+                if(_cnt < _T_Start+_T_Total-_T_rest_init)
                 {
                     //RFT_desired(2) = (Mg*0.5-initial_state.FT(2))*(_cnt-initial_state.time)/(_T_Start+_T_Total-_T_Double2-initial_state.time)+initial_state.FT(2);
-                    RFT_desired(2) = (Mg*0.5)*(_cnt-initial_state.time)/(_T_Start+_T_Total-initial_state.time);
+                    RFT_desired(2) = (Mg*0.5)*(_cnt-initial_state.time)/(_T_Start+_T_Total-_T_rest_init-initial_state.time);
                     LFT_desired(2) = Mg-RFT_desired(2);
                 }
                 else
@@ -702,10 +708,10 @@ void Robot_Control::Impedance_control()
             }
             else
             {
-                if(_cnt < _T_Start+_T_Total)
+                if(_cnt < _T_Start+_T_Total-_T_rest_init)
                 {
                     //LFT_desired(2) = (Mg*0.5-initial_state.FT(2))*(_cnt-initial_state.time)/(_T_Start+_T_Total-_T_Double2-initial_state.time)+initial_state.FT(2);
-                    LFT_desired(2) = (Mg*0.5)*(_cnt-initial_state.time)/(_T_Start+_T_Total-initial_state.time);
+                    LFT_desired(2) = (Mg*0.5)*(_cnt-initial_state.time)/(_T_Start+_T_Total-_T_rest_init-initial_state.time);
                     RFT_desired(2) = Mg-LFT_desired(2);
                 }
                 else
@@ -720,6 +726,12 @@ void Robot_Control::Impedance_control()
             RFT_desired(2) = 0.5*Mg;
             LFT_desired(2) = 0.5*Mg;
         }
+
+        //RFT_desired(2) = 0.0;
+        //RFT_desired.setZero();
+
+	//LFT_desired.setZero();
+
         ///// gain ���//////
         double kp_imp_z_L = 0.0;
         double kp_imp_alpha_L = 0.0;
@@ -753,27 +765,17 @@ void Robot_Control::Impedance_control()
         //del_RFoot(4) = (kp_imp_beta_R*(_L_FT_global(4)-LFT_desired(4))+(m_ori_imp-k_ori_imp/Hz)*(R_position_dot(4)-R_position_dot_desired(4))-k_ori_imp*(_Impedance_T_R_current(4)-_Impedance_T_R_desired_current(4))) /(m_ori_imp+d_ori_imp);
 
         ////kajita////////////
-        double m_imp = 3.0;//30
-        double d_imp = 2000.0;
-        double k_imp = 0.1;
+       
+       double m_imp = 5.0;
+       double d_imp = 2000.0;
+       double k_imp = 0.1;
 
-        double m_ori_imp = 0.5;//2
-        double d_ori_imp = 10.0;//100
-        double k_ori_imp = 0.1;//1+100.0*_B;
-
-
-        if(_step_number == _step_total_number-1)
-        {
-            m_imp = 10.0;
-            d_imp = 5000.0;
-            k_imp = 0.1;
-
-            m_ori_imp = 2.0;
-            d_ori_imp = 10.0;
-            k_ori_imp = 0.1;
-        }
+       double m_ori_imp = 3.0;//1+0.1*(_TT-900);
+       double d_ori_imp = 30.0;//1+10.0*_kp;//18.0;
+       double k_ori_imp = 0.1;//1+100.0*_B;
 
         double del_t = 1.0/Hz;
+
         Vector6D LF_error;
         LF_error = (LFT_desired-_L_FT_global);
         Vector6D LX_error;
@@ -786,24 +788,13 @@ void Robot_Control::Impedance_control()
         del_LFoot(4) = del_t*del_t/m_ori_imp*(LF_error(4)-d_ori_imp/del_t*(LX_error(4)-LX_error_1(4))-k_ori_imp*LX_error(4))+2*LX_error(4)-LX_error_1(4);
 
 
-        m_imp = 3.0;
+        m_imp = 5.0;
         d_imp = 2000.0;
         k_imp = 0.1;
 
-        m_ori_imp = 0.5;//1+0.1*(_TT-900);
-        d_ori_imp = 10.0;//1+10.0*_kp;//18.0;
+        m_ori_imp = 5.0;//1+0.1*(_TT-900);
+        d_ori_imp = 40.0;//1+10.0*_kp;//18.0;
         k_ori_imp = 0.1;//1+100.0*_B;
-
-        if(_step_number == _step_total_number-1)
-        {
-            m_imp = 10.0;
-            d_imp = 5000.0;
-            k_imp = 0.1;
-
-            m_ori_imp = 2.0;
-            d_ori_imp = 10.0;
-            k_ori_imp = 0.1;
-        }
 
 
         Vector6D RF_error;
@@ -829,32 +820,40 @@ void Robot_Control::Impedance_control()
 
         //del_RFoot(2) = (m_imp*ref_desired_error2+(-2*m_imp-d_imp*del_t)*ref_desired_error1+a1*_Impedance_T_R_desired_current(2)-del_t*del_t*(RF_error(2)))/a1;
 
-
-
         ///////������ġ//////
+        //Foot_trajectory_global.RFoot.translation()(2) = _Impedance_T_R_desired_current(2) - del_RFoot(2);
 
+       //  Foot_trajectory_global.RFoot_euler(0) = _Impedance_T_R_desired_current(3) - del_RFoot(3);
+       //  Foot_trajectory_global.RFoot_euler(1) = _Impedance_T_R_desired_current(4) - del_RFoot(4);
+
+ 		/*Foot_trajectory_global.LFoot.translation()(2) = _Impedance_T_L_desired_current(2) - del_LFoot(2);
+            Foot_trajectory_global.LFoot_euler(0) = _Impedance_T_L_desired_current(3) - del_LFoot(3);
+            Foot_trajectory_global.LFoot_euler(1) = _Impedance_T_L_desired_current(4) - del_LFoot(4);
+
+ Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
+
+         if(_cnt <= 5)
+         {
+             cout << "del" << del_RFoot(2) << endl;
+             cout << "de" << RX_error(2) << endl;
+             cout << "d" << RX_error_1(2) << endl;
+         }
+*/
+
+        // Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
+        // Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
+
+
+      
+
+      
         if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
-            //Foot_trajectory_global.LFoot.translation()(2) = _Impedance_T_L_current(2) + del_LFoot(2)/Hz;
-            //Foot_trajectory_global.LFoot_euler(0) = _Impedance_T_L_current(3) + del_LFoot(3)/Hz;
-            //Foot_trajectory_global.LFoot_euler(1) = _Impedance_T_L_current(4) + del_LFoot(4)/Hz;
-
-
             ///kajita
             Foot_trajectory_global.LFoot.translation()(2) = _Impedance_T_L_desired_current(2) - del_LFoot(2);
             Foot_trajectory_global.LFoot_euler(0) = _Impedance_T_L_desired_current(3) - del_LFoot(3);
             Foot_trajectory_global.LFoot_euler(1) = _Impedance_T_L_desired_current(4) - del_LFoot(4);
-        /*	Foot_trajectory_global.RFoot.translation()(2) = _Impedance_T_R_desired_current(2) - del_RFoot(2);
-            Foot_trajectory_global.RFoot_euler(0) = _Impedance_T_R_desired_current(3) - del_RFoot(3);
-        */	//
 
-            //for (int i=0; i<2; i++)
-            //{
-            //	if(Foot_trajectory_global.LFoot_euler(i) > 4.0*DEGREE )
-            //		Foot_trajectory_global.LFoot_euler(i) = 4.0*DEGREE;
-            //	else if(Foot_trajectory_global.LFoot_euler(i) < -4.0*DEGREE)
-            //		Foot_trajectory_global.LFoot_euler(i) = -4.0*DEGREE;
-            //}
             Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
             Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
 
@@ -862,32 +861,26 @@ void Robot_Control::Impedance_control()
         else if(_foot_step(_step_number,6) == 1)
         {
 
-            ///kajita
-
-            // 			Foot_trajectory_global.LFoot_euler(1) = _Impedance_T_L_desired_current(4) - del_LFoot(4);
             Foot_trajectory_global.RFoot.translation()(2) = _Impedance_T_R_desired_current(2) - del_RFoot(2);
             Foot_trajectory_global.RFoot_euler(0) = _Impedance_T_R_desired_current(3) - del_RFoot(3);
             Foot_trajectory_global.RFoot_euler(1) = _Impedance_T_R_desired_current(4) - del_RFoot(4);
 
-            /*	if(_cnt > _T_Start+_T_Total-_T_Double2-0.1*Hz)
-            {
-            Foot_trajectory_global.LFoot.translation()(2) = _Impedance_T_L_desired_current(2) - del_LFoot(2);
-            Foot_trajectory_global.LFoot_euler(0) = _Impedance_T_L_desired_current(3) - del_LFoot(3);
-
-            }*/
-            //
-
-            //for (int i=0; i<2; i++)
-            //{
-            //	if(Foot_trajectory_global.LFoot_euler(i) > 4.0*DEGREE )
-            //		Foot_trajectory_global.LFoot_euler(i) = 4.0*DEGREE;
-            //	else if(Foot_trajectory_global.LFoot_euler(i) < -4.0*DEGREE)
-            //		Foot_trajectory_global.LFoot_euler(i) = -4.0*DEGREE;
-            //}
             Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
             Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
 
         }
+   if((Foot_trajectory_global.LFoot.translation()(2)-_init_info._XL_global_init.translation()(2)) > 0.05)
+             Foot_trajectory_global.LFoot.translation()(2) = _init_info._XL_global_init.translation()(2) +0.05;
+
+         if((Foot_trajectory_global.LFoot.translation()(2)-_init_info._XL_global_init.translation()(2)) < -0.05)
+             Foot_trajectory_global.LFoot.translation()(2) = _init_info._XL_global_init.translation()(2) -0.05;
+
+
+         if((Foot_trajectory_global.RFoot.translation()(2)-_init_info._XR_global_init.translation()(2)) > 0.05)
+             Foot_trajectory_global.RFoot.translation()(2) = _init_info._XR_global_init.translation()(2) +0.05;
+
+         if((Foot_trajectory_global.RFoot.translation()(2)-_init_info._XR_global_init.translation()(2)) < -0.05)
+             Foot_trajectory_global.RFoot.translation()(2) = _init_info._XR_global_init.translation()(2) -0.05;
 
     }
 }

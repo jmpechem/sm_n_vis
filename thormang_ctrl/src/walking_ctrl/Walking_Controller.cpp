@@ -116,10 +116,10 @@ void WalkingCtrl::compute(VectorXD& output)
          ROS_INFO("%d %d",_cnt,_step_number);
 
 
-        if(_cnt>_T_Start)
-        {
-            _q=_desired_q_notcompensate;
-        }
+        //if(_cnt>_T_Start)
+        //{
+        //    _q=_desired_q_notcompensate;
+        //}
 
         Robot_state_update();
 
@@ -158,7 +158,23 @@ void WalkingCtrl::compute(VectorXD& output)
 
         Change_Global_Pattern();
 
-      // Impedance_controller();
+        /*
+        //test impedance air
+        Trunk_trajectory_global.translation() = _init_info._trunk_global_init.translation();
+        Trunk_trajectory_global.linear() = _init_info._trunk_global_init.linear();
+
+        Foot_trajectory_global.RFoot.translation() = _init_info._XR_global_init.translation();
+        Foot_trajectory_global.RFoot.linear() = _init_info._XR_global_init.linear();
+
+        Foot_trajectory_global.LFoot.translation() = _init_info._XL_global_init.translation();
+        Foot_trajectory_global.LFoot.linear() = _init_info._XL_global_init.linear();
+*/
+
+
+        Impedance_controller();
+
+        Impedance_reference_update();
+
 
         //Change_Local_Pattern();
 
@@ -188,16 +204,17 @@ void WalkingCtrl::compute(VectorXD& output)
 
         Vector3D trunk_temp;
         Rot2euler(Trunk_trajectory.linear(),trunk_temp);
-        if(_cnt>_T_Start)
+
+      /*  if(_cnt>_T_Start)
         {
             file[2] << _cnt << "\t" << _desired_q_notcompensate(16) << "\t" << _desired_q_notcompensate(17) << "\t" << _desired_q_notcompensate(18) << "\t" << _desired_q_notcompensate(19)<< "\t" << _desired_q_notcompensate(20)<< "\t" << _desired_q_notcompensate(21)<< "\t" << _Gyro_Base[0]<< "\t" << _Gyro_Base[1] << endl;
         }
         file[1]<<_cnt<< "\t" << _L_Ft(0) << "\t" << _L_Ft(1) << "\t" << _L_Ft(2) << "\t" << _L_Ft(3)<< "\t" << _L_Ft(4)<< "\t" << _L_Ft(5)<< "\t" << _R_Ft(0)<< "\t" << _R_Ft(1)<< "\t" << _R_Ft(2)<< "\t" << _R_Ft(3)<< "\t" << _R_Ft(4)<< "\t" << _R_Ft(5) << endl;
         // fprintf(fp13,"%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",_cnt,_T_Trunk_support_euler(0),_T_Trunk_support_euler(1),_T_Trunk_support_euler(2),trunk_temp(0),trunk_temp(1),trunk_temp(2),Foot_trajectory.LFoot.translation()(0),Foot_trajectory.LFoot.translation()(1),Foot_trajectory.LFoot.translation()(2));
 
+        file[3]<<_cnt<< "\t" << _ZMP_desired(0)<< "\t" << _ZMP_desired(1)<< endl;
         //Resolved_momentum_control();
-
-        //Impedance_reference_update();
+*/
 
         VectorXD qd;
         qd.resize(12);
@@ -223,8 +240,8 @@ void WalkingCtrl::compute(VectorXD& output)
         _desired_q_notcompensate=_desired_q;
 
 
-        //hip_compensator();
-        Hipcompensation();
+        hip_compensator();
+        //Hipcompensation();
 
 
 
@@ -299,17 +316,17 @@ void WalkingCtrl::setApproachdata(double x, double y, double theta)
 void WalkingCtrl::hip_compensator()
 {
 
-    double Left_Hip_angle = 3.8*DEGREE;
-    double Right_Hip_angle = 3.15*DEGREE;
-    double Left_Hip_angle_first_step = 3.8*DEGREE;
-    double Right_Hip_angle_first_step = 3.15*DEGREE;
+    double Left_Hip_angle = 3.7*DEGREE;
+    double Right_Hip_angle = 2.0*DEGREE;
+    double Left_Hip_angle_first_step = 3.7*DEGREE;
+    double Right_Hip_angle_first_step = 2.0*DEGREE;
 
     double Left_hip_angle_temp = 0.0;
     double Right_hip_angle_temp = 0.0;
     double temp_time = 0.1*Hz;
 
-    if(_step_number >= 3)
-	Right_Hip_angle = 3.3*DEGREE;
+  //  if(_step_number >= 3)
+	//Right_Hip_angle = 3.3*DEGREE;
 	
     if(_step_number == 0)
     {
@@ -570,7 +587,7 @@ void WalkingCtrl::Hipcompensation()
     }
 
     //rising=rising*1.0;
-    rising=0.6;
+    rising=1.0;
 
     //_desired_q(18)=_desired_q(18)+(a_total*rTau[0]+b_total);
     //_desired_q(19)=_desired_q(19)+(a_total*rTau[1]+b_total)*rising;
@@ -588,17 +605,19 @@ void WalkingCtrl::Hipcompensation()
 
     //_desired_q(18)=_desired_q(18)+(a_total*rTau[0]+b_total);
     _desired_q(19-2)=_desired_q(19-2)+(a_total*rTau(1)+b_total)*rising;
-    //_desired_q(20-2)=_desired_q(20-2)+(a_total*rTau(2)+b_total)*rising;//offwhenslow
-    //_desired_q(21-2)=_desired_q(21-2)+(a_total*rTau(3)+b_total)*rising*0.3;//offwhenslow
-    //_desired_q(22-2)=_desired_q(22-2)+(a_total*rTau(4)+b_total)*rising;//offwhenslow
+    _desired_q(20-2)=_desired_q(20-2)+(a_total*rTau(2)+b_total)*rising;//offwhenslow
+    _desired_q(21-2)=_desired_q(21-2)+(a_total*rTau(3)+b_total)*rising*0.3;//offwhenslow
+    _desired_q(22-2)=_desired_q(22-2)+(a_total*rTau(4)+b_total)*rising;//offwhenslow
     _desired_q(23-2)=_desired_q(23-2)+(a_total*rTau(5)+b_total)*rising;
 
     //_desired_q(24)=_desired_q(24)+(a_total*lTau[0]+b_total);
     _desired_q(25-2)=_desired_q(25-2)+(a_total*lTau(1)+b_total)*rising;
-    //_desired_q(26-2)=_desired_q(26-2)+(a_total*lTau(2)+b_total)*rising;//offwhenslow
-    //_desired_q(27-2)=_desired_q(27-2)+(a_total*lTau(3)+b_total)*rising*0.3;//offwhenslow
-    //_desired_q(28-2)=_desired_q(28-2)+(a_total*lTau(4)+b_total)*rising;//offwhenslow
+    _desired_q(26-2)=_desired_q(26-2)+(a_total*lTau(2)+b_total)*rising;//offwhenslow
+    _desired_q(27-2)=_desired_q(27-2)+(a_total*lTau(3)+b_total)*rising*0.3;//offwhenslow
+    _desired_q(28-2)=_desired_q(28-2)+(a_total*lTau(4)+b_total)*rising;//offwhenslow
     _desired_q(29-2)=_desired_q(29-2)+(a_total*lTau(5)+b_total)*rising;
+
+
 
 
 }
@@ -866,7 +885,8 @@ void WalkingCtrl::getdata(VectorXD& _q_robot, Vector6D& _L_Ft_robot, Vector6D& _
 
     _L_FT_lowpass = _L_Ft;
     _R_FT_lowpass = _R_Ft;
-
+    _R_FT_lowpass(3) = -_R_FT_lowpass(3);
+    _L_FT_lowpass(3) = -_L_FT_lowpass(3);
 }
 
 
