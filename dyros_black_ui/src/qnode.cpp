@@ -50,13 +50,15 @@ bool QNode::init() {
 	ros::NodeHandle n;
     // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
-    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
-    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("thormang_ctrl/task_cmd",5);
-    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("thormang_ctrl/recog_cmd",5);
-    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
+    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("/thormang_ctrl/joint_ctrl",5);
+    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("/thormang_ctrl/task_cmd",5);
+    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("/thormang_ctrl/recog_cmd",5);
+    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("/thormang_ctrl/walking_cmd",5);
 
-    joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
-    recog_point_subscriber = n.subscribe("custom_recog_point",1, &QNode::recogInfoCallback, this);
+    ft_sensor_calib_publisher = n.advertise<std_msgs::Float32>("/ati_ft_sensor/calibration", 5);
+
+    joint_state_subscirber = n.subscribe("/thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+    recog_point_subscriber = n.subscribe("/custom_recog_point",1, &QNode::recogInfoCallback, this);
 
     isConnected = true;
 	start();
@@ -75,12 +77,15 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::NodeHandle n;
     // Add your ros communications here.
     smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
-    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("thormang_ctrl/joint_ctrl",5);
-    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("thormang_ctrl/task_cmd",5);
-    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("thormang_ctrl/recog_cmd",5);
-    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("thormang_ctrl/walking_cmd",5);
+    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("/thormang_ctrl/joint_ctrl",5);
+    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("/thormang_ctrl/task_cmd",5);
+    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("/thormang_ctrl/recog_cmd",5);
+    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("/thormang_ctrl/walking_cmd",5);
 
-    joint_state_subscirber = n.subscribe("thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+    ft_sensor_calib_publisher = n.advertise<std_msgs::Float32>("/ati_ft_sensor/calibration", 5);
+
+    joint_state_subscirber = n.subscribe("/thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
+    recog_point_subscriber = n.subscribe("/custom_recog_point",1, &QNode::recogInfoCallback, this);
 
     isConnected = true;
 	start();
@@ -99,6 +104,16 @@ void QNode::run() {
 	Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
 }
 
+void QNode::send_ft_calib(float time)
+{
+    if(isConnected)
+    {
+        std_msgs::Float32 msg;
+        msg.data = time;
+
+        ft_sensor_calib_publisher.publish(msg);
+    }
+}
 
 void QNode::send_transition(std::string str)
 {

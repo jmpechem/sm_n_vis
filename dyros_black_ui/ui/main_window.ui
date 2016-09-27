@@ -21,10 +21,16 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources/images.qrc">
-    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+    <normaloff>:/images/icon_2.png</normaloff>:/images/icon_2.png</iconset>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>24</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout">
@@ -219,12 +225,12 @@
       </item>
       <item row="26" column="0">
        <property name="text">
-        <string>W-Pan</string>
+        <string>W-Pitch</string>
        </property>
       </item>
       <item row="27" column="0">
        <property name="text">
-        <string>W-Tilt</string>
+        <string>W-Yaw</string>
        </property>
       </item>
       <item row="28" column="0">
@@ -1107,7 +1113,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -1298,16 +1304,46 @@
                         </widget>
                        </item>
                        <item row="1" column="1">
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_x"/>
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_x">
+                         <property name="minimum">
+                          <double>-100.000000000000000</double>
+                         </property>
+                         <property name="maximum">
+                          <double>100.000000000000000</double>
+                         </property>
+                         <property name="singleStep">
+                          <double>0.100000000000000</double>
+                         </property>
+                        </widget>
                        </item>
                        <item row="2" column="1">
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_y"/>
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_y">
+                         <property name="minimum">
+                          <double>-100.000000000000000</double>
+                         </property>
+                         <property name="maximum">
+                          <double>100.000000000000000</double>
+                         </property>
+                         <property name="singleStep">
+                          <double>0.050000000000000</double>
+                         </property>
+                        </widget>
                        </item>
                        <item row="3" column="1">
                         <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_height"/>
                        </item>
                        <item row="4" column="1">
-                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_theta"/>
+                        <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_theta">
+                         <property name="minimum">
+                          <double>-500.000000000000000</double>
+                         </property>
+                         <property name="maximum">
+                          <double>500.000000000000000</double>
+                         </property>
+                         <property name="singleStep">
+                          <double>5.000000000000000</double>
+                         </property>
+                        </widget>
                        </item>
                        <item row="5" column="1">
                         <widget class="QDoubleSpinBox" name="doubleSpinBox_walk_imp_time"/>
@@ -1394,6 +1430,39 @@
              </spacer>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_sensor_ctrl">
+            <property name="title">
+             <string>Sensor Control</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_21">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QPushButton" name="button_ft_calib">
+                 <property name="text">
+                  <string>FT Sensor  Calibration</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_12">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <spacer name="horizontalSpacer_2">
@@ -1503,6 +1572,26 @@
    <addaction name="menu_File"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>0</y>
+       <width>99</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
   <action name="action_Quit">
    <property name="text">
     <string>&amp;Quit</string>
