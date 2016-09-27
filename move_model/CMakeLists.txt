@@ -30,7 +30,3 @@ include_directories(
    ${catkin_LIBRARIES}
  )
 
-
-
-add_dependencies(move_model thormang_ctrl_msgs_generate_messages_cpp)
-add_dependencies(move_model rt_dynamixel_msgs_generate_messages_cpp)

@@ -33,5 +33,3 @@ include_directories(
    ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}
  )
-
-add_dependencies(lidar_to_pcl thormang_ctrl_msgs_generate_messages_cpp)

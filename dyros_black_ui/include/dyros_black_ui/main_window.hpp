@@ -63,7 +63,6 @@ public Q_SLOTS:
 
     void on_button_scan_clicked();
     void on_button_estop_clicked();
-    void on_button_ft_calib_clicked();
     /******************************************
     ** Code based UI connections
     *******************************************/

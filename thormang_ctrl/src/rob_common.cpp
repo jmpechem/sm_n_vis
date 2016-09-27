@@ -88,16 +88,17 @@ void realrobot::update()
 {
     controlBase::update();
 
+    /*
     nowTime = ros::Time::now();
     uint32_t dt = nowTime.nsec - befoTime.nsec;
-    befoTime = nowTime;
 
     if(abs(dt - 5e6) > 3e6)
     {
         double ms = dt / 1000000.0;
         ROS_WARN("realtime broken. dt = %.2lf ms", ms);
     }
-
+    befoTime = nowTime;
+*/
 
     /*
     dxlJointStatePtr = dxlJointSub.poll();

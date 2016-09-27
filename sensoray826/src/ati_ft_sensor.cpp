@@ -1,5 +1,6 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Float32MultiArray.h>
 
 #include "sensoray826.h"
 
@@ -42,9 +43,11 @@ class atiFTSensorROS : public sensoray826_dev
     ros::Rate rate;
     ros::Publisher leftFootFTPublisher;
     ros::Publisher rightFootFTPublisher;
+    ros::Publisher ftRawPublisher;
     ros::Subscriber calibSubscriber;
     geometry_msgs::WrenchStamped leftFootMsg;
     geometry_msgs::WrenchStamped rightFootMsg;
+    std_msgs::Float32MultiArray rawMsg;
 
     int stampCount;
 
@@ -79,6 +82,7 @@ class atiFTSensorROS : public sensoray826_dev
                     _calibLFTData[i] += _lf / _calibMaxIndex;
                     _calibRFTData[i] += _rf / _calibMaxIndex;
                 }
+
                 _calibTimeIndex++;
             }
             else
@@ -96,6 +100,7 @@ class atiFTSensorROS : public sensoray826_dev
                          rightFootBias[0], rightFootBias[1], rightFootBias[2], rightFootBias[3], rightFootBias[4], rightFootBias[5]);
 
             }
+//ROS_INFO("%.3lf %.3lf %.3lf %.3lf %.3lf %.3lf ", adcVoltages[0], adcVoltages[1], adcVoltages[2], adcVoltages[3], adcVoltages[4], adcVoltages[5]);
         }
         else
         {
@@ -117,6 +122,7 @@ class atiFTSensorROS : public sensoray826_dev
                 leftFootAxisData_prev[i] = leftFootAxisData[i];
                 rightFootAxisData_prev[i] = rightFootAxisData[i];
             }
+        //ROS_INFO("%.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf %.3lf ", adcVoltages[0], adcVoltages[1], adcVoltages[2], adcVoltages[3], adcVoltages[4], adcVoltages[5],adcVoltages[8], adcVoltages[9], adcVoltages[10], adcVoltages[11], adcVoltages[12], adcVoltages[13]);
         }
     }
     void publishFTData()
@@ -127,7 +133,7 @@ class atiFTSensorROS : public sensoray826_dev
         leftFootMsg.wrench.torque.x = leftFootAxisData[3];
         leftFootMsg.wrench.torque.y = leftFootAxisData[4];
         leftFootMsg.wrench.torque.z = leftFootAxisData[5];
-
+	//ROS_INFO("aaaaaaaaaaaaaaaa");//
         rightFootMsg.wrench.force.x = rightFootAxisData[0];
         rightFootMsg.wrench.force.y = rightFootAxisData[1];
         rightFootMsg.wrench.force.z = rightFootAxisData[2];
@@ -137,8 +143,15 @@ class atiFTSensorROS : public sensoray826_dev
 
         leftFootMsg.header.stamp = ros::Time::now();
         rightFootMsg.header.stamp = leftFootMsg.header.stamp;
+
+        rawMsg.data.resize(16);
+        for(int i=0; i<16;i++)
+            rawMsg.data[i] = adcVoltages[i];
+
         leftFootFTPublisher.publish(leftFootMsg);
         rightFootFTPublisher.publish(rightFootMsg);
+        ftRawPublisher.publish(rawMsg);
+
         stampCount++;
     }
 
@@ -156,6 +169,7 @@ public:
         // ROS publish
         leftFootFTPublisher = nh.advertise<geometry_msgs::WrenchStamped>("ati_ft_sensor/left_foot_ft",5);
         rightFootFTPublisher = nh.advertise<geometry_msgs::WrenchStamped>("ati_ft_sensor/right_foot_ft",5);
+        ftRawPublisher = nh.advertise<std_msgs::Float32MultiArray>("ati_ft_sensor/raw",5);
         calibSubscriber = nh.subscribe("ati_ft_sensor/calibration", 1, &atiFTSensorROS::calibCallback, this);
 
         leftFootMsg.header.frame_id = "LeftFootFT";

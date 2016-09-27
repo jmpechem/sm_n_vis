@@ -130,7 +130,7 @@ void publisher_proc(void *arg)
     RTROSPublisher* pObj = (RTROSPublisher*)arg;
     int i,j;
 
-    rt_task_set_periodic(NULL, TM_NOW, 40e5);    // 1e6 -> 1ms   5e5 -> 500us
+    rt_task_set_periodic(NULL, TM_NOW, 50e5);    // 1e6 -> 1ms   5e5 -> 500us
 
     while (1)
     {

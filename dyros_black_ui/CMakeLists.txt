@@ -51,8 +51,4 @@ add_executable(dyros_black_ui ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} 
 target_link_libraries(dyros_black_ui ${QT_LIBRARIES} ${catkin_LIBRARIES})
 install(TARGETS dyros_black_ui RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-
-add_dependencies(dyros_black_ui thormang_ctrl_msgs_generate_messages_cpp)
-add_dependencies(dyros_black_ui rt_dynamixel_msgs_generate_messages_cpp)
-
 set(CMAKE_BUILD_TYPE Debug)

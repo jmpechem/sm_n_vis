@@ -696,7 +696,7 @@ void Robot_State::Initial_state_update()
     if(_cnt == 0)
     {
         cout << "_initialize" << endl;
-        _init_info._COM_support_init = _COM_real_support;
+        _init_info._COM_support_init = _T_Trunk_support.translation();
         _init_info._trunk_support_init.translation() = _T_Trunk_support.translation();
         _init_info._trunk_support_init.linear() = _T_Trunk_support.linear();
         Rot2euler(_T_Trunk_support.linear(),_init_info._trunk_support_euler_init);
@@ -840,20 +840,20 @@ void Robot_State::change_support_frame()
     }
     else
     {
-        Globalframe(com_frame,ref_frame,com_frame);
+        GlobalGyroframe(com_frame,ref_frame,com_frame);
         _COM_real_support = com_frame.translation();
 
-        Globalframe(_T_Trunk_global,ref_frame,_T_Trunk_support);
+        GlobalGyroframe(_T_Trunk_global,ref_frame,_T_Trunk_support);
         for (int i = 0 ; i<6 ; i++)
         {
-            Globalframe(_T_RFoot_global[i],ref_frame,_T_RFoot_support[i]);
-            Globalframe(_T_LFoot_global[i],ref_frame,_T_LFoot_support[i]);
+            GlobalGyroframe(_T_RFoot_global[i],ref_frame,_T_RFoot_support[i]);
+            GlobalGyroframe(_T_LFoot_global[i],ref_frame,_T_LFoot_support[i]);
         }
 
         for (int i = 0 ; i<7 ; i++)
         {
-            Globalframe(_T_RArm_global[i],ref_frame,_T_RArm_support[i]);
-            Globalframe(_T_LArm_global[i],ref_frame,_T_LArm_support[i]);
+            GlobalGyroframe(_T_RArm_global[i],ref_frame,_T_RArm_support[i]);
+            GlobalGyroframe(_T_LArm_global[i],ref_frame,_T_LArm_support[i]);
         }
     }
 }
@@ -927,175 +927,246 @@ void Robot_State::change_gyro_frame()
 
 void Robot_State::lT_R(VectorXD& q, HTransform& lT0_R, HTransform& lT1_R, HTransform& lT2_R, HTransform& lT3_R, HTransform& lT4_R, HTransform& lT5_R)
 {
-    lT0_R.linear().setZero();
-    lT1_R.linear().setZero();
-    lT2_R.linear().setZero();
-    lT3_R.linear().setZero();
-    lT4_R.linear().setZero();
-    lT5_R.linear().setZero();
-    lT0_R.translation().setZero();
-    lT1_R.translation().setZero();
-    lT2_R.translation().setZero();
-    lT3_R.translation().setZero();
-    lT4_R.translation().setZero();
-    lT5_R.translation().setZero();
+	lT0_R.linear().setZero();
+	lT1_R.linear().setZero();
+	lT2_R.linear().setZero();
+	lT3_R.linear().setZero();
+	lT4_R.linear().setZero();
+	lT5_R.linear().setZero();
+	lT0_R.translation().setZero();
+	lT1_R.translation().setZero();
+	lT2_R.translation().setZero();
+	lT3_R.translation().setZero();
+	lT4_R.translation().setZero();
+	lT5_R.translation().setZero();
+	/*
+	lT0_R(0,0) = cos(q(RF_BEGIN));
+	lT0_R(0,1) = sin(q(RF_BEGIN));
+	lT0_R(1,0) = -sin(q(RF_BEGIN));
+	lT0_R(1,1) = cos(q(RF_BEGIN));
+	lT0_R(2,2) = 1.0;
+	lT0_R(1,3) = -l_0;
+	lT0_R(2,3) = -l_1;
 
-    lT0_R(0,0) = cos(q(RF_BEGIN));
-    lT0_R(0,1) = sin(q(RF_BEGIN));
-    lT0_R(1,0) = -sin(q(RF_BEGIN));
-    lT0_R(1,1) = cos(q(RF_BEGIN));
-    lT0_R(2,2) = 1.0;
-    lT0_R(1,3) = -l_0;
-    lT0_R(2,3) = -l_1;
+	lT1_R(0,0) = cos(q(RF_BEGIN));
+	lT1_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT1_R(0,2) = -sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT1_R(1,0) = -sin(q(RF_BEGIN));
+	lT1_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT1_R(1,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT1_R(2,1) = sin(q(RF_BEGIN+1));
+	lT1_R(2,2) = cos(q(RF_BEGIN+1));
+	lT1_R(1,3) = -l_0;
+	lT1_R(2,3) = -l_1;
 
-    lT1_R(0,0) = cos(q(RF_BEGIN));
-    lT1_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
-    lT1_R(0,2) = -sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
-    lT1_R(1,0) = -sin(q(RF_BEGIN));
-    lT1_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
-    lT1_R(1,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
-    lT1_R(2,1) = sin(q(RF_BEGIN+1));
-    lT1_R(2,2) = cos(q(RF_BEGIN+1));
-    lT1_R(1,3) = -l_0;
-    lT1_R(2,3) = -l_1;
+	lT2_R(0,0) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT2_R(0,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT2_R(1,0) = -cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))-cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT2_R(1,2) = sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1));
+	lT2_R(2,0) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(2,1) = sin(q(RF_BEGIN+1));
+	lT2_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+	lT2_R(1,3) = -l_0;
+	lT2_R(2,3) = -l_1;
 
-    lT2_R(0,0) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
-    lT2_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
-    lT2_R(0,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
-    lT2_R(1,0) = -cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))-cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
-    lT2_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
-    lT2_R(1,2) = sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1));
-    lT2_R(2,0) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
-    lT2_R(2,1) = sin(q(RF_BEGIN+1));
-    lT2_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
-    lT2_R(1,3) = -l_0;
-    lT2_R(2,3) = -l_1;
+	lT3_R(0,0) = cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));
+	lT3_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT3_R(0,2) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
+	lT3_R(1,0) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
+	lT3_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT3_R(1,2) = cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
+	lT3_R(2,0) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2));
+	lT3_R(2,1) = sin(q(RF_BEGIN+1));
+	lT3_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3));
+	lT3_R(0,3)= l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));
+	lT3_R(1,3)= -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
+	lT3_R(2,3)= -l_1-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
 
-    lT3_R(0,0) = cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));
-    lT3_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
-    lT3_R(0,2) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
-    lT3_R(1,0) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
-    lT3_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
-    lT3_R(1,2) = cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
-    lT3_R(2,0) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2));
-    lT3_R(2,1) = sin(q(RF_BEGIN+1));
-    lT3_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3));
-    lT3_R(0,3)= l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));
-    lT3_R(1,3)= -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
-    lT3_R(2,3)= -l_1-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+	*/
+
+	lT0_R(0,0) = cos(q(RF_BEGIN));
+	lT0_R(0,1) = sin(q(RF_BEGIN));
+	lT0_R(1,0) = -sin(q(RF_BEGIN));
+	lT0_R(1,1) = cos(q(RF_BEGIN));
+	lT0_R(2,2) = 1.0;
+	lT0_R(1,3) = -l_0;
+	lT0_R(2,3) = -l_1;
+
+	lT1_R(0,0) = cos(q(RF_BEGIN));
+	lT1_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT1_R(0,2) = -sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT1_R(1,0) = -sin(q(RF_BEGIN));
+	lT1_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT1_R(1,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT1_R(2,1) = sin(q(RF_BEGIN+1));
+	lT1_R(2,2) = cos(q(RF_BEGIN+1));
+	lT1_R(1,3) = -l_0;
+	lT1_R(2,3) = -l_1;
+
+	lT2_R(0,0) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT2_R(0,2) = -cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1));
+	lT2_R(1,0) = -cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))-cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT2_R(1,2) = sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1));
+	lT2_R(2,0) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	lT2_R(2,1) = sin(q(RF_BEGIN+1));
+	lT2_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+	lT2_R(1,3) = -l_0;
+	lT2_R(2,3) = -l_1;
+
+	lT3_R(0,0) = cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));
+	lT3_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT3_R(0,2) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
+	lT3_R(1,0) = -cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
+	lT3_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT3_R(1,2) = cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)));
+	lT3_R(2,0) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2));
+	lT3_R(2,1) = sin(q(RF_BEGIN+1));
+	lT3_R(2,2) = cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3));
+
+	lT3_R(0,3)= l_2_x*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) + l_2_z*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)));	
+	lT3_R(1,3)=  - l_0 - l_2_x*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - l_2_z*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)));
+	lT3_R(2,3)= -l_1-l_2_z*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2)) + l_2_x*cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
 
 
-    lT4_R(0,0) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))));
-    lT4_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
-    lT4_R(0,2) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT4_R(1,0) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))));
-    lT4_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
-    lT4_R(1,2) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT4_R(2,0) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)));
-    lT4_R(2,1) = sin(q(RF_BEGIN+1));
-    lT4_R(2,2) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)));
-    lT4_R(0,3) =  l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+l_3*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT4_R(1,3) =  -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))-l_3*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT4_R(2,3) =  -l_1-l_3*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
 
-    lT5_R(0,0) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))));
-    lT5_R(0,1) = -sin(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+5))*sin(q(RF_BEGIN));
-    lT5_R(0,2) = -cos(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+5));
-    lT5_R(1,0) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))));
-    lT5_R(1,1) = sin(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))+cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+5));
-    lT5_R(1,2) = cos(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+5));
-    lT5_R(2,0) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)));
-    lT5_R(2,1) = cos(q(RF_BEGIN+5))*sin(q(RF_BEGIN+1))+sin(q(RF_BEGIN+5))*(cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))));
-    lT5_R(2,2) = -sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+5))+cos(q(RF_BEGIN+5))*(cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))));
-    lT5_R(0,3) =  l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+l_3*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT5_R(1,3) =  -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))-l_3*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
-    lT5_R(2,3) =  -l_1-l_3*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+	lT4_R(0,0) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))));
+	lT4_R(0,1) = cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN));
+	lT4_R(0,2) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(1,0) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))));
+	lT4_R(1,1) = cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1));
+	lT4_R(1,2) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(2,0) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)));
+	lT4_R(2,1) = sin(q(RF_BEGIN+1));
+	lT4_R(2,2) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)));
+/*	lT4_R(0,3) =  l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+l_3*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(1,3) =  -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))-l_3*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(2,3) =  -l_1-l_3*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+*/
+	lT4_R(0,3) = l_2_x*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) + l_2_z*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))) + l_3_x*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))) + l_3_z*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))) + sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(1,3) =  - l_0 - l_2_x*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - l_2_z*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))) - l_3_x*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))) - l_3_z*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))) + sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT4_R(2,3) = l_3_x*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)) + cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))) - l_1 - l_3_z*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3)) - cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))) - l_2_z*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2)) + l_2_x*cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+
+	lT5_R(0,0) = -sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))));
+	lT5_R(0,1) = -sin(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+5))*sin(q(RF_BEGIN));
+	lT5_R(0,2) = -cos(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+5));
+	lT5_R(1,0) = sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))))-cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))));
+	lT5_R(1,1) = sin(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))+cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+5));
+	lT5_R(1,2) = cos(q(RF_BEGIN+5))*(sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))-sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))))+cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2)))))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+5));
+	lT5_R(2,0) = cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2)))+sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)));
+	lT5_R(2,1) = cos(q(RF_BEGIN+5))*sin(q(RF_BEGIN+1))+sin(q(RF_BEGIN+5))*(cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))));
+	lT5_R(2,2) = -sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+5))+cos(q(RF_BEGIN+5))*(cos(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-sin(q(RF_BEGIN+4))*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))+cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))));
+/*	lT5_R(0,3) =  l_2*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+l_3*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2))+cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))-sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT5_R(1,3) =  -l_0-l_2*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))-l_3*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2))-cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))+sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))+cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT5_R(2,3) =  -l_1-l_3*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3))-cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)))-l_2*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2));
+*/
+	lT5_R(0,3) = l_2_x*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) + l_2_z*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))) + l_3_x*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1)))) + l_3_z*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) + cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))) + sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2)) - sin(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT5_R(1,3) =  - l_0 - l_2_x*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - l_2_z*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))) - l_3_x*(cos(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))) - sin(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1)))) - l_3_z*(cos(q(RF_BEGIN+3))*(sin(q(RF_BEGIN))*sin(q(RF_BEGIN+2)) - cos(q(RF_BEGIN))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+1))) + sin(q(RF_BEGIN+3))*(cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN)) + cos(q(RF_BEGIN))*sin(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))));
+	lT5_R(2,3) = l_3_x*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3)) + cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+3))*sin(q(RF_BEGIN+2))) - l_1 - l_3_z*(cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2))*cos(q(RF_BEGIN+3)) - cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2))*sin(q(RF_BEGIN+3))) - l_2_z*cos(q(RF_BEGIN+1))*cos(q(RF_BEGIN+2)) + l_2_x*cos(q(RF_BEGIN+1))*sin(q(RF_BEGIN+2));
+	
+
+
 }
 void Robot_State::lT_L(VectorXD& q, HTransform& lT0_L, HTransform& lT1_L, HTransform& lT2_L, HTransform& lT3_L, HTransform& lT4_L, HTransform& lT5_L)
 {
-    lT0_L.linear().setZero();
-    lT1_L.linear().setZero();
-    lT2_L.linear().setZero();
-    lT3_L.linear().setZero();
-    lT4_L.linear().setZero();
-    lT5_L.linear().setZero();
-    lT0_L.translation().setZero();
-    lT1_L.translation().setZero();
-    lT2_L.translation().setZero();
-    lT3_L.translation().setZero();
-    lT4_L.translation().setZero();
-    lT5_L.translation().setZero();
+	lT0_L.linear().setZero();
+	lT1_L.linear().setZero();
+	lT2_L.linear().setZero();
+	lT3_L.linear().setZero();
+	lT4_L.linear().setZero();
+	lT5_L.linear().setZero();
+	lT0_L.translation().setZero();
+	lT1_L.translation().setZero();
+	lT2_L.translation().setZero();
+	lT3_L.translation().setZero();
+	lT4_L.translation().setZero();
+	lT5_L.translation().setZero();
 
-    lT0_L(0,0) = cos(q(LF_BEGIN));
-    lT0_L(0,1) = sin(q(LF_BEGIN));
-    lT0_L(1,0) = -sin(q(LF_BEGIN));
-    lT0_L(1,1) = cos(q(LF_BEGIN));
-    lT0_L(2,2) = 1.0;
-    lT0_L(1,3) = l_0;
-    lT0_L(2,3) = -l_1;
+	lT0_L(0,0) = cos(q(LF_BEGIN));
+	lT0_L(0,1) = sin(q(LF_BEGIN));
+	lT0_L(1,0) = -sin(q(LF_BEGIN));
+	lT0_L(1,1) = cos(q(LF_BEGIN));
+	lT0_L(2,2) = 1.0;
+	lT0_L(1,3) = l_0;
+	lT0_L(2,3) = -l_1;
 
-    lT1_L(0,0) = cos(q(LF_BEGIN));
-    lT1_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
-    lT1_L(0,2) = -sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
-    lT1_L(1,0) = -sin(q(LF_BEGIN));
-    lT1_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
-    lT1_L(1,2) = -cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
-    lT1_L(2,1) = sin(q(LF_BEGIN+1));
-    lT1_L(2,2) = cos(q(LF_BEGIN+1));
-    lT1_L(1,3) = l_0;
-    lT1_L(2,3) = -l_1;
+	lT1_L(0,0) = cos(q(LF_BEGIN));
+	lT1_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
+	lT1_L(0,2) = -sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
+	lT1_L(1,0) = -sin(q(LF_BEGIN));
+	lT1_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
+	lT1_L(1,2) = -cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
+	lT1_L(2,1) = sin(q(LF_BEGIN+1));
+	lT1_L(2,2) = cos(q(LF_BEGIN+1));
+	lT1_L(1,3) = l_0;
+	lT1_L(2,3) = -l_1;
 
-    lT2_L(0,0) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
-    lT2_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
-    lT2_L(0,2) = cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
-    lT2_L(1,0) = -cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))+cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
-    lT2_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
-    lT2_L(1,2) = -sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1));
-    lT2_L(2,0) = -cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
-    lT2_L(2,1) = sin(q(LF_BEGIN+1));
-    lT2_L(2,2) = cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
-    lT2_L(1,3) = l_0;
-    lT2_L(2,3) = -l_1;
+	lT2_L(0,0) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
+	lT2_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
+	lT2_L(0,2) = cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1));
+	lT2_L(1,0) = -cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))+cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
+	lT2_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
+	lT2_L(1,2) = -sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1));
+	lT2_L(2,0) = -cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
+	lT2_L(2,1) = sin(q(LF_BEGIN+1));
+	lT2_L(2,2) = cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+	lT2_L(1,3) = l_0;
+	lT2_L(2,3) = -l_1;
 
-    lT3_L(0,0) = cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)));
-    lT3_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
-    lT3_L(0,2) = cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)));
-    lT3_L(1,0) = -cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))+sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)));
-    lT3_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
-    lT3_L(1,2) = -cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)));
-    lT3_L(2,0) = -cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2));
-    lT3_L(2,1) = sin(q(LF_BEGIN+1));
-    lT3_L(2,2) = cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3));
-    lT3_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)));
-    lT3_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)));
-    lT3_L(2,3) = -l_1-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+	lT3_L(0,0) = cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)));
+	lT3_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
+	lT3_L(0,2) = cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)));
+	lT3_L(1,0) = -cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))+sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)));
+	lT3_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
+	lT3_L(1,2) = -cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)));
+	lT3_L(2,0) = -cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2));
+	lT3_L(2,1) = sin(q(LF_BEGIN+1));
+	lT3_L(2,2) = cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3));
+/*	lT3_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)));
+	lT3_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)));
+	lT3_L(2,3) = -l_1-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+*/
+	lT3_L(0,3) = l_2_x*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - l_2_z*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)));
+	lT3_L(1,3) =  l_0 - l_2_x*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) + l_2_z*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)));
+	lT3_L(2,3) = - l_1 - l_2_z*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2)) - l_2_x*cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
 
-    lT4_L(0,0) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))));
-    lT4_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
-    lT4_L(0,2) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT4_L(1,0) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))));
-    lT4_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
-    lT4_L(1,2) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT4_L(2,0) = -cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)));
-    lT4_L(2,1) = sin(q(LF_BEGIN+1));
-    lT4_L(2,2) = cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)));
-    lT4_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))-l_3*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT4_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+l_3*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT4_L(2,3) = -l_1-l_3*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+	lT4_L(0,0) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))));
+	lT4_L(0,1) = cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN));
+	lT4_L(0,2) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(1,0) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))));
+	lT4_L(1,1) = cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1));
+	lT4_L(1,2) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(2,0) = -cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)));
+	lT4_L(2,1) = sin(q(LF_BEGIN+1));
+	lT4_L(2,2) = cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)));
+/*	lT4_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))-l_3*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+l_3*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(2,3) = -l_1-l_3*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+*/
+	lT4_L(0,3) = l_2_x*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - l_2_z*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))) + l_3_x*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))) - l_3_z*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))) + sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(1,3) = l_0 - l_2_x*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) + l_2_z*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))) - l_3_x*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))) + l_3_z*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))) + sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT4_L(2,3) = - l_1 - l_3_x*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)) + cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))) - l_3_z*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3)) - cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))) - l_2_z*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2)) - l_2_x*cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
 
 
-    lT5_L(0,0) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))));
-    lT5_L(0,1) = sin(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+5))*sin(q(LF_BEGIN));
-    lT5_L(0,2) = cos(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+5));
-    lT5_L(1,0) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))));
-    lT5_L(1,1) = -sin(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+5));
-    lT5_L(1,2) = -cos(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))-cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+5));
-    lT5_L(2,0) = -cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)));
-    lT5_L(2,1) = cos(q(LF_BEGIN+5))*sin(q(LF_BEGIN+1))+sin(q(LF_BEGIN+5))*(cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))));
-    lT5_L(2,2) = -sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+5))+cos(q(LF_BEGIN+5))*(cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))));
-    lT5_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))-l_3*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT5_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+l_3*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
-    lT5_L(2,3) = -l_1-l_3*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+	lT5_L(0,0) = -sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))));
+	lT5_L(0,1) = sin(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+5))*sin(q(LF_BEGIN));
+	lT5_L(0,2) = cos(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+5));
+	lT5_L(1,0) = sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))))-cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))));
+	lT5_L(1,1) = -sin(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+5));
+	lT5_L(1,2) = -cos(q(LF_BEGIN+5))*(sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))))+cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2)))))-cos(q(LF_BEGIN))*cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+5));
+	lT5_L(2,0) = -cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)));
+	lT5_L(2,1) = cos(q(LF_BEGIN+5))*sin(q(LF_BEGIN+1))+sin(q(LF_BEGIN+5))*(cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))));
+	lT5_L(2,2) = -sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+5))+cos(q(LF_BEGIN+5))*(cos(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-sin(q(LF_BEGIN+4))*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))+cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))));
+/*	lT5_L(0,3) = -l_2*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))-l_3*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2))-cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))+sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT5_L(1,3) = l_0+l_2*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+l_3*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2))+cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))+sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))-cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT5_L(2,3) = -l_1-l_3*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3))-cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)))-l_2*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2));
+*/ 
+	lT5_L(0,3) = l_2_x*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - l_2_z*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))) + l_3_x*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1)))) - l_3_z*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) - cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))) + sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2)) + sin(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT5_L(1,3) = l_0 - l_2_x*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) + l_2_z*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))) - l_3_x*(cos(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))) - sin(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1)))) + l_3_z*(cos(q(LF_BEGIN+3))*(sin(q(LF_BEGIN))*sin(q(LF_BEGIN+2)) + cos(q(LF_BEGIN))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+1))) + sin(q(LF_BEGIN+3))*(cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN)) - cos(q(LF_BEGIN))*sin(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))));
+	lT5_L(2,3) = - l_1 - l_3_x*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3)) + cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+3))*sin(q(LF_BEGIN+2))) - l_3_z*(cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2))*cos(q(LF_BEGIN+3)) - cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2))*sin(q(LF_BEGIN+3))) - l_2_z*cos(q(LF_BEGIN+1))*cos(q(LF_BEGIN+2)) - l_2_x*cos(q(LF_BEGIN+1))*sin(q(LF_BEGIN+2));
 
 }
 
@@ -1612,7 +1683,7 @@ void Robot_State::Robot_State_para_initialize()
 
 
     Mass.resize(29);
-    Mass << 0.657, 9.782, 1.04, 0.752, 2.021, 1.161, 0.37, 0.102, 1.44, 1.04, 0.752, 2.021, 1.161, 0.37, 0.102, 1.44, 1.455, 1.022, 3.394, 4.745, 1.022, 1.32, 1.455, 1.022, 3.394, 4.745, 1.022, 1.32, 4.465;
+    Mass << 0.657, 9.782, 1.04, 0.752, 2.021, 1.161, 0.37, 0.102, 1.44, 1.04, 0.752, 2.021, 1.161, 0.37, 0.102, 1.44, 1.495, 1.023, 3.154, 2.024, 1.023, 1.297, 1.495, 1.023, 3.154, 2.024, 1.023, 1.297, 4.465;
 
     _m_pelvis(0) = -0.02161;//-0.01;
     _m_pelvis(1) = 0.00067;
@@ -1626,53 +1697,53 @@ void Robot_State::Robot_State_para_initialize()
     _m_torso(1) = -0.00002;
     _m_torso(2) = 0.24309+0.2;
 
-    _m_R[0](0) = -0.03615;
-    _m_R[0](1) = 0.0;
-    _m_R[0](2) = 0.06372;
+    _m_R[0](0) = -0.0362;
+    _m_R[0](1) = -0.105;
+    _m_R[0](2) = -0.03782;
 
-    _m_R[1](0) = 0.0;
-    _m_R[1](1) = 0.01192;
+    _m_R[1](0) = -0.0061;
+    _m_R[1](1) = 0.00124;
     _m_R[1](2) = 0.0;
 
-    _m_R[2](0) = 0.01216;
-    _m_R[2](1) = 0.02093;
-    _m_R[2](2) = -0.15218;
+    _m_R[2](0) = 0.12092;
+    _m_R[2](1) = 0.0;
+    _m_R[2](2) = -0.24269;
 
-    _m_R[3](0) = -0.04716;
-    _m_R[3](1) = 0.02052;
-    _m_R[3](2) = -0.11371;
+    _m_R[3](0) = -0.0565;
+    _m_R[3](1) = 0.01917;
+    _m_R[3](2) = -0.24389;
 
-    _m_R[4](0) = -0.03892;
-    _m_R[4](1) = -0.0269;
-    _m_R[4](2) = -0.027;
+    _m_R[4](0) = -0.01198;
+    _m_R[4](1) = 0.0;
+    _m_R[4](2) = 0.0;
 
-    _m_R[5](0) = -0.00321;
-    _m_R[5](1) = 0.00002;
-    _m_R[5](2) = -0.07997;
+    _m_R[5](0) = -0.00204;
+    _m_R[5](1) = 0.0;
+    _m_R[5](2) = -0.07942;
 
-    _m_L[0](0) = -0.03615;
-    _m_L[0](1) = 0.0;
-    _m_L[0](2) = 0.06372;
+    _m_L[0](0) = -0.0362;
+    _m_L[0](1) = 0.105;
+    _m_L[0](2) = -0.03782;
 
-    _m_L[1](0) = 0.0;
-    _m_L[1](1) = -0.01192;
+    _m_L[1](0) = -0.0061;
+    _m_L[1](1) = -0.00124;
     _m_L[1](2) = 0.0;
 
-    _m_L[2](0) = 0.01216;
-    _m_L[2](1) = -0.02093;
-    _m_L[2](2) = -0.15218;
+    _m_L[2](0) = 0.12092;
+    _m_L[2](1) = 0.0;
+    _m_L[2](2) = -0.24269;
 
-    _m_L[3](0) = -0.04716;
-    _m_L[3](1) = -0.02052;
-    _m_L[3](2) = -0.11371;
+    _m_L[3](0) = -0.0565;
+    _m_L[3](1) = -0.01917;
+    _m_L[3](2) = -0.24389;
 
-    _m_L[4](0) = -0.03892;
-    _m_L[4](1) = 0.0269;
-    _m_L[4](2) = -0.027;
+    _m_L[4](0) = -0.01198;
+    _m_L[4](1) = 0.0;
+    _m_L[4](2) = -0.0;
 
-    _m_L[5](0) = -0.00321;
-    _m_L[5](1) = -0.00002;
-    _m_L[5](2) = -0.07997;
+    _m_L[5](0) = -0.00204;
+    _m_L[5](1) = 0.0;
+    _m_L[5](2) = -0.07942;
 
     _m_Rarm[0](0) = -0.00107;
     _m_Rarm[0](1) = 0.00115;

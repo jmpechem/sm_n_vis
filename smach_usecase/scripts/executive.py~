@@ -257,12 +257,12 @@ class Door_Mission(smach.State):
 #define State Door_Init
 class Door_Init(smach.State):
 	def __init__(self):
-	    smach.State.__init__(self,outcomes=['cmd_dready','cmd_modechg','loop','shutdown'])
+	    smach.State.__init__(self,outcomes=['d_ready','cmd_modechg','loop','shutdown'])
 
 	def execute(self,userdata):
 	    trans_tag = rospy.wait_for_message('transition',String)
-	    if trans_tag.data == "cmd_dready":
-		return 'cmd_dready'
+	    if trans_tag.data == "d_ready":
+		return 'd_ready'
 	    elif trans_tag.data == "cmd_modechg":
 		return 'cmd_modechg'
 	    elif trans_tag.data == "shutdown":
@@ -273,12 +273,12 @@ class Door_Init(smach.State):
 #define State Door_Ready
 class Door_Ready(smach.State):
 	def __init__(self):
-	    smach.State.__init__(self,outcomes=['cmd_dreach','cmd_modechg','loop','shutdown'])
+	    smach.State.__init__(self,outcomes=['d_reach','cmd_modechg','loop','shutdown'])
 
 	def execute(self,userdata):
  	    trans_tag = rospy.wait_for_message('transition',String)
-	    if trans_tag.data == "cmd_dreach":
-		return 'cmd_dreach'
+	    if trans_tag.data == "d_reach":
+		return 'd_reach'
 	    elif trans_tag.data == "cmd_modechg":
 		return 'cmd_modechg'
 	    elif trans_tag.data == "shutdown":
@@ -288,12 +288,12 @@ class Door_Ready(smach.State):
 #define State Door_Reach
 class Door_Reach(smach.State):
 	def __init__(self):
-	    smach.State.__init__(self,outcomes=['cmd_dopen','cmd_modechg','loop','shutdown'])
+	    smach.State.__init__(self,outcomes=['d_open','cmd_modechg','loop','shutdown'])
 
 	def execute(self,userdata):
 	    trans_tag = rospy.wait_for_message('transition',String)
-	    if trans_tag.data == "cmd_dopen":
-		return 'cmd_dopen'
+	    if trans_tag.data == "d_open":
+		return 'd_open'
 	    elif trans_tag.data == "cmd_modechg":
 		return 'cmd_modechg'
 	    elif trans_tag.data == "shutdown":
@@ -593,11 +593,11 @@ def main():
 	#Door_Mission state	
 	smach.StateMachine.add('Door_Mission',Door_Mission(),transitions={'d_init':'Door_Init','d_ready':'Door_Ready','d_reach':'Door_Reach','d_open':'Door_Open','d_push':'Door_Push','loop':'Door_Mission','shutdown':'END'})
 	#Door_Init state
-	smach.StateMachine.add('Door_Init',Door_Init(),transitions={'cmd_dready':'Door_Ready','cmd_modechg':'Mode_Chg','loop':'Door_Init','shutdown':'END'})
+	smach.StateMachine.add('Door_Init',Door_Init(),transitions={'d_ready':'Door_Ready','cmd_modechg':'Mode_Chg','loop':'Door_Init','shutdown':'END'})
 	#Door_Ready state
-	smach.StateMachine.add('Door_Ready',Door_Ready(),transitions={'cmd_dreach':'Door_Reach','cmd_modechg':'Mode_Chg','loop':'Door_Ready','shutdown':'END'})
+	smach.StateMachine.add('Door_Ready',Door_Ready(),transitions={'d_reach':'Door_Reach','cmd_modechg':'Mode_Chg','loop':'Door_Ready','shutdown':'END'})
 	#Door_Reach state
-	smach.StateMachine.add('Door_Reach',Door_Reach(),transitions={'cmd_dopen':'Door_Open','cmd_modechg':'Mode_Chg','loop':'Door_Reach','shutdown':'END'})
+	smach.StateMachine.add('Door_Reach',Door_Reach(),transitions={'d_open':'Door_Open','cmd_modechg':'Mode_Chg','loop':'Door_Reach','shutdown':'END'})
 	#Door_Open state
 	smach.StateMachine.add('Door_Open',Door_Open(),transitions={'cmd_dpush':'Door_Push','cmd_modechg':'Mode_Chg','loop':'Door_Open','shutdown':'END'})
 	#Door_Push state

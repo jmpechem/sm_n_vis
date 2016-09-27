@@ -1,9 +1,9 @@
-uint8 UPDATED=0
+uint8 UPDATED=1
 uint8 LOST=128
 
-uint8[32] id
-uint8[32] updated # error
-float32[32] angle
-float32[32] velocity
-float32[32] current
+uint8[] id
+uint8[] updated # error
+float64[] angle
+float64[] velocity
+float64[] current
 

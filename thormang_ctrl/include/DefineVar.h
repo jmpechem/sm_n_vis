@@ -30,20 +30,32 @@ typedef Eigen::Matrix<rScalar, -1, -1> dMatrix;
 typedef Eigen::Matrix<rScalar, -1, 1>  dVector;
 
 // Thormang model information & constant value
-#define l_0 0.105 // l_y_leg_01
-#define l_1 0.1829 // l_z_leg01
-#define l_2 0.3 // l_z_leg02
-#define l_3 0.3  // l_z_leg03
-#define l_4 0.21  //l_y_arm_01
-#define l_5 0.2785 //l_z_arm_01
-#define l_6 0.02995 //l_y_arm_02
-#define l_7 0.264 //l_z_arm_02
-#define l_8 0.03 //l_y_arm_03
-#define l_9 0.252 //l_z_arm_03
+#define l_0 0.105
+#define l_1 0.1829
+#define l_2 0.3
+#define l_3 0.3 
+#define l_4 0.21 
+#define l_5 0.2785 
+#define l_6 0.02995
+#define l_7 0.264
+#define l_8 0.03
+#define l_9 0.252
+
+//for modified version Robot size
+#define l_0 0.105
+#define l_1 0.1829
+#define l_2_x 0.1554
+#define l_2_z 0.339
+#define l_3_x 0.06
+#define l_3_z 0.368
+
+
+
 
 #define pi			3.141592653589793238462
 #define Gravity	9.81
 #define DEGREE	(0.01745329251994329576923690768489)
+#define RADIAN	(57.295779513082320876798154814096) //(180.0/M_PI)
 
 #define WA_BEGIN 0
 #define RA_BEGIN 2

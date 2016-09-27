@@ -6,14 +6,32 @@
 #include "sim_common.h"  // if you want to use vrep use sim common
 #include "rob_common.h" // if you want to use real robot use rob common
 
+#include <fstream>
+
+using namespace std;
 //
+/*
+class logger
+{
+public:
+    logger() {
+        fileName = "ctrl jitter";
+        ros::Time::now
+    }
+
+private:
+    fstream file;
+    string fileName;
+
+};
+*/
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "thormang_ctrl");
   
- controlBase *ctrObj = new realrobot;
- //controlBase *ctrObj = new simulation;
+controlBase *ctrObj = new realrobot;
+// controlBase *ctrObj = new simulation;
 
 
   while(ros::ok())

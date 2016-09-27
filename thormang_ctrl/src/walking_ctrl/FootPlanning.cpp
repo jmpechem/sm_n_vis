@@ -4,31 +4,31 @@ void Foot_Planning::plan_foot_step(Vector3D& _scan_data, MatrixXD& _foot_step, b
 {
     if(_scan_data(0) == 0 && _scan_data(1) == 0 && _scan_data(2) == 0)
     {
-/*
+
         _foot_step.resize(80,7);
         _foot_step.setZero();
 
         for (int i=0; i<40 ;i++)
         {
         _foot_step(2*i+0,0) = 0.0;//0.2*i+0.1;	//0.0;//-0.0491398 ;//0.2*i+0.2;
-        _foot_step(2*i+0,1) = -0.123978;
+        _foot_step(2*i+0,1) = -0.127794;
         _foot_step(2*i+0,2) = 0.0;
         _foot_step(2*i+0,6) = 1;
 
         _foot_step(2*i+1,0) = 0.0;//0.2*i+0.2;	//0.0;//-0.0491398 ;//0.2*i+0.2;
-        _foot_step(2*i+1,1) = 0.123978;
+        _foot_step(2*i+1,1) = 0.127794;
         _foot_step(2*i+1,2) = 0.0;
         _foot_step(2*i+1,6) = 0;
         }
-*/
 
+/*
         _foot_step.resize(1,7);
         _foot_step.setZero();
 
         _foot_step(0,0) = 0.0;
-        _foot_step(0,1) = 0.123978;
+        _foot_step(0,1) = 0.127794;
         _foot_step(0,6) = 0;
-
+*/
     }
     else
     {
@@ -76,7 +76,7 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
     double final_residual_angle = final_rot-final_total_step_number*final_drot;
 
     double L = sqrt(x*x+y*y);
-    double dlength = 0.1;
+    double dlength = 0.20;
     int middle_total_number = L/(dlength);
     double middle_residual_length = L-middle_total_number*(dlength);
 
@@ -138,8 +138,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin((i+1)*initial_drot);
-            _foot_step(index,1) = -temp*0.123978*cos((i+1)*initial_drot);
+            _foot_step(index,0) = temp*0.127794*sin((i+1)*initial_drot);
+            _foot_step(index,1) = -temp*0.127794*cos((i+1)*initial_drot);
             _foot_step(index,5) = (i+1)*initial_drot;
             _foot_step(index,6) = 0.5+0.5*temp;
             index++;
@@ -152,24 +152,24 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
             {
                 temp *= -1;
 
-                _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-                _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
                 _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
                 _foot_step(index,6) = 0.5+0.5*temp;
                 index++;
 
                 temp *= -1;
 
-                _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-                _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
                 _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
                 _foot_step(index,6) = 0.5+0.5*temp;
                 index++;
 
                 temp *= -1;
 
-                _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-                _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
                 _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
                 _foot_step(index,6) = 0.5+0.5*temp;
                 index++;
@@ -179,8 +179,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
             {
                 temp *= -1;
 
-                _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-                _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+                _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
                 _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
                 _foot_step(index,6) = 0.5+0.5*temp;
                 index++;
@@ -190,16 +190,16 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-            _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+            _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+            _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
             _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
             _foot_step(index,6) = 0.5+0.5*temp;
             index++;
 
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
-            _foot_step(index,1) = -temp*0.123978*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
+            _foot_step(index,0) = temp*0.127794*sin((initial_total_step_number)*initial_drot+initial_residual_angle);
+            _foot_step(index,1) = -temp*0.127794*cos((initial_total_step_number)*initial_drot+initial_residual_angle);
             _foot_step(index,5) = (initial_total_step_number)*initial_drot+initial_residual_angle;
             _foot_step(index,6) = 0.5+0.5*temp;
             index++;
@@ -215,8 +215,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp2 *= -1;
 
-            _foot_step(index,0) = cos(initial_rot)*(dlength*(i+1))+temp2*sin(initial_rot)*(0.123978);
-            _foot_step(index,1) = sin(initial_rot)*(dlength*(i+1))-temp2*cos(initial_rot)*(0.123978);
+            _foot_step(index,0) = cos(initial_rot)*(dlength*(i+1))+temp2*sin(initial_rot)*(0.127794);
+            _foot_step(index,1) = sin(initial_rot)*(dlength*(i+1))-temp2*cos(initial_rot)*(0.127794);
             _foot_step(index,5) = initial_rot;
             _foot_step(index,6) = 0.5+0.5*temp2;
             index++;
@@ -228,24 +228,24 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
             {
                 temp2 *= -1;
 
-                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
                 _foot_step(index,5) = initial_rot;
                 _foot_step(index,6) = 0.5+0.5*temp2;
                 index++;
 
                 temp2 *= -1;
 
-                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
                 _foot_step(index,5) = initial_rot;
                 _foot_step(index,6) = 0.5+0.5*temp2;
                 index++;
 
                 temp2 *= -1;
 
-                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
                 _foot_step(index,5) = initial_rot;
                 _foot_step(index,6) = 0.5+0.5*temp2;
                 index++;
@@ -254,8 +254,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
             {
                 temp2 *= -1;
 
-                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+                _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+                _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
                 _foot_step(index,5) = initial_rot;
                 _foot_step(index,6) = 0.5+0.5*temp2;
                 index++;
@@ -265,16 +265,16 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp2 *= -1;
 
-            _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-            _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+            _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+            _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
             _foot_step(index,5) = initial_rot;
             _foot_step(index,6) = 0.5+0.5*temp2;
             index++;
 
             temp2 *= -1;
 
-            _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.123978);
-            _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.123978);
+            _foot_step(index,0) = cos(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)+temp2*sin(initial_rot)*(0.127794);
+            _foot_step(index,1) = sin(initial_rot)*(dlength*(middle_total_number)+middle_residual_length)-temp2*cos(initial_rot)*(0.127794);
             _foot_step(index,5) = initial_rot;
             _foot_step(index,6) = 0.5+0.5*temp2;
             index++;
@@ -299,8 +299,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp3 *= -1;
 
-            _foot_step(index,0) = final_position_x+temp3*0.123978*sin((i+1)*final_drot+initial_rot);
-            _foot_step(index,1) = final_position_y-temp3*0.123978*cos((i+1)*final_drot+initial_rot);
+            _foot_step(index,0) = final_position_x+temp3*0.127794*sin((i+1)*final_drot+initial_rot);
+            _foot_step(index,1) = final_position_y-temp3*0.127794*cos((i+1)*final_drot+initial_rot);
             _foot_step(index,5) = (i+1)*final_drot+initial_rot;
             _foot_step(index,6) = 0.5+0.5*temp3;
             index++;
@@ -310,16 +310,16 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp3 *= -1;
 
-            _foot_step(index,0) = final_position_x+temp3*0.123978*sin(alpha);
-            _foot_step(index,1) = final_position_y-temp3*0.123978*cos(alpha);
+            _foot_step(index,0) = final_position_x+temp3*0.127794*sin(alpha);
+            _foot_step(index,1) = final_position_y-temp3*0.127794*cos(alpha);
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+0.5*temp3;
             index++;
 
             temp3 *= -1;
 
-            _foot_step(index,0) = final_position_x+temp3*0.123978*sin(alpha);
-            _foot_step(index,1) = final_position_y-temp3*0.123978*cos(alpha);
+            _foot_step(index,0) = final_position_x+temp3*0.127794*sin(alpha);
+            _foot_step(index,1) = final_position_y-temp3*0.127794*cos(alpha);
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+0.5*temp3;
             index++;
@@ -328,8 +328,8 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
         {
             temp3 *= -1;
 
-            _foot_step(index,0) = final_position_x+temp3*0.123978*sin(alpha);
-            _foot_step(index,1) = final_position_y-temp3*0.123978*cos(alpha);
+            _foot_step(index,0) = final_position_x+temp3*0.127794*sin(alpha);
+            _foot_step(index,1) = final_position_y-temp3*0.127794*cos(alpha);
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+0.5*temp3;
             index++;
@@ -344,7 +344,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
     double y = _scan_data(1);
     double alpha = _scan_data(2);
 
-    double dx = 0.1;
+    double dx = 0.2;
     double dy = 0.05;
     double dtheta = 10.0*DEGREE;
     if(x<0.0)
@@ -449,7 +449,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
         // ÂøÁö¹ß °è»ê
         _foot_step(index,0) = 0;
-        _foot_step(index,1) = -temp*0.123978;
+        _foot_step(index,1) = -temp*0.127794;
         _foot_step(index,6) = 0.5+temp*0.5;
         index++;
 
@@ -459,7 +459,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = (i+1)*dx;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -470,7 +470,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
 
@@ -478,7 +478,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -488,7 +488,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -508,7 +508,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -519,7 +519,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -529,7 +529,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978;
+            _foot_step(index,1) = -temp*0.127794;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -540,7 +540,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978+(i+1)*dy;
+            _foot_step(index,1) = -temp*0.127794+(i+1)*dy;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
 
@@ -548,7 +548,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978+(i+1)*dy;
+            _foot_step(index,1) = -temp*0.127794+(i+1)*dy;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -559,7 +559,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978+y;
+            _foot_step(index,1) = -temp*0.127794+y;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
 
@@ -567,7 +567,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
 
             // ÂøÁö¹ß °è»ê
             _foot_step(index,0) = x;
-            _foot_step(index,1) = -temp*0.123978+y;
+            _foot_step(index,1) = -temp*0.127794+y;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
         }
@@ -582,8 +582,8 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
         {
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin((i+1)*dtheta)+x;
-            _foot_step(index,1) = -temp*0.123978*cos((i+1)*dtheta)+y;
+            _foot_step(index,0) = temp*0.127794*sin((i+1)*dtheta)+x;
+            _foot_step(index,1) = -temp*0.127794*cos((i+1)*dtheta)+y;
             _foot_step(index,5) = (i+1)*dtheta;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
@@ -593,16 +593,16 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
         {
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin(alpha)+x;
-            _foot_step(index,1) = -temp*0.123978*cos(alpha)+y;
+            _foot_step(index,0) = temp*0.127794*sin(alpha)+x;
+            _foot_step(index,1) = -temp*0.127794*cos(alpha)+y;
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
 
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin(alpha)+x;
-            _foot_step(index,1) = -temp*0.123978*cos(alpha)+y;
+            _foot_step(index,0) = temp*0.127794*sin(alpha)+x;
+            _foot_step(index,1) = -temp*0.127794*cos(alpha)+y;
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;
@@ -611,8 +611,8 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
         {
             temp *= -1;
 
-            _foot_step(index,0) = temp*0.123978*sin(alpha)+x;
-            _foot_step(index,1) = -temp*0.123978*cos(alpha)+y;
+            _foot_step(index,0) = temp*0.127794*sin(alpha)+x;
+            _foot_step(index,1) = -temp*0.127794*cos(alpha)+y;
             _foot_step(index,5) = alpha;
             _foot_step(index,6) = 0.5+temp*0.5;
             index++;

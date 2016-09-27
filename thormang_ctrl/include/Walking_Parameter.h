@@ -1,4 +1,4 @@
-#ifndef __WALKING_PARAMETER__
+﻿#ifndef __WALKING_PARAMETER__
 #define __WALKING_PARAMETER__
 
 #include "DefineVar.h"
@@ -30,8 +30,10 @@ public:
     fstream file[FILE_CNT];
 
 public:
-	int Hz;
 
+	double COM_pd;
+	int Hz;
+	Vector3D COM_prev;
     typedef struct {
         HTransform	_XL_global_init;
         HTransform	_XR_global_init;
@@ -67,6 +69,9 @@ public:
 
 
 public:
+
+    bool                    _global_walking_flag;
+
     Vector3D                _scan_data;
 	Vector3D				_Base_COM;
 	Vector3D				_COM_R[6];

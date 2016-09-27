@@ -351,9 +351,54 @@ void Pattern_generator::Trunk_trajectory_update()
     }
     else
     {
-        Trunk_trajectory.translation()(0) = _COM_desired(0) - _COM_offset(0);
+double kp = 3.0;
+double d = 0.5;
+       // Trunk_trajectory.translation()(0) = _COM_desired(0) - _COM_offset(0);
+
+	if(_cnt >= _T_Start && _cnt < _T_Start+0.3*Hz)
+	{
+		kp = 0+ 3.0*(_cnt-_T_Start)/(0.3*Hz);
+		d = 0+ 0.5*(_cnt-_T_Start)/(0.3*Hz);
+	}
+
+
+	if(_cnt == 0) 
+		COM_prev = _COM_real_support;			
+
+	if(_cnt ==0)
+		COM_pd = 0.0;
+ 	//Trunk_trajectory.translation()(0) = _T_Trunk_support.translation()(0)+kp*(_COM_desired(0) - _COM_real_support(0) + 0.06) + d*_xd(1)- d*(_COM_real_support(0)-COM_prev(0))/Hz  ;
+
+
+	double offset_x = 0.0;
+	if(_foot_step(_step_number,6) == 1)
+	{
+		double temp_time = 0.1*Hz;
+		if(_cnt < _T_Start_real)
+			offset_x = Cubic(_cnt,_T_Start+temp_time,_T_Start_real-temp_time,0.0,0.0,0.02,0.0);
+		else
+			offset_x = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last+temp_time,_T_Start+_T_Total-temp_time,0.02,0.0,0.0,0.0);
+	}
+
+    Trunk_trajectory.translation()(0) = _COM_desired(0) - _COM_offset(0);// + offset_x;// + kp * (_COM_desired(0) - _COM_real_support(0) + 0.06)+(3.0-kp)*COM_pd;
         Trunk_trajectory.translation()(1) = _COM_desired(1) - _COM_offset(1);
         Trunk_trajectory.translation()(2) = _COM_desired(2);
+
+	
+	if(_cnt == _T_Start+_T_Total)
+		COM_pd = (_COM_desired(0) - _COM_real_support(0) + 0.06);
+
+	COM_prev = _COM_real_support;	
+
+
+        
+	double dt = 1.0/Hz;
+	kp = 100.0;
+	d = 2000.0;
+
+	//COM_pd = (kp*_COM_desired(0)+d*dt*COM_prev(0))/(kp+d*dt);
+	
+
     }
 
     //Trunk orientation
@@ -397,31 +442,56 @@ void Pattern_generator::Foot_trajectory_update()
     for(int i=0; i<6; i++)
         target_swing_foot(i) = _foot_step_localframe(_step_number,i);
 
+    if(_cnt == 0)
+    {
+        cout << "target_swing_foot" << target_swing_foot(0) << endl;
+    }
+
+
     if(_cnt < _T_Start_real+_T_Double1)
     {
         Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
-        Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
-        Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
         Foot_trajectory.LFoot_dot.setZero();
+        Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.LFoot.translation()(2),0.0,0.0,0.0);
 
+        Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
+
+        for(int i=0; i<2; i++)
+            Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.LFoot_euler(i),0.0,0.0,0.0);
+
+        Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
+
+   
         Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
-        Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
+ 	Foot_trajectory.RFoot_dot.setZero();
+	Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot.translation()(2),0.0,0.0,0.0);	
+
         Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
-        Foot_trajectory.RFoot_dot.setZero();
+	for(int i=0; i<2; i++)
+        Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot_euler(i),0.0,0.0,0.0);
+Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));	
+       
     }
     else if(_cnt >= _T_Start_real+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2-_T_rest_last)
     {
+double t_rest_temp = 0.1*Hz;
+
         if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
-            Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
+	    Foot_trajectory.LFoot.translation()(2) = 0.0;	
+            //Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
             Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
+	    Foot_trajectory.LFoot_euler(0) = 0.0;
+	    Foot_trajectory.LFoot_euler(1) = 0.0;
             Foot_trajectory.LFoot_dot.setZero();
+	    Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
 
             if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
             {
-                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0);
-                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.RFoot.translation()(2),0.0,_ho,0.0,Hz);
+
+                Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0);
+                Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0,Hz);
             }
             else
             {
@@ -431,29 +501,37 @@ void Pattern_generator::Foot_trajectory_update()
 
             for(int i=0; i<2; i++)
             {
-                Foot_trajectory.RFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0);
+                Foot_trajectory.RFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp+0.1*Hz,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0);
                 Foot_trajectory.RFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
-            for(int i=0; i<3; i++)
+            for(int i=0; i<2; i++)
             {
-                Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
+                Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
+                Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
             }
+       Foot_trajectory.RFoot_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(2),0.0,target_swing_foot(5),0.0);
+       Foot_trajectory.RFoot_dot(5) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(2),0.0,target_swing_foot(5),0.0,Hz);
+
 
             Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));
         }
         else if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
             Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
-            Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
+	    Foot_trajectory.RFoot.translation()(2) = 0.0;
+           //Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
             Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
+            Foot_trajectory.RFoot_euler(0) = 0.0;
+	    Foot_trajectory.RFoot_euler(1) = 0.0;
             Foot_trajectory.RFoot_dot.setZero();
+	    Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));
 
             if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
             {
-                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0);
-                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_init_Foot_trajectory.LFoot.translation()(2),0.0,_ho,0.0,Hz);
+
+                Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0);
+                Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0,Hz);
             }
             else
             {
@@ -463,15 +541,20 @@ void Pattern_generator::Foot_trajectory_update()
 
             for(int i=0; i<2; i++)
             {
-                Foot_trajectory.LFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0);
+                Foot_trajectory.LFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp+0.1*Hz,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0);
                 Foot_trajectory.LFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
             for(int i=0; i<3; i++)
             {
-                Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(i),0.0,target_swing_foot(i+3),0.0,Hz);
+                Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
+                Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
             }
+
+
+  Foot_trajectory.LFoot_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(2),0.0,target_swing_foot(5),0.0);
+                Foot_trajectory.LFoot_dot(5) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(2),0.0,target_swing_foot(5),0.0,Hz);
+
 
             Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
         }
@@ -493,9 +576,13 @@ void Pattern_generator::Foot_trajectory_update()
         if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
-            Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
+	    Foot_trajectory.LFoot.translation()(2) = 0.0;
             Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
+	    Foot_trajectory.LFoot_euler(0) = 0.0;
+	    Foot_trajectory.LFoot_euler(1) = 0.0;
+ 	    Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
             Foot_trajectory.LFoot_dot.setZero();
+
             for(int i=0; i<3; i++)
             {
                 Foot_trajectory.RFoot.translation()(i) = target_swing_foot(i);
@@ -508,9 +595,14 @@ void Pattern_generator::Foot_trajectory_update()
         else if (_foot_step(_step_number,6) == 0)
         {
             Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
-            Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
+	    Foot_trajectory.RFoot.translation()(2) = 0.0;
+            //Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
             Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
+	    Foot_trajectory.RFoot_euler(0) = 0.0;
+	    Foot_trajectory.RFoot_euler(1) = 0.0;
             Foot_trajectory.RFoot_dot.setZero();
+ Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));
+
 
             for(int i=0; i<3; i++)
             {
@@ -562,6 +654,9 @@ void Pattern_generator::Ref_ZMP_update()
             _initial_global_swing_foot(i) = _init_info._XR_global_init.translation()(i);
         for(int i=0; i<3; i++)
             _initial_global_swing_foot(i+3) = _init_info._XR_global_euler_init(i);
+
+	_initial_global_support_foot(0) = 0.0;
+	_initial_global_swing_foot(0) = 0.0;
     }
     else
     {
@@ -574,6 +669,9 @@ void Pattern_generator::Ref_ZMP_update()
             _initial_global_swing_foot(i) = _init_info._XL_global_init.translation()(i);
         for(int i=0; i<3; i++)
             _initial_global_swing_foot(i+3) = _init_info._XL_global_euler_init(i);
+
+    _initial_global_support_foot(0) = 0.0;
+	_initial_global_swing_foot(0) = 0.0;
     }
 
 
@@ -597,7 +695,7 @@ void Pattern_generator::Ref_ZMP_update()
 
 void Pattern_generator::Ref_COM_update_local()
 {
-    _COM_offset(0) = -0.01;
+   // _COM_offset(0) = -0.08;
     // �κ� ���� �� cnt=0 (ùƽ)���� ���� �Ǵ� �κ��� COM or Trunk�ġ
     if(_com_control_flag == true)
     {
@@ -660,13 +758,13 @@ void Pattern_generator::Ref_COM_update_local()
     {
         if(_com_control_flag == true)
         {
-            _xs(0) = _init_COM._COM(0)+_xs(1)*1.0/Hz;
-            _ys(0) = _init_COM._COM(1)+_ys(1)*1.0/Hz;
+            _xs(0) = _init_COM._COM(0);//+_xs(1)*1.0/Hz;
+            _ys(0) = _init_COM._COM(1);//+_ys(1)*1.0/Hz;
         }
         else
         {
-            _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0) + _xs(1)*1.0/Hz;
-            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(1) + _ys(1)*1.0/Hz;
+            _xs(0) = _init_COM._Trunk.translation()(0)+ _COM_offset(0);// + _xs(1)*1.0/Hz;
+            _ys(0) = _init_COM._Trunk.translation()(1)+ _COM_offset(1);// + _ys(1)*1.0/Hz;
         }
     }
 
@@ -1226,8 +1324,8 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
         for (int i=0; i<= _T_temp; i++) //200 tick���� ��� ���
         {
 
-            _Ref_ZMP(i,0) = _init_info._COM_support_init(0);
-            _Ref_ZMP(i,1) = _init_info._COM_support_init(1);
+            _Ref_ZMP(i,0) = _init_info._COM_support_init(0)+_COM_offset(0);
+            _Ref_ZMP(i,1) = _init_info._COM_support_init(1)+_COM_offset(1);
             index++;
         }
     }
@@ -1291,7 +1389,9 @@ void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, doub
 
     if(step_number == 0)
     {
-        Kx = _initial_local_support_foot_offset(0) - _init_info._COM_support_init(0);
+	//_initial_local_support_foot_offset(0)=0.0;
+
+        Kx = _initial_local_support_foot_offset(0) - _init_info._COM_support_init(0) - _COM_offset(0);
         Kx2 = (_foot_step_localframe(step_number,0)+_initial_local_support_foot(0))/2.0 - _initial_local_support_foot_offset(0);
 
         Ky = _initial_local_support_foot_offset(1) - _init_info._COM_support_init(1);
@@ -1301,13 +1401,13 @@ void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, doub
         {
             if(i < T_rest_init)
             {
-                temp_px(i) = _init_info._COM_support_init(0);
-                temp_py(i) = _init_info._COM_support_init(1);
+                temp_px(i) = _init_info._COM_support_init(0)+_COM_offset(0);
+                temp_py(i) = _init_info._COM_support_init(1)+_COM_offset(1);
             }
             else if(i >= T_rest_init && i < T_rest_init+T_Double1)
             {
-                temp_px(i) = _init_info._COM_support_init(0) + Kx/T_Double1*(i+1-T_rest_init);
-                temp_py(i) = _init_info._COM_support_init(1) + Ky/T_Double1*(i+1-T_rest_init);
+                temp_px(i) = _init_info._COM_support_init(0)+_COM_offset(0) + Kx/T_Double1*(i+1-T_rest_init);
+                temp_py(i) = _init_info._COM_support_init(1)+_COM_offset(1) + Ky/T_Double1*(i+1-T_rest_init);
             }
             else if(i>= T_rest_init+T_Double1 & i< T_Total-T_rest_last-T_Double2)
             {
@@ -1328,6 +1428,8 @@ void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, doub
     }
     else if(step_number == 1)
     {
+//_initial_local_support_foot(0) = 0.0;
+
         Kx = _foot_step_localframe_offset(step_number-1,0) - (_foot_step_localframe(step_number-1,0) + _initial_local_support_foot(0))/2.0;
         Kx2 = (_foot_step_localframe(step_number,0)+_foot_step_localframe(step_number-1,0))/2.0 - _foot_step_localframe_offset(step_number-1,0);
 
@@ -1440,12 +1542,14 @@ void Pattern_generator::GlobaltoLocal_footstep()
             reference.translation() = _init_info._XL_global_init.translation();
             reference.translation()(2) = 0;
             reference.linear() = Rotate_with_Z(_init_info._XL_global_euler_init(2));
+	    reference.translation()(0) = 0.0;
         }
         else
         {
             reference.translation() = _init_info._XR_global_init.translation();
             reference.translation()(2) = 0;
             reference.linear() = Rotate_with_Z(_init_info._XR_global_euler_init(2));
+	    reference.translation()(0) = 0.0;
         }
     }
     else
@@ -1467,6 +1571,7 @@ void Pattern_generator::GlobaltoLocal_footstep()
         {
             for(int j=0; j<3; j++)
                 temp_global_position(j)  = _foot_step(i,j);
+
 
             Globalposition(temp_global_position,reference,temp_local_position);
 

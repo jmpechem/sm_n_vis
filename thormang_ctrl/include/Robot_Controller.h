@@ -23,12 +23,25 @@ public:
     void Impedance_update();
     void Impedance_controller();
     void Impedance_control();
-public:
+    void Impedance_after_update();
+    void Impedance_after_update_initialize();
 
+public:
     Vector6D _Impedance_Ref_prev1_L;
     Vector6D _Impedance_Ref_prev2_L;
     Vector6D _Impedance_Ref_prev1_R;
     Vector6D _Impedance_Ref_prev2_R;
+    Vector6D _Impedance_Ref_current_L;
+    Vector6D _Impedance_Ref_current_R;
+
+    Vector6D _Impedance_Ref_prev1_L2;
+    Vector6D _Impedance_Ref_prev2_L2;
+    Vector6D _Impedance_Ref_prev1_R2;
+    Vector6D _Impedance_Ref_prev2_R2;
+    Vector6D _Impedance_Ref_current_L2;
+    Vector6D _Impedance_Ref_current_R2;
+
+
     bool _Impedance_flag;
     Vector6D _Impedance_T_R_prev1;
     Vector6D _Impedance_T_L_prev1;

@@ -1226,7 +1226,7 @@ int RTDynamixelPro::getAllStatus()
 
 
 
-RTIME control_period = 40e5;
+RTIME control_period = 50e5;
 // dxl_control for rt call
 void dxl_control(void* parent)
 {
@@ -1245,7 +1245,7 @@ void dxl_control(void* parent)
         {
             pRTDynamixelObj->bControlLoopProcessing = true;
             pRTDynamixelObj->rttLoopStartTime = rt_timer_read();
-            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (36e5); // 90%
+            pRTDynamixelObj->rttLoopTimeoutTime = pRTDynamixelObj->rttLoopStartTime + (47e5); // 90%
 
 
             if(pRTDynamixelObj->bControlWriteEnable)

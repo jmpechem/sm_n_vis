@@ -133,7 +133,83 @@ void controlBase::WalkingCheckState()
 void controlBase::UpperBodyLoop()
 {
     //// Auto Mission /////
+    if (smach_state == "Valve_Ready")
+    {
+        if(_cnt == 0)
+        {
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+        else if(_cnt == 2.0*_UpperCtrl._Hz){
+            _UpperCtrl._cnt = 0;
+            _target_q = q;
+
+            _index =2;
+            _target_q(_index++) = -5*DEGREE;
+            _target_q(_index++) = 66*DEGREE;
+            _target_q(_index++) = 117*DEGREE;
+
+
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(1.0); // duration set
+
+
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+        else if(_cnt == 3.5*_UpperCtrl._Hz){
+            _UpperCtrl._cnt = 0;
+            _target_q = q;
+
+            _index =5;
+
+            _target_q(_index++) = 78*DEGREE;
+            _target_q(_index++) = 9*DEGREE;
+            _target_q(_index++) = 60*DEGREE;
+            _target_q(_index++) = 10*DEGREE;
+
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(1.5); // duration set
+
+
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+        else if(_cnt == 6.0*_UpperCtrl._Hz){
+            _UpperCtrl._cnt = 0;
+            _index = 2;
+
+            _target_q = q;
+
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 100*DEGREE;
+            _target_q(_index++) = 90*DEGREE;
+            _target_q(_index++) = -45*DEGREE;
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 90*DEGREE;
+
+
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(3.0); // duration set
+
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+    }
     if (smach_state == "Valve_Close")
+    {
+        if(_cnt == 0) {
+            _Joint_flag = true;
+            _CLIK_flag = false;
+        }
+        else if(_cnt == 5.0*_UpperCtrl._Hz){
+            _UpperCtrl._cnt = 0;
+            _Joint_flag = false;
+            _CLIK_flag = true;
+        }
+    }
+    if (smach_state == "Door_Mission")
     {
         if(_cnt == 0) {
             _Joint_flag = true;
@@ -185,29 +261,32 @@ void controlBase::UpperBodyCheckState()
             _index = 0;
             _target_q(_index++) = 0;
             _target_q(_index++) = 0;
-            _target_q(_index++) = -40*DEGREE;
-            _target_q(_index++) = 75*DEGREE;
-            _target_q(_index++) = 90*DEGREE;
-            _target_q(_index++) = 35*DEGREE;
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = 60*DEGREE;
-            _target_q(_index++) = 90*DEGREE;
 
-            _target_q(_index++) = 40*DEGREE;
-            _target_q(_index++) = -75*DEGREE;
-            _target_q(_index++) = -90*DEGREE;
-            _target_q(_index++) = -35*DEGREE;
-            _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = -60*DEGREE;
-            _target_q(_index++) = -90*DEGREE;
+          // R_arm
+            _target_q(_index++) = -45*DEGREE;
+            _target_q(_index++) = 95*DEGREE;
+            _target_q(_index++) = 80*DEGREE;
+            _target_q(_index++) = 30*DEGREE;
+            _target_q(_index++) =  0*DEGREE;
+            _target_q(_index++) = 65*DEGREE;
+            _target_q(_index++) = 10*DEGREE;
 
+         // L_arm
+            _target_q(_index++) =  45*DEGREE;
+            _target_q(_index++) = -95*DEGREE;
+            _target_q(_index++) = -80*DEGREE;
+            _target_q(_index++) = -30*DEGREE;
+            _target_q(_index++) =  0*DEGREE;
+            _target_q(_index++) = -65*DEGREE;
+            _target_q(_index++) = -10*DEGREE;
+         //R_leg
             _target_q(_index++) = 0*DEGREE;
             _target_q(_index++) = -2*DEGREE;
             _target_q(_index++) = 20*DEGREE;
             _target_q(_index++) = -40*DEGREE;
             _target_q(_index++) = 20*DEGREE;
             _target_q(_index++) = 2*DEGREE;
-
+        //L_leg
             _target_q(_index++) = 0*DEGREE;
             _target_q(_index++) = 2*DEGREE;
             _target_q(_index++) = -20*DEGREE;
@@ -225,23 +304,30 @@ void controlBase::UpperBodyCheckState()
         }
         else if (smach_state == "Valve_Ready") // Valve Ready
         {
-            ROS_INFO("Valve Ready");
+             ROS_INFO("Valve Ready");
 
-            _target_q = q;
+            _index = 2;
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 100*DEGREE;
+            _target_q(_index++) = 90*DEGREE;
+            _target_q(_index++) = -45*DEGREE;
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 90*DEGREE;
+           // _target_q(_index++) = 0*DEGREE;
 
-            _index = LA_BEGIN;
-            _target_q(_index++) = 30*DEGREE;
-            _target_q(_index++) = -80*DEGREE;
-            _target_q(_index++) = -90*DEGREE;
+            _target_q(_index++) =  0*DEGREE;
             _target_q(_index++) = -100*DEGREE;
+            _target_q(_index++) = -90*DEGREE;
+            _target_q(_index++) = 45*DEGREE;
             _target_q(_index++) = 0*DEGREE;
-            _target_q(_index++) = 20*DEGREE;
-            _target_q(_index++) = 180*DEGREE;
             _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = -90*DEGREE;
+
 
             _UpperCtrl.SET_FK_Target(_target_q);
-            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
-
+            _UpperCtrl.SET_FK_Parameter(2.0); // duration set
+     
             _Joint_flag = true;
             _CLIK_flag = false;
         }
@@ -276,7 +362,7 @@ void controlBase::UpperBodyCheckState()
                 _target_q(_index++) = 0*DEGREE;
                 _target_q(_index++) = 20*DEGREE;
                 _target_q(_index++) = 180*DEGREE;
-                _target_q(_index++) = 0*DEGREE;
+                //_target_q(_index++) = 0*DEGREE;
 
                 _UpperCtrl.SET_FK_Target(_target_q);
                 _UpperCtrl.SET_FK_Parameter(5.0); // duration set
@@ -308,6 +394,103 @@ void controlBase::UpperBodyCheckState()
             _UpperCtrl.SET_IK_Target(_target_x);
             _UpperCtrl.SET_IK_Parameter(100.0, true, true, 0.05, 0.001); // CLIK gain, Rel of Abs Pos, Singularity Avoidance, Singularity Gain, Singularity Threshold
         }
+
+        // Door missions
+        else if (smach_state == "Door_Init") // Door Init
+        {
+            ROS_INFO("Door Init");
+
+            _index = 0;
+            _target_q(_index++) = 0;
+            _target_q(_index++) = 0;
+
+          // R_arm
+            _target_q(_index++) = -45*DEGREE;
+            _target_q(_index++) = 95*DEGREE;
+            _target_q(_index++) = 80*DEGREE;
+            _target_q(_index++) = 30*DEGREE;
+            _target_q(_index++) =  0*DEGREE;
+            _target_q(_index++) = 65*DEGREE;
+            _target_q(_index++) = 10*DEGREE;
+
+         // L_arm
+            _target_q(_index++) =  45*DEGREE;
+            _target_q(_index++) = -95*DEGREE;
+            _target_q(_index++) = -80*DEGREE;
+            _target_q(_index++) = -30*DEGREE;
+            _target_q(_index++) =  0*DEGREE;
+            _target_q(_index++) = -65*DEGREE;
+            _target_q(_index++) = -10*DEGREE;
+         //R_leg
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = -2*DEGREE;
+            _target_q(_index++) = 20*DEGREE;
+            _target_q(_index++) = -40*DEGREE;
+            _target_q(_index++) = 20*DEGREE;
+            _target_q(_index++) = 2*DEGREE;
+        //L_leg
+            _target_q(_index++) = 0*DEGREE;
+            _target_q(_index++) = 2*DEGREE;
+            _target_q(_index++) = -20*DEGREE;
+            _target_q(_index++) = 40*DEGREE;
+            _target_q(_index++) = -20*DEGREE;
+            _target_q(_index++) = -2*DEGREE;
+
+            _UpperCtrl.Set_Initialize();
+
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
+
+            _Joint_flag = true;
+            _CLIK_flag = false;
+            cout<<_cnt<<endl;
+        }
+
+        else if (smach_state == "Door_Ready") // Door Ready
+        {
+            ROS_INFO("Door Ready");
+
+               _target_q = q;
+
+                ROS_INFO("1st motion");
+                _index = RA_BEGIN;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = 80*DEGREE;
+                _target_q(_index++) = 90*DEGREE;
+                _target_q(_index++) = -45*DEGREE;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = 90*DEGREE;
+               // _target_q(_index++) = 0*DEGREE;
+
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = -80*DEGREE;
+                _target_q(_index++) = -90*DEGREE;
+                _target_q(_index++) = 45*DEGREE;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = -90*DEGREE;
+
+            /*if(_cnt>5*_UpperCtrl._Hz && _cnt<10*_UpperCtrl._Hz){
+                ROS_INFO("2nd motion");
+                _index = RA_BEGIN;
+                _target_q(_index++) = 90*DEGREE;
+                _target_q(_index++) = 40*DEGREE;
+                _target_q(_index++) = 45*DEGREE;
+                _target_q(_index++) = 90*DEGREE;
+                _target_q(_index++) = 90*DEGREE;
+                _target_q(_index++) = 0*DEGREE;
+                _target_q(_index++) = 90*DEGREE;
+            }*/
+
+            _UpperCtrl.SET_FK_Target(_target_q);
+            _UpperCtrl.SET_FK_Parameter(5.0); // duration set
+
+            _Joint_flag = true;
+            _CLIK_flag = false;
+
+        }
+	_cnt++;
     }
 
     if (taskCmdMsg.subtask==1)
@@ -403,7 +586,7 @@ void controlBase::compute()
     UpperBodyLoop();
     WalkingLoop();
 
-    if(smach_state == "Valve_Reach" ||smach_state == "Valve_Ready" || smach_state == "Valve_Close")
+  /*  if(smach_state == "Valve_Reach" ||smach_state == "Valve_Ready" || smach_state == "Valve_Close")
     {
 int suhan;
 		suhan=RA_BEGIN;
@@ -414,7 +597,7 @@ int suhan;
             _desired_q(suhan++) = 0*DEGREE;
             _desired_q(suhan++) = 60*DEGREE;
             _desired_q(suhan++) = 90*DEGREE;
-    }
+    }*/
 }
 
 void controlBase::reflect()

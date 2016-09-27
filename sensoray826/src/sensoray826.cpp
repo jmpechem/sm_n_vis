@@ -114,7 +114,7 @@ void sensoray826_dev::analogSampleLoopThread()
             }
         }
 
-        //ROS_INFO("%.3lf %.3lf %.3lf %.3lf %.3lf %.3lf ", adcVoltages[0], adcVoltages[1], adcVoltages[2], adcVoltages[3], adcVoltages[4], adcVoltages[5]);
+        ROS_INFO("%.3lf %.3lf %.3lf %.3lf %.3lf %.3lf ", adcVoltages[0], adcVoltages[1], adcVoltages[2], adcVoltages[3], adcVoltages[4], adcVoltages[5]);
         //ROS_INFO("%.4lf %.4lf %.4lf %.4lf %.4lf %.4lf ", axisData[0], axisData[1], axisData[2], axisData[3], axisData[4], axisData[5]);
 
         //ROS_INFO("%8x",buf[0]);
