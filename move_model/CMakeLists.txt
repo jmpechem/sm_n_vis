@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   visualization_msgs
   interactive_markers
+  thormang_ctrl_msgs
 )
 catkin_package(
 )

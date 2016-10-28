@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   visualization_msgs
   interactive_markers
+  thormang_ctrl_msgs
 )
 catkin_package(
 )
@@ -25,8 +26,8 @@ include_directories(
    ${catkin_LIBRARIES}
  )
 
- add_executable(move_model src/move_model.cpp)
- target_link_libraries(move_model
+ add_executable(custom_recog src/custom_recog.cpp)
+ target_link_libraries(custom_recog
    ${catkin_LIBRARIES}
  )
 
