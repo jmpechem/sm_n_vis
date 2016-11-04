@@ -1,9 +1,9 @@
 <launch>
   <node name="ground_filter" pkg="jm_map" type="ground_filter" />
   <node name="traversability" pkg="jm_map" type="traversability" />
-  <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
-    <rosparam command="load" file="$(find jm_map)/config/jm_map.yaml" />
-  </node>
+  <!--node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen"-->
+    <!--rosparam command="load" file="$(find jm_map)/config/jm_map.yaml" /-->
+  <!--/node-->
 
   <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find grid_map_demos)/rviz/grid_map_demo.rviz" /-->
 </launch>

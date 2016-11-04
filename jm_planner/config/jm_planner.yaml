@@ -1,4 +1,4 @@
-grid_map_topic: /grid_map
+grid_map_topic: /plan_test
 
 grid_map_visualizations:
 
@@ -63,3 +63,10 @@ grid_map_visualizations:
     type: point_cloud
     params:
      layer: cost_elevation
+
+  - name: plan_cost
+    type: occupancy_grid
+    params:
+     layer: plan
+     data_min: 0.0
+     data_max: 9.0
