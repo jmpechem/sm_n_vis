@@ -9,6 +9,7 @@ realrobot::realrobot() : rate(200.0)
     dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
 
     // dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
+
     dxlJointSetPub.init(nh, "rt_dynamixel/joint_set", 1);
 
 
@@ -35,8 +36,8 @@ realrobot::realrobot() : rate(200.0)
 
     for(int i=0;i<total_dof; i++)
     {
-        jointStateMsgPtr->id[i] = jointID[i];
-        dxlJointSetMsgPtr->id[i] = jointID[i];
+        jointStateUIPub.msg_.id[i] = jointID[i];
+        dxlJointSetPub.msg_.id[i] = jointID[i];
     }
 }
 
@@ -182,11 +183,10 @@ void realrobot::writedevice()
         set_torque(1);
         for(int i=0; i< total_dof; i++)
         {
-            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+            dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
         // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
-            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
             dxlJointSetPub.unlockAndPublish();
         }
     }
@@ -195,11 +195,10 @@ void realrobot::writedevice()
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
         for(int i=0; i< total_dof; i++)
         {
-            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+            dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
         // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
-            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
             dxlJointSetPub.unlockAndPublish();
         }
     }
@@ -208,11 +207,10 @@ void realrobot::writedevice()
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
         for(int i=0; i< total_dof; i++)
         {
-            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+            dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
         // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
-            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
             dxlJointSetPub.unlockAndPublish();
         }
     }
@@ -225,12 +223,10 @@ void realrobot::writedevice()
     {
         for(int i=0; i< total_dof; i++)
         {
-            dxlJointSetMsgPtr->angle[i] = _desired_q(i);
+            dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
         // dxlJointSetPub.publish(dxlJointSetMsgPtr);
-        
         if (dxlJointSetPub.trylock()) {
-            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
             dxlJointSetPub.unlockAndPublish();
         }
     }
@@ -281,7 +277,8 @@ void realrobot::jointCallback(const rt_dynamixel_msgs::JointStateConstPtr msg)
 
                 q_dot(i) = msg->velocity[j];
                 torque(i) = msg->current[j];
-                jointStateMsgPtr->error[i] = msg->updated[j];
+                jointStateUIPub.msg_.error[i] = msg->updated[j];
+                // jointStateMsgPtr->error[i] = msg->updated[j];
             }
         }
     }

@@ -56,7 +56,6 @@ private:
    bool jointCtrlMsgRecv;
 
    // rt_dynamixel_msgs::JointSet jointSetMsg;
-   rt_dynamixel_msgs::JointSetPtr dxlJointSetMsgPtr;
    // rt_dynamixel_msgs::JointStateConstPtr dxlJointStatePtr;
 
    /*

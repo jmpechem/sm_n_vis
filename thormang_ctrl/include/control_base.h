@@ -74,9 +74,10 @@ protected:
 
     // rosrt implement
     // Publisher Message Preallocator
-    thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
-    std_msgs::StringPtr smachMsgPtr;
+    //thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
+    //std_msgs::StringPtr smachMsgPtr;
 
+    /*
     // Subscriber Pointers
     thormang_ctrl_msgs::WalkingCmdConstPtr walkingMsgPtr;
     thormang_ctrl_msgs::TaskCmdConstPtr taskMsgPtr;
@@ -85,6 +86,7 @@ protected:
     smach_msgs::SmachContainerStatusConstPtr smachStatusMsgPtr;
     std_msgs::Float32MultiArrayConstPtr recogPointPtr;
 
+    */
     /*
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
