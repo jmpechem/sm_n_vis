@@ -25,6 +25,45 @@ const int jointIDs[40] = {27, 28,
                           16,18,20,22,24,26,
                           29,30,31,32};
 
+
+// Callback
+
+void controlBase::WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg)
+{
+    walkingCmdMsg = *msg;
+}
+
+void controlBase::TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg)
+{
+  taskCmdMsg = *msg;
+}
+
+void controlBase::RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg)
+{
+
+}
+
+void controlBase::UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr &joint)
+{
+    jointCtrlMsg = *joint;
+    jointCtrlMsgRecv = true;
+}
+
+void controlBase::SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &smach)
+{
+    smach_state = smach->active_states[0];
+}
+
+void controlBase::RecogPointCallback(const std_msgs::Float32MultiArrayConstPtr& msg)
+{
+    for(int i=0; i<6; i++)
+    {
+        recogPoint[i] = msg->data[i];
+    }
+}
+
+
+
 // Constructor
 controlBase::controlBase() :
     uiUpdateCount(0),
@@ -33,35 +72,43 @@ controlBase::controlBase() :
     _Walking_flag(false)
 {
 
-    rosrt::init();
+    // rosrt::init();
 
     total_dof = 32;
 
-    walkingCmdSub.initialize(3, nh, "thormang_ctrl/walking_cmd");
-    taskCmdSub.initialize(3, nh, "thormang_ctrl/task_cmd");
-    recogCmdSub.initialize(3, nh, "thormang_ctrl/recog_cmd");
-    jointCtrlSub.initialize(3, nh, "thormang_ctrl/joint_ctrl");
-    smachSub.initialize(3, nh, "Jimin_machine/smach/container_status");
-    recogPointSub.initialize(3, nh, "custom_recog_point");
+    // walkingCmdSub.initialize(3, nh, "thormang_ctrl/walking_cmd");
+    walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd", 3, &controlBase::WalkingCmdCallback, this);
+    // taskCmdSub.initialize(3, nh, "thormang_ctrl/task_cmd");
+    taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd", 3, &controlBase::TaskCmdCallback, this);
+    // recogCmdSub.initialize(3, nh, "thormang_ctrl/recog_cmd");
+    recogCmdSub = nh.subscribe( "thormang_ctrl/recog_cmd", 3, &controlBase::RecogCmdCallback, this);
+    // jointCtrlSub.initialize(3, nh, "thormang_ctrl/joint_ctrl");
+    jointCtrlSub = nh.subscribe( "thormang_ctrl/joint_ctrl", 3, &controlBase::UIJointCtrlCallback, this);
+    // smachSub.initialize(3, nh, "Jimin_machine/smach/container_status");
+    smachSub = nh.subscribe( "Jimin_machine/smach/container_status", 3, &controlBase::SmachCallback, this);
+    // recogPointSub.initialize(3, nh, "custom_recog_point");
+    recogPointSub = nh.subscribe( "custom_recog_point", 3, &controlBase::RecogPointCallback, this);
 
-    jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
-    smachPub.initialize(nh, "transition",1,1,std_msgs::String());
+    // jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
+    jointStateUIPub.init(nh, "thormang_ctrl/joint_state",1);
+    // smachPub.initialize(nh, "transition",1,1,std_msgs::String());
+    smachPub.init(nh, "transition",1);
 
-    jointStateMsgPtr = jointStateUIPub.allocate();
-    smachMsgPtr = smachPub.allocate();
+    // smachMsgPtr = smachPub.allocate();
 
-    jointStateMsgPtr->angle.resize(total_dof);
-    jointStateMsgPtr->velocity.resize(total_dof);
-    jointStateMsgPtr->error.resize(total_dof);
-    jointStateMsgPtr->current.resize(total_dof);
-    jointStateMsgPtr->id.resize(total_dof);
+
+    jointStateUIPub.msg_.angle.resize(total_dof);
+    jointStateUIPub.msg_.velocity.resize(total_dof);
+    jointStateUIPub.msg_.error.resize(total_dof);
+    jointStateUIPub.msg_.current.resize(total_dof);
+    jointStateUIPub.msg_.id.resize(total_dof);
 
     make_id_inverse_list();
     parameter_initialize();
 
     for(int i=0; i<total_dof; i++)
     {
-        jointStateMsgPtr->id[i] = jointID[i];
+        jointStateUIPub.msg_.id[i] = jointID[i];
     }
 }
 
@@ -534,7 +581,7 @@ void controlBase::UpperBodyCheckState()
 
 void controlBase::update()
 {
-
+/*
     walkingMsgPtr = walkingCmdSub.poll();
     if(walkingMsgPtr)   // Data recv
     {
@@ -569,6 +616,7 @@ void controlBase::update()
             recogPoint[i] = recogPointPtr->data[i];
         }
     }
+    */
 }
 
 void controlBase::compute()
@@ -608,12 +656,15 @@ void controlBase::reflect()
         uiUpdateCount = 0;
         for(int i=0; i<total_dof; i++)
         {
-            jointStateMsgPtr->angle[i] = q(i);
-            jointStateMsgPtr->velocity[i] = q_dot(i);
-            jointStateMsgPtr->current[i] = torque(i);
+            jointStateUIPub.msg_.angle[i] = q(i);
+            jointStateUIPub.msg_.velocity[i] = q_dot(i);
+            jointStateUIPub.msg_.current[i] = torque(i);
         }
 
-        jointStateUIPub.publish(jointStateMsgPtr);
+        // jointStateUIPub.publish(jointStateMsgPtr);
+        if (jointStateUIPub.trylock()) {
+            jointStateUIPub.unlockAndPublish();
+        }
     }
 }
 // Common functions
@@ -692,32 +743,3 @@ double controlBase::Rounding( double x, int digit )
     return ( floor( (x) * pow( float(10), digit ) + 0.5f ) / pow( float(10), digit ) );
 }
 
-
-/*
-// Callback
-void controlBase::UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr &joint)
-{
-    jointCtrlMsg = *joint;
-    jointCtrlMsgRecv = true;
-}
-
-void controlBase::SmachCallback(const smach_msgs::SmachContainerStatusConstPtr &smach)
-{
-    smach_state = smach->active_states[0];
-}
-
-void controlBase::WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg)
-{
-    walkingCmdMsg = *msg;
-}
-
-void controlBase::TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg)
-{
-  taskCmdMsg = *msg;
-}
-
-void controlBase::RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg)
-{
-
-}
-*/

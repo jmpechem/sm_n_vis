@@ -8,7 +8,8 @@ realrobot::realrobot() : rate(200.0)
     dxlModeSetClient = nh.serviceClient<rt_dynamixel_msgs::ModeSetting>("rt_dynamixel/mode");
     dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
 
-    dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
+    // dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
+    dxlJointSetPub.init(nh, "rt_dynamixel/joint_set", 1);
 
 
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state", 1, &realrobot::jointCallback, this, ros::TransportHints().tcpNoDelay(true));
@@ -25,10 +26,12 @@ realrobot::realrobot() : rate(200.0)
     rightFootFTSub.initialize(3, nh, "ati_ft_sensor/right_foot_ft");
 */
 
-    dxlJointSetMsgPtr = dxlJointSetPub.allocate();
+    // dxlJointSetMsgPtr = dxlJointSetPub.allocate();
 
-    dxlJointSetMsgPtr->angle.resize(total_dof);
-    dxlJointSetMsgPtr->id.resize(total_dof);
+    // dxlJointSetMsgPtr->angle.resize(total_dof);
+    dxlJointSetPub.msg_.angle.resize(total_dof);
+    // dxlJointSetMsgPtr->id.resize(total_dof);
+    dxlJointSetPub.msg_.id.resize(total_dof);
 
     for(int i=0;i<total_dof; i++)
     {
@@ -181,7 +184,11 @@ void realrobot::writedevice()
         {
             dxlJointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        if (dxlJointSetPub.trylock()) {
+            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
+            dxlJointSetPub.unlockAndPublish();
+        }
     }
     else if (smach_state == "Auto")
     {
@@ -190,7 +197,11 @@ void realrobot::writedevice()
         {
             dxlJointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        if (dxlJointSetPub.trylock()) {
+            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
+            dxlJointSetPub.unlockAndPublish();
+        }
     }
     else if (smach_state == "Manual")
     {
@@ -199,7 +210,11 @@ void realrobot::writedevice()
         {
             dxlJointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        if (dxlJointSetPub.trylock()) {
+            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
+            dxlJointSetPub.unlockAndPublish();
+        }
     }
     else if (smach_state == "None")
     {
@@ -212,7 +227,12 @@ void realrobot::writedevice()
         {
             dxlJointSetMsgPtr->angle[i] = _desired_q(i);
         }
-        dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
+        
+        if (dxlJointSetPub.trylock()) {
+            dxlJointSetPub.msg_ = *dxlJointSetMsgPtr;
+            dxlJointSetPub.unlockAndPublish();
+        }
     }
 }
 

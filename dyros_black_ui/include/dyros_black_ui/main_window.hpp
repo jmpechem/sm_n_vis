@@ -11,7 +11,7 @@
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
-
+#ifndef Q_MOC_RUN
 #include <QtGui/QMainWindow>
 #include <vector>
 #include "ui_main_window.h"
@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDoubleSpinBox>
+#endif
 
 /*****************************************************************************
 ** Namespace

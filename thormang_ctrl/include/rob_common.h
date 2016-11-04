@@ -34,13 +34,13 @@ private:
    ros::ServiceClient dxlModeSetClient; ///< dynamixel mode select service
    ros::ServiceClient dxlMotorSetClient; ///< dynmamixel motor setting service
 
-   rosrt::Publisher<rt_dynamixel_msgs::JointSet> dxlJointSetPub;
+   realtime_tools::RealtimePublisher<rt_dynamixel_msgs::JointSet> dxlJointSetPub;
    /*
-   rosrt::Subscriber<rt_dynamixel_msgs::JointState> dxlJointSub;
+   ros::Subscriber<rt_dynamixel_msgs::JointState> dxlJointSub;
 
-   rosrt::Subscriber<sensor_msgs::Imu> imuSub;
-   rosrt::Subscriber<geometry_msgs::WrenchStamped> leftFootFTSub;
-   rosrt::Subscriber<geometry_msgs::WrenchStamped> rightFootFTSub;
+   ros::Subscriber<sensor_msgs::Imu> imuSub;
+   ros::Subscriber<geometry_msgs::WrenchStamped> leftFootFTSub;
+   ros::Subscriber<geometry_msgs::WrenchStamped> rightFootFTSub;
 */
    ros::Subscriber dxlJointSub;
 

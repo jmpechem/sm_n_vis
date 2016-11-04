@@ -15,7 +15,7 @@
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
-
+#ifndef Q_MOC_RUN
 #include <ros/ros.h>
 #include <string>
 #include <QThread>
@@ -30,6 +30,7 @@
 #include "thormang_ctrl_msgs/RecogCmd.h"
 #include "thormang_ctrl_msgs/TaskCmd.h"
 #include "thormang_ctrl_msgs/WalkingCmd.h"
+#endif
 
 
 /*****************************************************************************

@@ -9,7 +9,8 @@
 
 // ROS Library
 #include <ros/ros.h>
-#include <rosrt/rosrt.h>
+//#include <rosrt/rosrt.h>
+#include <realtime_tools/realtime_publisher.h>
 #include <tf/transform_datatypes.h>
 
 // ROS Messages
@@ -59,16 +60,16 @@ public:
 protected:
     ros::NodeHandle nh;
 
-    rosrt::Subscriber<thormang_ctrl_msgs::WalkingCmd> walkingCmdSub;
-    rosrt::Subscriber<thormang_ctrl_msgs::TaskCmd> taskCmdSub;
-    rosrt::Subscriber<thormang_ctrl_msgs::RecogCmd> recogCmdSub;
+    ros::Subscriber walkingCmdSub;
+    ros::Subscriber taskCmdSub;
+    ros::Subscriber recogCmdSub;
 
-    rosrt::Publisher<std_msgs::String> smachPub;
-    rosrt::Subscriber<smach_msgs::SmachContainerStatus> smachSub;
+    realtime_tools::RealtimePublisher<std_msgs::String> smachPub;
+    ros::Subscriber smachSub;
 
-    rosrt::Publisher<thormang_ctrl_msgs::JointState> jointStateUIPub;
-    rosrt::Subscriber<thormang_ctrl_msgs::JointSet> jointCtrlSub;
-    rosrt::Subscriber<std_msgs::Float32MultiArray> recogPointSub;
+    realtime_tools::RealtimePublisher<thormang_ctrl_msgs::JointState> jointStateUIPub;
+    ros::Subscriber jointCtrlSub;
+    ros::Subscriber recogPointSub;
 
 
     // rosrt implement
@@ -163,14 +164,14 @@ protected:
 private:
 
     void make_id_inverse_list();
-    /*
+    
     // Callback functions
     void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr& smach);
     void UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr& joint);
     void WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg);
     void TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg);
     void RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg);
-    */
+     void RecogPointCallback(const std_msgs::Float32MultiArrayConstPtr& msg);
 };
 
 

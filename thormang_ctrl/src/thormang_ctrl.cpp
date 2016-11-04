@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "thormang_ctrl");
   
-controlBase *ctrObj = new realrobot;
-// controlBase *ctrObj = new simulation;
+// controlBase *ctrObj = new realrobot;
+controlBase *ctrObj = new simulation;
 
 
   while(ros::ok())
