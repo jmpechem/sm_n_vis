@@ -63,3 +63,10 @@ grid_map_visualizations:
     type: point_cloud
     params:
      layer: cost_elevation
+
+  - name: boundary_cost
+    type: occupancy_grid
+    params:
+     layer: boundary
+     data_min: 0.0
+     data_max: 1.0

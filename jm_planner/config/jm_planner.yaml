@@ -69,4 +69,11 @@ grid_map_visualizations:
     params:
      layer: plan
      data_min: 0.0
-     data_max: 9.0
+     data_max: 1.0
+
+  - name: boundary_cost
+    type: occupancy_grid
+    params:
+     layer: boundary
+     data_min: 0.0
+     data_max: 1.0

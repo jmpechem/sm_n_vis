@@ -105,7 +105,25 @@ int main(int argc, char** argv)
                        }
                     }
 	}
+
+   pcl::PointXYZ filter_min;
+   pcl::PointXYZ filter_max;
+   pcl::getMinMax3D(*assembly_,filter_min,filter_max);
+   pcl::PointCloud<pcl::PointXYZ> final_assembly_;
+   double z_thres = 1.5;
+   for(int i=0;i<assembly_->size();i++)
+   {
+       cout << "z : " << assembly_->points[i].z << "  min_z : " << filter_min.z << endl;
+           if ( abs(filter_min.z-assembly_->points[i].z) <= z_thres)
+           {
+                   temp.x = assembly_->points[i].x;
+                   temp.y = assembly_->points[i].y;
+                   temp.z = assembly_->points[i].z;
+                   final_assembly_.push_back(temp);
+           }
+   }
    // Step filtered from ground
+   /*
    pcl::PointXYZ filter_min;
    pcl::PointXYZ filter_max;
    pcl::getMinMax3D(*assembly_,filter_min,filter_max);
@@ -129,6 +147,7 @@ int main(int argc, char** argv)
 			final_assembly_.push_back(temp);
 		}
 	}
+	*/
 	sensor_msgs::PointCloud2 output_;
 	pcl::toROSMsg(final_assembly_,output_);
 	//pcl::toROSMsg(*assembly_,output_);

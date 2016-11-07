@@ -51,6 +51,8 @@ using namespace cv;
 #define GRID_X_OFFSET 5
 #define GRID_Y_OFFSET 0
 #define GRID_RESOLUTION 0.05
+#define ROBOT_FOOTPRINT_SIZE   0.25
+#define FLAT_PLANE_THRESHOLD   0.1
 
  boost::recursive_mutex rawMapMutex_;
 
@@ -323,6 +325,10 @@ int roundToInt(double x) {
   if (x >= 0) return (int) (x + 0.5);
   return (int) (x - 0.5);
 }
+double norm_dist_cell(double x,double y, double cell_x, double cell_y)
+{
+  return sqrt( (x-cell_x)*(x-cell_x) + (y-cell_y)*(y-cell_y) );
+}
 
 void obstacle_classifier(GridMap& map, GridMap input_map)
 {
@@ -367,8 +373,8 @@ void obstacle_classifier(GridMap& map, GridMap input_map)
  cv::namedWindow("Canny Contours");
  cv::imshow("Canny Contours", contoursInv);
 */
-/* // 채널 분리
- cv::Mat channel[3];
+ // 채널 분리
+ /*cv::Mat channel[3];
  split(opened,channel);
 
  cv::namedWindow("r");
@@ -378,6 +384,14 @@ void obstacle_classifier(GridMap& map, GridMap input_map)
  imshow("g",channel[1]);
  imshow("b",channel[2]);
 
+ cv::namedWindow("original");
+ imshow("original",myMat);
+
+ cv::namedWindow("filtered");
+ imshow("filtered",opened);
+
+ cv::waitKey(3);*/
+/*
  cv::Mat contoursR;
  cv::Canny(channel[0],contoursR,100,350);
  cv::Mat contoursInvR; // 반전 영상
@@ -493,13 +507,41 @@ void obstacle_classifier(GridMap& map, GridMap input_map)
       {
           map.at("costmap",*it) = NAN;
           map.at("cost_elevation",*it) = NAN;
+          map.at("plan",*it) = NAN;
       }
       else
       {
-          map.at("costmap",*it) = 1-cost_map_data[k];
+          map.at("costmap",*it) = 1-cost_map_data[k];          
           map.at("cost_elevation",*it) = map.at("elevation",*it);
-      }
+          map.at("plan",*it) = map.at("costmap",*it);
+          if(map.at("plan",*it) < 0.1){} // flat plane
+          else {map.at("obstacle",*it) = map.at("plan",*it);} // diffrence plane
+        }
       k++;
+    }
+  for(GridMapIterator it(map);!it.isPastEnd(); ++it){
+      if(!map.isValid(*it,"obstacle")){}
+      else {
+      Eigen::Vector2d center;
+      map.getPosition(*it,center);
+
+        for(CircleIterator submapIterator(map,center,ROBOT_FOOTPRINT_SIZE);!submapIterator.isPastEnd();++submapIterator){
+            if(map.isValid(*submapIterator,"obstacle")){}
+            else {
+                Eigen::Vector2d cells;
+                map.getPosition(*submapIterator,cells);
+                double dist = norm_dist_cell(center(0),center(1),cells(0),cells(1));
+                double weight = dist/ROBOT_FOOTPRINT_SIZE;
+                map.at("boundary",*submapIterator) = 1-exp(-1.0 * weight);
+                 }
+             }
+            }
+    }
+  for(GridMapIterator it(map);!it.isPastEnd(); ++it){
+      if(!map.isValid(*it,"plan")){continue;}
+      if(map.isValid(*it,"boundary")){
+          map.at("plan",*it) = map.at("boundary",*it);
+        }
     }
 
   scopedLockmap.unlock();
@@ -516,7 +558,7 @@ int main(int argc, char** argv)
   ros::Publisher grid_pub = nh.advertise<grid_map_msgs::GridMap>("grid_map", 1, true);
 
 
-  GridMap grid_map({"elevation","normal_x","normal_y","normal_z","roughness","slope","height","traverse","costmap","cost_elevation"});
+  GridMap grid_map({"elevation","normal_x","normal_y","normal_z","roughness","slope","height","traverse","costmap","cost_elevation","plan","boundary","obstacle"});
   grid_map.setGeometry(Length(GRID_X_SIZE,GRID_Y_SIZE), GRID_RESOLUTION,Position(GRID_X_OFFSET,GRID_Y_OFFSET));
   grid_map.setFrameId("base_link");
 

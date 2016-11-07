@@ -55,6 +55,7 @@ using namespace cv;
 #define MAX_X 10
 #define MAX_Y 10
 
+
 const int MAP_WIDTH = 200;
 const int MAP_HEIGHT = 200;
 
@@ -210,11 +211,11 @@ float norm_dist(float grid_x,float grid_y,float user_x,float user_y)
 void map_cb(const grid_map_msgs::GridMap& map_input){
 
   grid_map::GridMapRosConverter::fromMessage(map_input,map_data);
-  if(first_time_running)
+  /*if(first_time_running)
   {
       map_data.add("plan");
       first_time_running = false;
-  }
+  }*/
 
   if(do_local_planning)
   {
@@ -224,13 +225,30 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
       float dmin = 0.0f;
       Index goal_idx;
       int i=0;
-      for (GridMapIterator it(map_data); !it.isPastEnd(); ++it) {
-        if (!map_data.isValid(*it, "costmap")){
+      for (GridMapIterator it(map_data); !it.isPastEnd(); ++it) {          
+        if (!map_data.isValid(*it, "plan")){
               world_map[i] = 9;
             }
         else{
-              world_map[i] = (int)(9.0*map_data.at("costmap",*it)+1);
-              map_data.at("plan",*it) = world_map[i];
+
+             Eigen::Vector2d center;
+             map_data.getPosition(*it,center);
+/*             int cost_trav = (int)(9.0*map_data.at("costmap",*it)+1);
+              for(SpiralIterator submapIterator(map_data,center,ROBOT_FOOTPRINT);!submapIterator.isPastEnd();++submapIterator){
+                  if (!map_data.isValid(*submapIterator, "costmap")) continue;
+                  if (  ((int)(9.0*map_data.at("costmap",*it)+1)) > 1 )
+                  {
+                      continue;
+                  }
+                  else
+                  {
+                      map_data.at("costmap",*submapIterator) = (int)(9.0*map_data.at("costmap",*it)+5);
+                  }
+                  //cost_trav
+                  //map_data.at("costmap",*submapIterator) = ;
+                }*/
+                world_map[i] = (int)(9.0*map_data.at("plan",*it)+1);
+              //world_map[i];
 
               Position test_pos;
               test_pos(0) = user_goal_pose.pose.position.x;
