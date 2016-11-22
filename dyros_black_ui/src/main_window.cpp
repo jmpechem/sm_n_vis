@@ -833,7 +833,7 @@ void MainWindow::on_button_joint_save_clicked()
   outFile << "ID\tAngle" << std::endl;
   for (int i=0; i<32; i++)
   {
-    outFile << qnode.joint_msg.id[i] << "\t" << qnode.joint_msg.angle[i] << std::endl;
+    outFile << (int)qnode.joint_msg.id[i] << "\t" << qnode.joint_msg.angle[i] << std::endl;
     //outFile << i << "\t" << 1.0 << std::endl;
   }
 

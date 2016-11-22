@@ -59,12 +59,12 @@ class Handclap_Ready(Simple_State):
 
 class Handclap_Do(Simple_State):
   def __init__(self):
-    smach.State.__init__(self, outcomes=['handclap_end','cmd_modechg','shutdown'])
+    smach.State.__init__(self, outcomes=['handclap_ready','handclap_end','cmd_modechg','shutdown'])
 
 
 class Handclap_End(Simple_State):
   def __init__(self):
-    smach.State.__init__(self, outcomes=['cmd_modechg','shutdown'])
+    smach.State.__init__(self, outcomes=['handclap_ready','cmd_modechg','shutdown'])
 
 
 
@@ -80,12 +80,12 @@ class Handshake_Ready(Simple_State):
 
 class Handshake_Do(Simple_State):
   def __init__(self):
-    smach.State.__init__(self, outcomes=['handshake_end','cmd_modechg','shutdown'])
+    smach.State.__init__(self, outcomes=['handshake_end','handshake_ready','cmd_modechg','shutdown'])
 
 
 class Handshake_End(Simple_State):
   def __init__(self):
-    smach.State.__init__(self, outcomes=['cmd_modechg','shutdown'])
+    smach.State.__init__(self, outcomes=['handshake_ready','cmd_modechg','shutdown'])
 
 
 #define state JointCtrl
@@ -300,13 +300,13 @@ def main():
 
     smach.StateMachine.add('Handclap_Start', Handclap_Start(), transitions={'handclap_ready':'Handclap_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Handclap_Ready', Handclap_Ready(), transitions={'handclap_do':'Handclap_Do','cmd_modechg':'Mode_Chg','shutdown':'END'})
-    smach.StateMachine.add('Handclap_Do', Handclap_Do(), transitions={'handclap_end':'Handclap_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
-    smach.StateMachine.add('Handclap_End', Handclap_End(), transitions={'cmd_modechg':'Mode_Chg','shutdown':'END'})
+    smach.StateMachine.add('Handclap_Do', Handclap_Do(), transitions={'handclap_ready':'Handclap_Ready','handclap_end':'Handclap_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
+    smach.StateMachine.add('Handclap_End', Handclap_End(), transitions={'handclap_ready':'Handclap_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
 
     smach.StateMachine.add('Handshake_Start', Handshake_Start(), transitions={'handshake_ready':'Handshake_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Handshake_Ready', Handshake_Ready(), transitions={'handshake_do':'Handshake_Do','cmd_modechg':'Mode_Chg','shutdown':'END'})
-    smach.StateMachine.add('Handshake_Do', Handshake_Do(), transitions={'handshake_end':'Handshake_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
-    smach.StateMachine.add('Handshake_End', Handshake_End(), transitions={'cmd_modechg':'Mode_Chg','shutdown':'END'})
+    smach.StateMachine.add('Handshake_Do', Handshake_Do(), transitions={'handshake_ready':'Handshake_Ready','handshake_end':'Handshake_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
+    smach.StateMachine.add('Handshake_End', Handshake_End(), transitions={'handshake_ready':'Handshake_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
 
     # Valve_Mission state
     smach.StateMachine.add('Valve_Mission', Valve_Mission(), transitions={'v_init':'Valve_Init','v_ready':'Valve_Ready','v_approach':'Valve_Approach','v_reach':'Valve_Reach','v_close':'Valve_Close','shutdown':'END'})
