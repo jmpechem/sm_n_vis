@@ -13,6 +13,8 @@
 #include <QMessageBox>
 #include <iostream>
 #include <QString>
+#include <fstream>
+#include <string>
 #include "../include/dyros_black_ui/main_window.hpp"
 
 /*****************************************************************************
@@ -93,6 +95,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(ui.button_auto_valve_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_auto_valve_start, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
 
+    QObject::connect(ui.button_auto_egress_init, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_egress_egress, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_egress_standby, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_egress_start, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_egress_guide, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_auto_egress_hello, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
     QObject::connect(ui.button_manual, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
 
     QObject::connect(ui.button_manual_joint_ctrl, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
@@ -100,6 +109,19 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(ui.button_manual_recog_ctrl,SIGNAL(clicked()),this,SLOT(stateButtonClicked()));
 
     QObject::connect(ui.button_mode_change, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+
+    QObject::connect(ui.button_event, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_event_handclap, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handclap_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handclap_do, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handclap_end, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handshake, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handshake_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handshake_do, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_handshake_end, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
 
 
     QObject::connect(ui.button_scan,SIGNAL(clicked()),this,SLOT(on_button_scan_clicked()));
@@ -263,6 +285,9 @@ void MainWindow::autoMissionSelectVisible(int mission)
     ui.button_auto_door_push->setVisible(mission==2);
     ui.button_auto_door_reach->setVisible(mission==2);
     ui.button_auto_door_ready->setVisible(mission==2);
+    ui.button_auto_egress_init->setVisible(mission==3);
+    ui.button_auto_egress_egress->setVisible(mission==3);
+    ui.button_auto_egress_standby->setVisible(mission==3);
 }
 void MainWindow::updateUI()
 {
@@ -461,6 +486,21 @@ void MainWindow::stateButtonClicked()
         state = "d_reach";
     } else if (objName.compare("button_auto_door_ready") == 0) {
         state = "d_ready";
+
+    } else if (objName.compare("button_auto_egress_start") == 0) {
+      state = "mission3";
+      autoMissionSelectVisible(3);
+    } else if (objName.compare("button_auto_egress_init") == 0) {
+        state = "e_init";
+    } else if (objName.compare("button_auto_egress_egress") == 0) {
+        state = "e_egress";
+    } else if (objName.compare("button_auto_egress_standby") == 0) {
+        state = "e_standby";
+    } else if (objName.compare("button_auto_egress_hello") == 0) {
+        state = "e_hello";
+    } else if (objName.compare("button_auto_egress_guide") == 0) {
+        state = "e_guide";
+
     } else if (objName.compare("button_manual") == 0) {
         state = "manu_on";
     } else if (objName.compare("button_manual_joint_ctrl") == 0) {
@@ -471,6 +511,24 @@ void MainWindow::stateButtonClicked()
         state = "cmd_modechg";
     } else if (objName.compare("button_manual_recog_ctrl") == 0) {
         state = "activate_recog";
+    } else if (objName.compare("button_event") == 0) {
+        state = "event_on";
+    } else if (objName.compare("button_event_handclap") == 0) {
+        state = "handclap";
+    } else if (objName.compare("button_event_handclap_ready") == 0) {
+        state = "handclap_ready";
+    } else if (objName.compare("button_event_handclap_do") == 0) {
+        state = "handclap_do";
+    } else if (objName.compare("button_event_handclap_end") == 0) {
+        state = "handclap_end";
+    } else if (objName.compare("button_event_handshake") == 0) {
+        state = "handshake";
+    } else if (objName.compare("button_event_handshake_ready") == 0) {
+        state = "handshake_ready";
+    } else if (objName.compare("button_event_handshake_do") == 0) {
+        state = "handshake_do";
+    } else if (objName.compare("button_event_handshake_end") == 0) {
+        state = "handshake_end";
     }
     qnode.send_transition(state);
 }
@@ -753,5 +811,32 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
-}  // namespace dyros_black_ui
 
+
+void MainWindow::on_button_joint_save_clicked()
+{
+
+  std::string homeDir(getenv("HOME"));
+  std::string fullDir = homeDir + "/DAQ/JointDatas/" + ui.line_edit_joint_file_name->text().toStdString();
+  std::cout << fullDir;
+  std::ofstream outFile(fullDir.c_str());
+
+  outFile << qnode.joint_msg.angle[0];
+  outFile << 1.0;
+  for (int i=1; i<32; i++)
+  {
+    //outFile << "," << 1.0;
+    outFile << "," << qnode.joint_msg.angle[i];
+  }
+  outFile << std::endl << std::endl;
+
+  outFile << "ID\tAngle" << std::endl;
+  for (int i=0; i<32; i++)
+  {
+    outFile << qnode.joint_msg.id[i] << "\t" << qnode.joint_msg.angle[i] << std::endl;
+    //outFile << i << "\t" << 1.0 << std::endl;
+  }
+
+}
+
+}  // namespace dyros_black_ui

@@ -65,6 +65,7 @@ public Q_SLOTS:
     void on_button_scan_clicked();
     void on_button_estop_clicked();
     void on_button_ft_calib_clicked();
+    void on_button_joint_save_clicked();
     /******************************************
     ** Code based UI connections
     *******************************************/
@@ -81,6 +82,7 @@ public Q_SLOTS:
     void updateLoggingView(); // no idea why this can't connect automatically
     void updateJointView();
     void updateRecogInfo();
+
 
 private:
 	Ui::MainWindowDesign ui;
