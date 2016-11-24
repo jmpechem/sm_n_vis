@@ -70,8 +70,6 @@ protected:
 
     // rosrt implement
     // Publisher Message Preallocator
-    thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
-    std_msgs::StringPtr smachMsgPtr;
 
     /*
     ros::Subscriber walkingCmdSub;

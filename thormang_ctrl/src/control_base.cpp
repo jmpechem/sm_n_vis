@@ -39,22 +39,22 @@ controlBase::controlBase(ros::NodeHandle &nh) :
     total_dof = 32;
 
     // walkingCmdSub.initialize(3, nh, "thormang_ctrl/walking_cmd");
-    walkingCmdSub = nh.subscribe("thormang_ctrl/walking_cmd", 3, &controlBase::WalkingCmdCallback, this);
+    walkingCmdSub = nh.subscribe("/thormang_ctrl/walking_cmd", 3, &controlBase::WalkingCmdCallback, this);
     // taskCmdSub.initialize(3, nh, "thormang_ctrl/task_cmd");
-    taskCmdSub = nh.subscribe("thormang_ctrl/task_cmd", 3, &controlBase::TaskCmdCallback, this);
+    taskCmdSub = nh.subscribe("/thormang_ctrl/task_cmd", 3, &controlBase::TaskCmdCallback, this);
     // recogCmdSub.initialize(3, nh, "thormang_ctrl/recog_cmd");
-    recogCmdSub = nh.subscribe( "thormang_ctrl/recog_cmd", 3, &controlBase::RecogCmdCallback, this);
+    recogCmdSub = nh.subscribe( "/thormang_ctrl/recog_cmd", 3, &controlBase::RecogCmdCallback, this);
     // jointCtrlSub.initialize(3, nh, "thormang_ctrl/joint_ctrl");
-    jointCtrlSub = nh.subscribe( "thormang_ctrl/joint_ctrl", 3, &controlBase::UIJointCtrlCallback, this);
+    jointCtrlSub = nh.subscribe( "/thormang_ctrl/joint_ctrl", 3, &controlBase::UIJointCtrlCallback, this);
     // smachSub.initialize(3, nh, "Jimin_machine/smach/container_status");
-    smachSub = nh.subscribe( "Jimin_machine/smach/container_status", 3, &controlBase::SmachCallback, this);
+    smachSub = nh.subscribe( "/Jimin_machine/smach/container_status", 3, &controlBase::SmachCallback, this);
     // recogPointSub.initialize(3, nh, "custom_recog_point");
-    recogPointSub = nh.subscribe( "custom_recog_point", 3, &controlBase::RecogPointCallback, this);
+    recogPointSub = nh.subscribe( "/custom_recog_point", 3, &controlBase::RecogPointCallback, this);
 
     // jointStateUIPub.initialize(nh, "thormang_ctrl/joint_state",1,1,thormang_ctrl_msgs::JointState());
-    jointStateUIPub.init(nh, "thormang_ctrl/joint_state",1);
+    jointStateUIPub.init(nh, "/thormang_ctrl/joint_state",1);
     // smachPub.initialize(nh, "transition",1,1,std_msgs::String());
-    smachPub.init(nh, "transition",1);
+    smachPub.init(nh, "/transition",1);
 
     // smachMsgPtr = smachPub.allocate();
 

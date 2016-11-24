@@ -5,24 +5,24 @@ realrobot::realrobot(ros::NodeHandle &nh) : controlBase(nh), rate(200.0)
     dxlMode = rt_dynamixel_msgs::ModeSettingRequest::SETTING;
     dxlTorque = 0;
 
-    dxlModeSetClient = nh.serviceClient<rt_dynamixel_msgs::ModeSetting>("rt_dynamixel/mode");
-    dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
+    dxlModeSetClient = nh.serviceClient<rt_dynamixel_msgs::ModeSetting>("/rt_dynamixel/mode");
+    dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("/rt_dynamixel/motor_set");
 
-    dxlJointSetPub.init(nh, "rt_dynamixel/joint_set", 1);
+    dxlJointSetPub.init(nh, "/rt_dynamixel/joint_set", 1);
 
-    dxlJointSub = nh.subscribe("rt_dynamixel/joint_state", 1, &realrobot::jointCallback, this, ros::TransportHints().tcpNoDelay(true));
-    imuSub = nh.subscribe("imu/imu", 1, &realrobot::imuCallback, this, ros::TransportHints().tcpNoDelay(true));
-    imuFilterSub = nh.subscribe("imu/filter", 1, &realrobot::imuFilterCallback, this, ros::TransportHints().tcpNoDelay(true));
+    dxlJointSub = nh.subscribe("/rt_dynamixel/joint_state", 1, &realrobot::jointCallback, this, ros::TransportHints().tcpNoDelay(true));
+    imuSub = nh.subscribe("/imu/imu", 1, &realrobot::imuCallback, this, ros::TransportHints().tcpNoDelay(true));
+    imuFilterSub = nh.subscribe("/imu/filter", 1, &realrobot::imuFilterCallback, this, ros::TransportHints().tcpNoDelay(true));
 
-    leftFootFTSub = nh.subscribe("ati_ft_sensor/left_foot_ft", 1, &realrobot::leftFootFTCallback, this);
-    rightFootFTSub = nh.subscribe("ati_ft_sensor/right_foot_ft", 1, &realrobot::rightFootFTCallback, this);
+    leftFootFTSub = nh.subscribe("/ati_ft_sensor/left_foot_ft", 1, &realrobot::leftFootFTCallback, this);
+    rightFootFTSub = nh.subscribe("/ati_ft_sensor/right_foot_ft", 1, &realrobot::rightFootFTCallback, this);
 
     dxlJointSetPub.msg_.angle.resize(total_dof);
     dxlJointSetPub.msg_.id.resize(total_dof);
 
     for(int i=0;i<total_dof; i++)
     {
-        jointStateMsgPtr->id[i] = jointID[i];
+        jointStateUIPub.msg_.id[i] = jointID[i];
     }
 
 
@@ -264,7 +264,7 @@ void realrobot::jointCallback(const rt_dynamixel_msgs::JointStateConstPtr msg)
 
                 q_dot(i) = msg->velocity[j];
                 torque(i) = msg->current[j];
-                jointStateMsgPtr->error[i] = msg->updated[j];
+                jointStateUIPub.msg_.error[i] = msg->updated[j];
             }
         }
     }

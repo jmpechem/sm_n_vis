@@ -30,9 +30,9 @@ private:
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "thormang_ctrl");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("~");
     std::string mode;
-    nh.param<std::string>("mode", mode, "simulation");
+    nh.param<std::string>("run_mode", mode, "real");
     controlBase *ctrObj;
     if(mode == "simulation")
     {

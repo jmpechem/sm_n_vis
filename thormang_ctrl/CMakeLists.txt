@@ -57,3 +57,4 @@ add_dependencies(thormang_ctrl_lib thormang_ctrl_msgs_generate_messages_cpp)
 add_dependencies(thormang_ctrl_lib rt_dynamixel_msgs_generate_messages_cpp)
 
 SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Debug)

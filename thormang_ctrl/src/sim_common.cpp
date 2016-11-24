@@ -7,17 +7,17 @@ simulation::simulation(ros::NodeHandle &nh): controlBase(nh), rate(200)
     simulationTime=0.0f; // set initial simulation time
     subInfo = nh.subscribe("/vrep/info",100,&simulation::infoCallback,this);
     vrepHandleClient = nh.serviceClient<vrep_common::simRosGetObjectHandle>("/vrep/simRosGetObjectHandle");
-    client_startsync = nh.serviceClient<vrep_common::simRosSynchronous>("vrep/simRosSynchronous");
+    client_startsync = nh.serviceClient<vrep_common::simRosSynchronous>("/vrep/simRosSynchronous");
     srv_startsync.request.enable = 1;
-    client_startTrig = nh.serviceClient<vrep_common::simRosSynchronousTrigger>("vrep/simRosSynchronousTrigger");
+    client_startTrig = nh.serviceClient<vrep_common::simRosSynchronousTrigger>("/vrep/simRosSynchronousTrigger");
 
-    start_simulation = nh.serviceClient<vrep_common::simRosStartSimulation>("vrep/simRosStartSimulation");
-    end_simulation = nh.serviceClient<vrep_common::simRosStopSimulation>("vrep/simRosStopSimulation");
+    start_simulation = nh.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
+    end_simulation = nh.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");
 
-    Jointsub = nh.subscribe("vrep/JointState",100,&simulation::JointCallback,this);
-    Lftsub = nh.subscribe("vrep/LFT",100,&simulation::LftCallback,this);
-    Rftsub = nh.subscribe("vrep/RFT",100,&simulation::RftCallback,this);
-    vrepJointSetPub = nh.advertise<vrep_common::JointSetStateData>("vrep/JointSet",100);
+    Jointsub = nh.subscribe("/vrep/JointState",100,&simulation::JointCallback,this);
+    Lftsub = nh.subscribe("/vrep/LFT",100,&simulation::LftCallback,this);
+    Rftsub = nh.subscribe("/vrep/RFT",100,&simulation::RftCallback,this);
+    vrepJointSetPub = nh.advertise<vrep_common::JointSetStateData>("/vrep/JointSet",100);
 
     vrep_start();
     vrep_initialize();
