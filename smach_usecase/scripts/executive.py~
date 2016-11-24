@@ -329,7 +329,7 @@ def main():
     smach.StateMachine.add('Handshake_Do', Handshake_Do(), transitions={'handshake_ready':'Handshake_Ready','handshake_end':'Handshake_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Handshake_End', Handshake_End(), transitions={'handshake_ready':'Handshake_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
 
-    smach.StateMachine.add('Hello_Start', Hello_Start(), transitions={'hello_ready':'Hello_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
+    smach.StateMachine.add('Hello_Start', Hello_Start(), transitions={'hello_ready':'hello_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Hello_Ready', Hello_Ready(), transitions={'hello_do':'Hello_Do','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Hello_Do', Hello_Do(), transitions={'hello_ready':'Hello_Ready','hello_end':'Hello_End','cmd_modechg':'Mode_Chg','shutdown':'END'})
     smach.StateMachine.add('Hello_End', Hello_End(), transitions={'hello_ready':'Hello_Ready','cmd_modechg':'Mode_Chg','shutdown':'END'})

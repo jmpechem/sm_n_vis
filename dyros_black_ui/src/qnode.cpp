@@ -38,6 +38,7 @@ QNode::~QNode() {
       ros::shutdown(); // explicitly needed since we use ros::start();
       ros::waitForShutdown();
     }
+    delete nh;  // deallocate ndoe handle
 	wait();
 }
 
@@ -45,22 +46,9 @@ bool QNode::init() {
 	ros::init(init_argc,init_argv,"dyros_black_ui");
 	if ( ! ros::master::check() ) {
 		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
-    // Add your ros communications here.
-    smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
-    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("/thormang_ctrl/joint_ctrl",5);
-    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("/thormang_ctrl/task_cmd",5);
-    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("/thormang_ctrl/recog_cmd",5);
-    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("/thormang_ctrl/walking_cmd",5);
-
-    ft_sensor_calib_publisher = n.advertise<std_msgs::Float32>("/ati_ft_sensor/calibration", 5);
-
-    joint_state_subscirber = n.subscribe("/thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
-    recog_point_subscriber = n.subscribe("/custom_recog_point",1, &QNode::recogInfoCallback, this);
-
-    isConnected = true;
+  }
+  init_nh();
+  ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	start();
 	return true;
 }
@@ -72,24 +60,31 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::init(remappings,"dyros_black_ui");
 	if ( ! ros::master::check() ) {
 		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
-    // Add your ros communications here.
-    smach_publisher = n.advertise<std_msgs::String>("/transition", 5);
-    joint_ctrl_publisher = n.advertise<thormang_ctrl_msgs::JointSet>("/thormang_ctrl/joint_ctrl",5);
-    task_cmd_publisher = n.advertise<thormang_ctrl_msgs::TaskCmd>("/thormang_ctrl/task_cmd",5);
-    recog_cmd_publisher = n.advertise<thormang_ctrl_msgs::RecogCmd>("/thormang_ctrl/recog_cmd",5);
-    walking_cmd_publisher = n.advertise<thormang_ctrl_msgs::WalkingCmd>("/thormang_ctrl/walking_cmd",5);
-
-    ft_sensor_calib_publisher = n.advertise<std_msgs::Float32>("/ati_ft_sensor/calibration", 5);
-
-    joint_state_subscirber = n.subscribe("/thormang_ctrl/joint_state",1,&QNode::jointStateCallback,this);
-    recog_point_subscriber = n.subscribe("/custom_recog_point",1, &QNode::recogInfoCallback, this);
-
-    isConnected = true;
+  }
+  init_nh();
+  ros::start(); // explicitly needed since our nodehandle is going out of scope.
 	start();
 	return true;
+}
+void QNode::init_nh()
+{
+    nh = new ros::NodeHandle("thormang_ctrl"); // allocate node handle
+    // Add your ros communications here.
+    smach_publisher = nh->advertise<std_msgs::String>("/transition", 5);
+    joint_ctrl_publisher = nh->advertise<thormang_ctrl_msgs::JointSet>("joint_ctrl",5);
+    task_cmd_publisher = nh->advertise<thormang_ctrl_msgs::TaskCmd>("task_cmd",5);
+    recog_cmd_publisher = nh->advertise<thormang_ctrl_msgs::RecogCmd>("recog_cmd",5);
+    walking_cmd_publisher = nh->advertise<thormang_ctrl_msgs::WalkingCmd>("walking_cmd",5);
+
+    ft_sensor_calib_publisher = nh->advertise<std_msgs::Float32>("/ati_ft_sensor/calibration", 5);
+
+    hello_cnt_publisher = nh->advertise<std_msgs::Int32>("hello_cnt",5);
+
+    joint_state_subscirber = nh->subscribe("joint_state",1,&QNode::jointStateCallback,this);
+    recog_point_subscriber = nh->subscribe("/custom_recog_point",1, &QNode::recogInfoCallback, this);
+
+    isConnected = true;
+
 }
 
 void QNode::run() {
@@ -150,6 +145,13 @@ void QNode::send_recog_cmd(thormang_ctrl_msgs::RecogCmd& recog_msg)
 void QNode::send_task_cmd(thormang_ctrl_msgs::TaskCmd& task_msg)
 {    
     task_cmd_publisher.publish(task_msg);
+}
+
+void QNode::send_hello_count(const int count)
+{
+    std_msgs::Int32 msg;
+    msg.data = count;
+    hello_cnt_publisher.publish(msg);
 }
 
 void QNode::jointStateCallback(const thormang_ctrl_msgs::JointStateConstPtr &msg)

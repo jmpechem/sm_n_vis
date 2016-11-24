@@ -58,6 +58,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
 
     // | Creating UI
+
+
+    QPalette* palette_estop = new QPalette();
+    palette_estop->setColor(QPalette::Button, QColor(255,187,0));
+    ui.button_estop->setAutoFillBackground(true);
+    ui.button_estop->setPalette(*palette_estop);
+    ui.button_estop->update();
     // -- Table
     if ( ui.checkbox_remember_settings->isChecked() ) {
         on_button_connect_clicked(true);
@@ -68,7 +75,6 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     horizonHeaderLabel.append("Torque");
     horizonHeaderLabel.append("Error");
     ui.motor_table->setHorizontalHeaderLabels(horizonHeaderLabel);
-
     for(int i=0; i<32; i++)
     {
         jointID.push_back(i+1);
@@ -117,10 +123,16 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(ui.button_event_handclap_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_event_handclap_do, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_event_handclap_end, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
     QObject::connect(ui.button_event_handshake, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_event_handshake_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_event_handshake_do, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
     QObject::connect(ui.button_event_handshake_end, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+
+    QObject::connect(ui.button_event_hello, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_hello_ready, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_hello_do, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
+    QObject::connect(ui.button_event_hello_end, SIGNAL(clicked()), this, SLOT(stateButtonClicked()));
 
 
 
@@ -529,6 +541,15 @@ void MainWindow::stateButtonClicked()
         state = "handshake_do";
     } else if (objName.compare("button_event_handshake_end") == 0) {
         state = "handshake_end";
+    } else if (objName.compare("button_event_hello") == 0) {
+        state = "hello";
+    } else if (objName.compare("button_event_hello_ready") == 0) {
+        state = "hello_ready";
+    } else if (objName.compare("button_event_hello_do") == 0) {
+        state = "hello_do";
+        qnode.send_hello_count(ui.spin_hello_count->value());
+    } else if (objName.compare("button_event_hello_end") == 0) {
+        state = "hello_end";
     }
     qnode.send_transition(state);
 }

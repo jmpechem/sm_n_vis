@@ -22,8 +22,9 @@
 #include <QStringListModel>
 #include <vector>
 
-#include "std_msgs/Float32MultiArray.h"
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Int32.h>
 
 #include "thormang_ctrl_msgs/JointSet.h"
 #include "thormang_ctrl_msgs/JointState.h"
@@ -50,6 +51,7 @@ public:
 	virtual ~QNode();
 	bool init();
 	bool init(const std::string &master_url, const std::string &host_url);
+  void init_nh();
 	void run();
 
 	/*********************
@@ -72,6 +74,7 @@ public:
     void send_walking_cmd(thormang_ctrl_msgs::WalkingCmd& walking_msg);
     void send_recog_cmd(thormang_ctrl_msgs::RecogCmd& recog_msg);
     void send_task_cmd(thormang_ctrl_msgs::TaskCmd& task_msg);
+    void send_hello_count(const int count);
 
     thormang_ctrl_msgs::JointState joint_msg;
     std_msgs::Float32MultiArray recog_info_msg;
@@ -94,10 +97,14 @@ private:
     ros::Publisher task_cmd_publisher;
     ros::Publisher recog_cmd_publisher;
 
+    ros::Publisher hello_cnt_publisher;
+
     ros::Publisher ft_sensor_calib_publisher;
 
     ros::Subscriber joint_state_subscirber;
     ros::Subscriber recog_point_subscriber;
+
+    ros::NodeHandle *nh;
 
     QStringListModel logging_model;
 
