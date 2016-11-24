@@ -15,6 +15,11 @@ _Matrix_Type_ pinv(const _Matrix_Type_ &a, double epsilon =std::numeric_limits<d
 void UpperCtrl::IK_compute(VectorXD& output)
 {
 	Get_IK_Value();
+
+    if(_gyro_flag == true){
+        Global_Change();
+
+    }
 	
 	if (_target_state < _target_num && _cnt == _pre_time+_current_task_time) {
 		SET_IK_Initialize();
@@ -50,6 +55,7 @@ void UpperCtrl::SET_IK_Initialize()
 }
 void UpperCtrl::IK_solver(VectorXD& output)
 {
+	output = _init_info.q;
 	if (_arm_type){
 		MatrixXD J_Temp;
                 J_Temp = _Rarm.J* _Rarm.J.transpose();
@@ -99,7 +105,7 @@ void UpperCtrl::IK_solver(VectorXD& output)
 		        IK_solver_basic(output);
 
 	}
-		int suhan;
+		/*int suhan;
 		suhan=RA_BEGIN;
 	    output(suhan++) = -40*DEGREE;
             output(suhan++) = 75*DEGREE;
@@ -107,10 +113,11 @@ void UpperCtrl::IK_solver(VectorXD& output)
             output(suhan++) = 35*DEGREE;
             output(suhan++) = 0*DEGREE;
             output(suhan++) = 60*DEGREE;
-            output(suhan++) = 90*DEGREE;
+            output(suhan++) = 90*DEGREE;*/
 }
 void UpperCtrl::IK_solver_basic(VectorXD& output)
 {
+	
 	if (_arm_type) {				
 		if (_cnt>= _init_info.t && _cnt <= _init_info.t + _current_task_time) {
 			for (int i=0; i<3; i++) {
@@ -275,6 +282,22 @@ void UpperCtrl::FK_solver(int current_time, int init_time, int final_time, Vecto
 	for (int i=0; i<JOINT_NUM; i++)
 		output(i) = Cubic(current_time, init_time, final_time, _init_info.q(i), 0.0, _target_q(i), 0.0);
 }
+void UpperCtrl::WAIST_compute(VectorXD& output){
+    if (_cnt == 0)
+        _init_info.q = _q;
+
+    //cout<< "waist target_q in waist_compute: "<<_target_q(0)<<"  "<<_target_q(1)<<endl;
+
+    WAIST_FK_solver(_cnt, 0, _duration*_Hz, output);
+}
+void UpperCtrl::WAIST_FK_solver(int current_time, int init_time, int final_time, VectorXD& output)
+{
+    for (int i=0; i<2; i++)
+        output(i) = Cubic(current_time, init_time, final_time, _init_info.q(i), 0.0, _target_q(i), 0.0);
+
+    //cout<< "waist target_q: "<<_target_q(0)<<"  "<<_target_q(1)<<endl;
+}
+
 void UpperCtrl::SET_FK_Target(VectorXD planning)
 {
 	_target_q = planning;
@@ -282,4 +305,58 @@ void UpperCtrl::SET_FK_Target(VectorXD planning)
 void UpperCtrl::SET_FK_Parameter(double duration)
 {
 	_duration = duration;	
+}
+void UpperCtrl::Global_Change(){
+
+    Gyro2Matrix();
+
+    Vector3D target_temp;
+    for(int i=0;i<3;i++){
+        target_temp(i) = _target_global(i);
+    }
+
+    target_temp = _gyroMatrix*target_temp;
+
+    for(int i=0;i<3;i++)
+    {
+        _target_global(i) = target_temp(i);
+    }
+
+}
+
+void UpperCtrl::Gyro2Matrix(){
+    double pitch, roll, yaw;
+
+    roll = _Gyro_data(0);
+    pitch = _Gyro_data(1);
+    yaw = _Gyro_data(2);
+
+    Matrix3D Rotate_x, Rotate_y, Rotate_z;
+    Rotate_x.setZero();
+    Rotate_y.setZero();
+    Rotate_z.setZero();
+
+    Rotate_x(0,0) = cos(roll);
+    Rotate_x(0,1) = -sin(roll);
+    Rotate_x(1,0) = sin(roll);
+    Rotate_x(1,1) = cos(roll);
+
+    Rotate_y(0,0) = cos(pitch);
+    Rotate_y(0,2) = sin(pitch);
+    Rotate_y(2,0) = -sin(pitch);
+    Rotate_y(2,2) = cos(pitch);
+
+    Rotate_z(1,1) = cos(yaw);
+    Rotate_z(1,2) = -sin(yaw);
+    Rotate_z(2,1) = sin(yaw);
+    Rotate_z(2,2) = cos(yaw);
+
+    Rotate_z.setOnes();
+
+    _gyroMatrix = Rotate_x * Rotate_y * Rotate_z;
+}
+
+void UpperCtrl::setGyro(Vector3D& robot_gyro, bool Global){
+    _Gyro_data = robot_gyro;
+    _gyro_flag = Global;
 }

@@ -9,7 +9,6 @@
 
 // ROS Library
 #include <ros/ros.h>
-//#include <rosrt/rosrt.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <tf/transform_datatypes.h>
 
@@ -37,13 +36,13 @@
 extern const string JointName[40];
 extern const int jointIDs[40];
 
-enum body_select {UPPER, WALKING, HEAD};
+enum body_select {UPPER,WAIST, WALKING, HEAD};
 
 class controlBase
 {
 
 public:
-    controlBase();
+    controlBase(ros::NodeHandle &nh);
     virtual ~controlBase(){}
     // Default User Call function
     void parameter_initialize(); // initialize all parameter function(q,qdot,force else...)
@@ -58,8 +57,6 @@ public:
 
     bool check_state_changed();
 protected:
-    ros::NodeHandle nh;
-
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
     ros::Subscriber recogCmdSub;
@@ -71,22 +68,11 @@ protected:
     ros::Subscriber jointCtrlSub;
     ros::Subscriber recogPointSub;
 
-
     // rosrt implement
     // Publisher Message Preallocator
-    //thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
-    //std_msgs::StringPtr smachMsgPtr;
+    thormang_ctrl_msgs::JointStatePtr jointStateMsgPtr;
+    std_msgs::StringPtr smachMsgPtr;
 
-    /*
-    // Subscriber Pointers
-    thormang_ctrl_msgs::WalkingCmdConstPtr walkingMsgPtr;
-    thormang_ctrl_msgs::TaskCmdConstPtr taskMsgPtr;
-    thormang_ctrl_msgs::RecogCmdConstPtr recogMsgPtr;
-    thormang_ctrl_msgs::JointSetConstPtr jointSetMsgPtr;
-    smach_msgs::SmachContainerStatusConstPtr smachStatusMsgPtr;
-    std_msgs::Float32MultiArrayConstPtr recogPointPtr;
-
-    */
     /*
     ros::Subscriber walkingCmdSub;
     ros::Subscriber taskCmdSub;
@@ -125,6 +111,10 @@ protected:
     bool _Init_walking_flag;
     bool _Walking_flag;
 
+    bool _Init_Egress_flag;
+    bool _Egress_flag;
+
+    bool _Waist_flag;
     bool _Joint_flag;
     bool _CLIK_flag;
 
@@ -142,6 +132,7 @@ protected:
     VectorXD _walking_q; // temporary walking q values
     VectorXD _upper_output_q; // upper output q values
     VectorXD _walking_output_q; // walking output q values
+    Matrix3D Gyro_Matrix;
 
 
     int total_dof; //
@@ -159,6 +150,7 @@ protected:
     void WalkingLoop();
     void UpperBodyCheckState();
     void UpperBodyLoop();
+    void WholebodyLoop();
 
     void updateDesired(body_select body, VectorXD &update_q);
 
@@ -166,14 +158,15 @@ protected:
 private:
 
     void make_id_inverse_list();
-    
+
     // Callback functions
     void SmachCallback(const smach_msgs::SmachContainerStatusConstPtr& smach);
     void UIJointCtrlCallback(const thormang_ctrl_msgs::JointSetConstPtr& joint);
     void WalkingCmdCallback(const thormang_ctrl_msgs::WalkingCmdConstPtr& msg);
     void TaskCmdCallback(const thormang_ctrl_msgs::TaskCmdConstPtr& msg);
     void RecogCmdCallback(const thormang_ctrl_msgs::RecogCmdConstPtr& msg);
-     void RecogPointCallback(const std_msgs::Float32MultiArrayConstPtr& msg);
+    void RecogPointCallback(const std_msgs::Float32MultiArrayConstPtr& msg);
+
 };
 
 

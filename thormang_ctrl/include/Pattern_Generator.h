@@ -9,6 +9,10 @@ using namespace math_function;
 class Pattern_generator: virtual public WalkingPara
 {
 public:
+    void Egress(int t_start, int gap, int gap2, VectorXD t_egress);
+    void Desired_output(int cnt, int time_parameter_init,int time_parameter_end, Vector6D p_init,Vector6D p_end, Vector6D ori_init, Vector6D ori_end, Vector6D& desired_position,Vector6D& desired_orientation);
+    void Foot_trajectory_update2();
+    void Foot_swing_trajectory(int cnt, int t_start, int interval, Vector3D& target_p, Vector3D current_p, Vector3D desired_p, double height);
     void Heel_Toe_Motion_pattern();
     void Heel_Toe_Motion();
     void Change_Local_Pattern();
@@ -66,5 +70,14 @@ public:
     MatrixXD		_BBB;
 
     double			start_time;
+
+    Vector6D leg_init; // for taking off car
+    Vector6D leg_ori; // for taking off car
+
+    Vector6D p_parameter_init;
+    Vector6D p_parameter_end;
+    Vector6D ori_parameter_init;
+    Vector6D ori_parameter_end;
+
 };
 #endif

@@ -18,7 +18,7 @@
 
 class simulation : public controlBase{
  public:   
-   simulation(); // constructor for initialize node
+   simulation(ros::NodeHandle &nh); // constructor for initialize node
    virtual ~simulation() { vrep_end(); }
    void infoCallback(const vrep_common::VrepInfo::ConstPtr& info); // vrep information(ex. simulation update time) callback
    void JointCallback(const sensor_msgs::JointState::ConstPtr& joint); // vrep current joint value callback

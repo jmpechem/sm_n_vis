@@ -26,5 +26,11 @@ public:
 	void SET_FK_Target(VectorXD planning);
 	void SET_FK_Parameter(double duration);
 
+    void WAIST_compute(VectorXD& output);
+    void WAIST_FK_solver(int current_time, int init_time, int final_time, VectorXD& output);
+
+    void Global_Change();
+    void Gyro2Matrix();
+    void setGyro(Vector3D& robot_gyro, bool Global);
 
 };

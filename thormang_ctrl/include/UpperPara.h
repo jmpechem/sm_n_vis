@@ -9,6 +9,9 @@ public:
 	FILE* fp1;
 
 	int		_Hz;
+    int _gap;
+    int _gap2;
+
 
 	struct Initinfo{
 		int			t;
@@ -87,8 +90,13 @@ public:
 
 	double		_rmax;
 	double  	_w0;
-        double          _lambda;
-        double          _w;
+    double          _lambda;
+    double          _w;
+
+    //////sensors /////////
+    Vector3D _Gyro_data;
+    Matrix3D _gyroMatrix;
+    bool  _gyro_flag; // for on-off gyro sensor feedback
 
 
 };

@@ -12,10 +12,16 @@ void WalkingPara::set_user_value()
     //_T_rest_init = 1.0*Hz;
     //_T_rest_last = 1.0*Hz;
 
-    _T_Double1 = 0.1*Hz;
+   _T_Double1 = 0.1*Hz;
     _T_Double2 = 0.1*Hz;
 
-    _T_Total = 3.0*Hz;
+    _T_Total = 3.0*Hz; // original
+
+   /* _T_Double1 = 2.0*Hz;
+    _T_Double2 = 2.0*Hz;
+
+    _T_Total = 10.0*Hz;*/ // challenge parade
+
 //R_leg
     _T_rest_init = 1.0*Hz;
     _T_rest_last = 1.0*Hz;
@@ -48,19 +54,24 @@ void WalkingPara::set_user_value()
 
     //_ZMP_left_offset = 0.005;
     //_ZMP_right_offset = -0.005;
-    //_ZMP_left_offset = 0.01;
-    //_ZMP_right_offset = -0.01;
-    _ZMP_left_offset = 0.005;
-    _ZMP_right_offset = -0.005;
+    _ZMP_left_offset = 0.01;
+    _ZMP_right_offset = -0.01;
+    //_ZMP_left_offset = 0.005;
+    //_ZMP_right_offset = -0.005;
     //_ZMP_left_offset = 0;
    // //_ZMP_right_offset = 0;
+
+    //_ZMP_left_offset = -0.05;
+    //_ZMP_right_offset = 0.05;
 }
 
 void WalkingPara::WALKINGpara_initialize()
 {
 
-
-
+    Imp_FT_debug.resize(12);
+    Imp_FT_debug.setZero();
+    _Joint_Offset_Angle.resize(12);
+    _Joint_Offset_Angle.setZero();
     _cnt = 0;
     _step_number = 0;
     _step_total_number = 0;

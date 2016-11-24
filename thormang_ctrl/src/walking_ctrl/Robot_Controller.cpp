@@ -589,11 +589,17 @@ void Robot_Control::Impedance_update()
     {
         if(_cnt == 0)
         {
+            _Impedance_T_R_prev2(i) = _T_RFoot_global[5].translation()(i);
+            _Impedance_T_L_prev2(i) = _T_LFoot_global[5].translation()(i);
+
             _Impedance_T_R_prev1(i) = _T_RFoot_global[5].translation()(i);
             _Impedance_T_L_prev1(i) = _T_LFoot_global[5].translation()(i);
         }
         else
         {
+            _Impedance_T_R_prev2(i) = _Impedance_T_R_prev1(i);
+            _Impedance_T_L_prev2(i) = _Impedance_T_L_prev1(i);
+
             _Impedance_T_R_prev1(i) = _Impedance_T_R_current(i);
             _Impedance_T_L_prev1(i) = _Impedance_T_L_current(i);
         }
@@ -603,11 +609,19 @@ void Robot_Control::Impedance_update()
 
         if(_cnt == 0)
         {
+            _Impedance_T_R_prev2(i+3) = _T_RFoot_global_euler(i);
+            _Impedance_T_L_prev2(i+3) = _T_LFoot_global_euler(i);
+
+
             _Impedance_T_R_prev1(i+3) =  _T_RFoot_global_euler(i);
             _Impedance_T_L_prev1(i+3) =  _T_LFoot_global_euler(i);
         }
         else
         {
+            _Impedance_T_R_prev2(i+3) = _Impedance_T_R_prev1(i+3);
+            _Impedance_T_L_prev2(i+3) = _Impedance_T_L_prev1(i+3);
+
+
             _Impedance_T_R_prev1(i+3) = _Impedance_T_R_current(i+3);
             _Impedance_T_L_prev1(i+3) = _Impedance_T_L_current(i+3);
         }
@@ -620,11 +634,16 @@ void Robot_Control::Impedance_update()
     {
         if(_cnt == 0)
         {
+            _Impedance_T_R_desired_prev2(i) = Foot_trajectory_global.RFoot.translation()(i);
             _Impedance_T_R_desired_prev1(i) = Foot_trajectory_global.RFoot.translation()(i);
+            _Impedance_T_L_desired_prev2(i) = Foot_trajectory_global.LFoot.translation()(i);
             _Impedance_T_L_desired_prev1(i) = Foot_trajectory_global.LFoot.translation()(i);
         }
         else
         {
+            _Impedance_T_L_desired_prev2(i) = _Impedance_T_L_desired_prev1(i);
+            _Impedance_T_R_desired_prev2(i) = _Impedance_T_R_desired_prev1(i);
+
             _Impedance_T_R_desired_prev1(i) = _Impedance_T_R_desired_current(i);
             _Impedance_T_L_desired_prev1(i) = _Impedance_T_L_desired_current(i);
         }
@@ -634,11 +653,17 @@ void Robot_Control::Impedance_update()
 
         if(_cnt == 0)
         {
+            _Impedance_T_R_desired_prev2(i+3) =  Foot_trajectory_global.RFoot_euler(i);
+            _Impedance_T_L_desired_prev2(i+3) =  Foot_trajectory_global.LFoot_euler(i);
+
             _Impedance_T_R_desired_prev1(i+3) =  Foot_trajectory_global.RFoot_euler(i);
             _Impedance_T_L_desired_prev1(i+3) =  Foot_trajectory_global.LFoot_euler(i);
         }
         else
         {
+            _Impedance_T_L_desired_prev2(i+3) = _Impedance_T_L_desired_prev1(i+3);
+            _Impedance_T_R_desired_prev2(i+3) = _Impedance_T_R_desired_prev1(i+3);
+
             _Impedance_T_R_desired_prev1(i+3) = _Impedance_T_R_desired_current(i+3);
             _Impedance_T_L_desired_prev1(i+3) = _Impedance_T_L_desired_current(i+3);
         }
@@ -674,7 +699,7 @@ void Robot_Control::Impedance_control()
     if(_cnt == 0)
         _Impedance_flag = false;
 
-    double offset_time = _T_Imp+0.4*Hz;
+    double offset_time = 0.4*Hz;
     double FT_Threshold = 50.0;
 
     /////////Impedance ������ �� ���//////////////
@@ -696,13 +721,26 @@ void Robot_Control::Impedance_control()
             _Impedance_flag = true;
             initial_state.time = _cnt;
             initial_state.FT = FT;
-            initial_state.LFoot_current = _T_LFoot_support[5].translation();
-            initial_state.RFoot_current = _T_RFoot_support[5].translation();
+            initial_state.LFoot_current = _T_LFoot_global[5].translation();
+            initial_state.RFoot_current = _T_RFoot_global[5].translation();
+            initial_state.LFoot_linear = _T_LFoot_global[5].linear();
+            initial_state.RFoot_linear = _T_RFoot_global[5].linear();
+            initial_state.LFoot_euler = _T_LFoot_global_euler;
+            initial_state.RFoot_euler = _T_RFoot_global_euler;
             cout << "_cnt" << _cnt << endl;
             cout << "_step_number" << _step_number << endl;
             cout << "Lfoot" << initial_state.LFoot_current << endl;
             cout << "Rfoot" << initial_state.RFoot_current << endl;
             cout << "Impedance start"<<endl;
+
+            Xe_LFoot.resize(2,1); Xe_LFoot.setZero();
+            Xe_RFoot.resize(2,1); Xe_RFoot.setZero();
+            Xe_LFoot_Roll.resize(2,1); Xe_LFoot_Roll.setZero();
+            Xe_RFoot_Roll.resize(2,1); Xe_RFoot_Roll.setZero();
+            Xe_LFoot_Pitch.resize(2,1); Xe_LFoot_Pitch.setZero();
+            Xe_RFoot_Pitch.resize(2,1); Xe_RFoot_Pitch.setZero();
+
+
         }
         if(_cnt == _T_Start+_T_Total-_T_rest_init-_T_Double2-_T_Imp)
         {
@@ -710,8 +748,20 @@ void Robot_Control::Impedance_control()
             _Impedance_flag = true;
             initial_state.time = _cnt;
             initial_state.FT = FT;
-            initial_state.LFoot_current = _T_LFoot_support[5].translation();
-            initial_state.RFoot_current = _T_RFoot_support[5].translation();
+            initial_state.LFoot_current = _T_LFoot_global[5].translation();
+            initial_state.RFoot_current = _T_RFoot_global[5].translation();
+            initial_state.LFoot_linear = _T_LFoot_global[5].linear();
+            initial_state.RFoot_linear = _T_RFoot_global[5].linear();
+            initial_state.LFoot_euler = _T_LFoot_global_euler;
+            initial_state.RFoot_euler = _T_RFoot_global_euler;
+
+
+            Xe_LFoot.resize(2,1); Xe_LFoot.setZero();
+            Xe_RFoot.resize(2,1); Xe_RFoot.setZero();
+            Xe_LFoot_Roll.resize(2,1); Xe_LFoot_Roll.setZero();
+            Xe_RFoot_Roll.resize(2,1); Xe_RFoot_Roll.setZero();
+            Xe_LFoot_Pitch.resize(2,1); Xe_LFoot_Pitch.setZero();
+            Xe_RFoot_Pitch.resize(2,1); Xe_RFoot_Pitch.setZero();
         }
     }
 
@@ -730,10 +780,11 @@ void Robot_Control::Impedance_control()
    // if(_cnt > 5)
    //     _Impedance_flag = true;
 
+   // _Impedance_flag = true; // test
     ///////////Impedance control ���� /////////////////////////
     if(_Impedance_flag == true)
     {
-        double Mg = 55.3628*9.81; // �κ� ����
+        double Mg = 48.3628*9.81; // �κ� ����
         //////desired force moment ���///
         RFT_desired.setZero();
         LFT_desired.setZero();
@@ -774,199 +825,137 @@ void Robot_Control::Impedance_control()
             LFT_desired(2) = 0.5*Mg;
         }
 
-        //RFT_desired(2) = 0.0;
-        //RFT_desired.setZero();
+      //  RFT_desired.setZero();
+      //  LFT_desired.setZero();
 
-	//LFT_desired.setZero();
+        double m_imp = 20.0;
+        double d_imp = 6000.0;
+        double k_imp = 0.1;
 
-        ///// gain ���//////
-        double kp_imp_z_L = 0.0;
-        double kp_imp_alpha_L = 0.0;
-        double kp_imp_beta_L = 0.0;
-
-        double kp_imp_z_R = 0.0;
-        double kp_imp_alpha_R = 0.0;
-        double kp_imp_beta_R = 0.0;
-
-        kp_imp_z_L = 1.0;//Cubic(abs(_L_FT_global(2)-LFT_desired(2)),0.0,600.0,0.0,0.0,2.0,0.0);
-        kp_imp_alpha_L =  1.0;//Cubic(abs(_L_FT_global(3)-LFT_desired(3)),0.0,100.0,0.0,0.0,1.0,0.0);
-        kp_imp_beta_L = 1.0;//Cubic(abs(_L_FT_global(4)-LFT_desired(4)),0.0,100.0,0.0,0.0,1.0,0.0);
-        kp_imp_z_R = 1.0;//Cubic(abs(_R_FT_global(2)-RFT_desired(2)),0.0,600.0,0.0,0.0,2.0,0.0);
-        kp_imp_alpha_R =  1.0;//Cubic(abs(_R_FT_global(3)-RFT_desired(3)),0.0,100.0,0.0,0.0,1.0,0.0);
-        kp_imp_beta_R = 1.0;//Cubic(abs(_R_FT_global(4)-RFT_desired(4)),0.0,100.0,0.0,0.0,1.0,0.0);
-
-        ////////////////Control /////////////////
-
-        Vector6D del_LFoot;
-        Vector6D del_RFoot;
-
-        del_LFoot.setZero();
-        del_RFoot.setZero();
-
-        //del_LFoot(2) = (kp_imp_z_L*(_L_FT_global(2)-LFT_desired(2))+(m_imp-k_imp/Hz)*(L_position_dot(2)-L_position_dot_desired(2))-k_imp*(_Impedance_T_L_current(2)-_Impedance_T_L_desired_current(2))) /(m_imp+d_imp);
-        //del_LFoot(3) = (kp_imp_alpha_L*(_L_FT_global(3)-LFT_desired(3))+(m_ori_imp-k_ori_imp/Hz)*(L_position_dot(3)-L_position_dot_desired(3))-k_ori_imp*(_Impedance_T_L_current(3)-_Impedance_T_L_desired_current(3))) /(m_ori_imp+d_ori_imp);
-        //del_LFoot(4) = (kp_imp_beta_L*(_L_FT_global(4)-LFT_desired(4))+(m_ori_imp-k_ori_imp/Hz)*(L_position_dot(4)-L_position_dot_desired(4))-k_ori_imp*(_Impedance_T_L_current(4)-_Impedance_T_L_desired_current(4))) /(m_ori_imp+d_ori_imp);
-
-        //del_RFoot(2) = (kp_imp_z_R*(_R_FT_global(2)-RFT_desired(2))+(m_imp-k_imp/Hz)*(R_position_dot(2)-R_position_dot_desired(2))-k_imp*(_Impedance_T_R_current(2)-_Impedance_T_R_desired_current(2))) /(m_imp+d_imp);
-        //del_RFoot(3) = (kp_imp_alpha_R*(_R_FT_global(3)-RFT_desired(3))+(m_ori_imp-k_ori_imp/Hz)*(R_position_dot(3)-R_position_dot_desired(3))-k_ori_imp*(_Impedance_T_R_current(3)-_Impedance_T_R_desired_current(3))) /(m_ori_imp+d_ori_imp);
-        //del_RFoot(4) = (kp_imp_beta_R*(_L_FT_global(4)-LFT_desired(4))+(m_ori_imp-k_ori_imp/Hz)*(R_position_dot(4)-R_position_dot_desired(4))-k_ori_imp*(_Impedance_T_R_current(4)-_Impedance_T_R_desired_current(4))) /(m_ori_imp+d_ori_imp);
-
-        ////kajita////////////
-       
-       double m_imp = 5.0;
-       double d_imp = 2000.0;
-       double k_imp = 0.1;
-
-       double m_ori_imp = 5.0;//1+0.1*(_TT-900);
-       double d_ori_imp = 200.0;//1+10.0*_kp;//18.0;
-       double k_ori_imp = 0.1;//1+100.0*_B;
+        double m_ori_imp = 5.0;
+        double d_ori_imp = 100.0;
+        double k_ori_imp = 0.1;
 
         double del_t = 1.0/Hz;
+
         Vector6D LF_error;
-        LF_error = (LFT_desired-_L_FT_global)*kp_imp_z_L;
+        LF_error = (LFT_desired-_L_FT_global);
         Vector6D LX_error;
-        LX_error = _Impedance_T_L_desired_current-_Impedance_Ref_prev1_L;
+        LX_error = _Impedance_T_L_desired_prev1-_Impedance_T_L_prev1;
         Vector6D LX_error_1;
-        LX_error_1 = _Impedance_T_L_desired_current-_Impedance_Ref_prev2_L;
-
-        del_LFoot(2) = del_t*del_t/m_imp*(LF_error(2)-d_imp/del_t*(LX_error(2)-LX_error_1(2))-k_imp*LX_error(2))+2*LX_error(2)-LX_error_1(2);
-        del_LFoot(3) = del_t*del_t/m_ori_imp*(LF_error(3)-d_ori_imp/del_t*(LX_error(3)-LX_error_1(3))-k_ori_imp*LX_error(3))+2*LX_error(3)-LX_error_1(3);
-        del_LFoot(4) = del_t*del_t/m_ori_imp*(LF_error(4)-d_ori_imp/del_t*(LX_error(4)-LX_error_1(4))-k_ori_imp*LX_error(4))+2*LX_error(4)-LX_error_1(4);
-
-        if(_foot_step(_step_number,6) == 1)
-        {
-            m_imp = 1.5;
-            d_imp = 100.0;
-            k_imp = 0.1;
-        }
-        else
-        {
-            m_imp = 1.5;
-            d_imp = 100.0;
-
-        }
-
-
+        LX_error_1 =  (_Impedance_T_L_desired_prev1-_Impedance_T_L_desired_prev2)/del_t-(_Impedance_T_L_prev1-_Impedance_T_L_prev2)/del_t;
 
         Vector6D RF_error;
-        RF_error = (RFT_desired-_R_FT_global)*kp_imp_z_R;
+        RF_error = (RFT_desired-_R_FT_global);
         Vector6D RX_error;
-        RX_error = _Impedance_T_R_desired_current-_Impedance_Ref_prev1_R;
+        RX_error = _Impedance_T_R_desired_prev1-_Impedance_T_R_prev1;
         Vector6D RX_error_1;
-        RX_error_1 = _Impedance_T_R_desired_current-_Impedance_Ref_prev2_R;
-
-        del_RFoot(2) = del_t*del_t/m_imp*(RF_error(2)-d_imp/del_t*(RX_error(2)-RX_error_1(2))-k_imp*RX_error(2))+2*RX_error(2)-RX_error_1(2);
-        del_RFoot(3) = del_t*del_t/m_ori_imp*(RF_error(3)-d_ori_imp/del_t*(RX_error(3)-RX_error_1(3))-k_ori_imp*RX_error(3))+2*RX_error(3)-RX_error_1(3);
-        del_RFoot(4) = del_t*del_t/m_ori_imp*(RF_error(4)-d_ori_imp/del_t*(RX_error(4)-RX_error_1(4))-k_ori_imp*RX_error(4))+2*RX_error(4)-RX_error_1(4);
+        RX_error_1 =  (_Impedance_T_R_desired_prev1-_Impedance_T_R_desired_prev2)/del_t-(_Impedance_T_R_prev1-_Impedance_T_R_prev2)/del_t;
 
 
-        /////////////////////////////////////////////////////////////////
 
-        if(_foot_step(_step_number,6) == 1) // swing foot gain
-        {
-            m_imp = 5.0;
-            d_imp = 2000.0;
-            k_imp = 0.1;
+        Imp_FT_debug(0) = RFT_desired(2);
+        Imp_FT_debug(1) = RFT_desired(3);
+        Imp_FT_debug(2) = RFT_desired(4);
+        Imp_FT_debug(3) = _R_FT_global(2);
+        Imp_FT_debug(4) = _R_FT_global(3);
+        Imp_FT_debug(5) = _R_FT_global(4);
 
-            m_ori_imp = 5.0;//1+0.1*(_TT-900);
-            d_ori_imp = 200.0;//1+10.0*_kp;//18.0;
-            k_ori_imp = 0.1;//1+100.0*_B;
-
-            if(_cnt > _T_Start+_T_Total-_T_rest_last)
-            {
-                m_imp = 30.0;
-                d_imp = 500000.0;
-
-                m_ori_imp = 5.0;//1+0.1*(_TT-900);
-                d_ori_imp = 200.0;//1+10.0*_kp;//18.0;
-                k_ori_imp = 0.1;//1+100.0*_B;
-            }
-        }
-        else // support foot
-        {
-            m_imp = 30.0;
-            d_imp = 500000.0;
-
-            m_ori_imp = 5.0;//1+0.1*(_TT-900);
-            d_ori_imp = 200.0;//1+10.0*_kp;//18.0;
-            k_ori_imp = 0.1;//1+100.0*_B;
-
-        }
+        Imp_FT_debug(6) = LFT_desired(2);
+        Imp_FT_debug(7) = LFT_desired(3);
+        Imp_FT_debug(8) = LFT_desired(4);
+        Imp_FT_debug(9) = _L_FT_global(2);
+        Imp_FT_debug(10) = _L_FT_global(3);
+        Imp_FT_debug(11) = _L_FT_global(4);
 
 
-        RF_error = _R_FT_global-RFT_desired;
-        RX_error = _Impedance_Ref_current_R-_Impedance_Ref_prev1_R;
 
-        del_RFoot(2) = (RF_error(2) + d_imp*Hz*(RX_error(2)) + (2*m_imp*Hz*Hz + d_imp*Hz)*_Impedance_Ref_prev1_R2(2) - m_imp*Hz*Hz*_Impedance_Ref_prev2_R2(2))/(m_imp*Hz*Hz+d_imp*Hz);
-        del_RFoot(3) = (RF_error(3) + d_ori_imp*Hz*(RX_error(3)) + (2*m_ori_imp*Hz*Hz + d_ori_imp*Hz)*_Impedance_Ref_prev1_R2(3) - m_ori_imp*Hz*Hz*_Impedance_Ref_prev2_R2(3))/(m_ori_imp*Hz*Hz+d_ori_imp*Hz);
-        del_RFoot(4) = (RF_error(4) + d_ori_imp*Hz*(RX_error(4)) + (2*m_ori_imp*Hz*Hz + d_ori_imp*Hz)*_Impedance_Ref_prev1_R2(4) - m_ori_imp*Hz*Hz*_Impedance_Ref_prev2_R2(4))/(m_ori_imp*Hz*Hz+d_ori_imp*Hz);
+        MatrixXD Ad;
+        Ad.resize(2,2); Ad.setZero();
+        MatrixXD Bd;
+        Bd.resize(2,1); Bd.setZero();
 
-        if(_foot_step(_step_number,6) == 1) // support foot
-        {
-            m_imp = 30.0;
-            d_imp = 500000.0;
-            k_imp = 0.1;
-        }
-        else
-        {
-            m_imp = 5.0;
-            d_imp = 2000.0;
+        Ad(0,0) = 1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(-d_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)+d_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)+exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)+exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp))*(1.0/2.0);
+        Ad(0,1) = -(m_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-m_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp))*1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp);
+        Ad(1,0) = (k_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-k_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp))*1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp);
+        Ad(1,1) = 1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(d_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-d_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)+exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)+exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp))*(1.0/2.0);
 
-            if(_cnt > _T_Start+_T_Total-_T_rest_last)
-            {
-                m_imp = 30.0;
-                d_imp = 500000.0;
-            }
-        }
+        Bd(0,0) = -((m_imp*(1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(d_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-d_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)+exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)+exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp))*(1.0/2.0)-1.0))/k_imp-(d_imp*(m_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-m_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp))*1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp))/k_imp)/(m_imp);
+        Bd(1,0) = -((m_imp*exp((d_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp)-m_imp*exp((d_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_imp*m_imp*-4.0+d_imp*d_imp)*(1.0/2.0))/m_imp))*1.0/sqrt(k_imp*m_imp*-4.0+d_imp*d_imp))/(m_imp);
 
 
-        LF_error = _L_FT_global-LFT_desired;
-        LX_error = _Impedance_Ref_current_L-_Impedance_Ref_prev1_L;
-        del_LFoot(2) = (LF_error(2) + d_imp*Hz*(LX_error(2)) + (2*m_imp*Hz*Hz + d_imp*Hz)*_Impedance_Ref_prev1_L2(2) - m_imp*Hz*Hz*_Impedance_Ref_prev2_L2(2))/(m_imp*Hz*Hz+d_imp*Hz);
-        del_LFoot(3) = (LF_error(3) + d_ori_imp*Hz*(LX_error(3)) + (2*m_ori_imp*Hz*Hz + d_ori_imp*Hz)*_Impedance_Ref_prev1_L2(3) - m_ori_imp*Hz*Hz*_Impedance_Ref_prev2_L2(3))/(m_ori_imp*Hz*Hz+d_ori_imp*Hz);
-        del_LFoot(4) = (LF_error(4) + d_ori_imp*Hz*(LX_error(4)) + (2*m_ori_imp*Hz*Hz + d_ori_imp*Hz)*_Impedance_Ref_prev1_L2(4) - m_ori_imp*Hz*Hz*_Impedance_Ref_prev2_L2(4))/(m_ori_imp*Hz*Hz+d_ori_imp*Hz);
+        MatrixXD Ad_ori;
+        Ad_ori.resize(2,2); Ad_ori.setZero();
+        MatrixXD Bd_ori;
+        Bd_ori.resize(2,1); Bd_ori.setZero();
+
+        Ad_ori(0,0) = 1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(-d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)+d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp))*(1.0/2.0);
+        Ad_ori(0,1) = -(m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp))*1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp);
+        Ad_ori(1,0) = (k_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-k_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp))*1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp);
+        Ad_ori(1,1) = 1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp))*(1.0/2.0);
+
+        Bd_ori(0,0) = -((m_ori_imp*(1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-d_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)+exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp))*(1.0/2.0)-1.0))/k_ori_imp-(d_ori_imp*(m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp))*1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp))/k_ori_imp)/(m_ori_imp);
+        Bd_ori(1,0) = -((m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)-del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp)-m_ori_imp*exp((d_ori_imp*del_t*(-1.0/2.0)+del_t*sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp)*(1.0/2.0))/m_ori_imp))*1.0/sqrt(k_ori_imp*m_ori_imp*-4.0+d_ori_imp*d_ori_imp))/(m_ori_imp);
+
+
+        MatrixXD Xe_plus_LFoot;
+        Xe_plus_LFoot.resize(2,1);
+        MatrixXD Xe_plus_RFoot;
+        Xe_plus_RFoot.resize(2,1);
+        MatrixXD Xe_plus_LFoot_Roll;
+        Xe_plus_LFoot_Roll.resize(2,1);
+        MatrixXD Xe_plus_RFoot_Roll;
+        Xe_plus_RFoot_Roll.resize(2,1);
+        MatrixXD Xe_plus_LFoot_Pitch;
+        Xe_plus_LFoot_Pitch.resize(2,1);
+        MatrixXD Xe_plus_RFoot_Pitch;
+        Xe_plus_RFoot_Pitch.resize(2,1);
+
+
+        Xe_plus_LFoot = Ad*Xe_LFoot+Bd*LF_error(2);
+        Xe_plus_RFoot = Ad*Xe_RFoot+Bd*RF_error(2);
+
+        Xe_plus_LFoot_Roll = Ad_ori*Xe_LFoot_Roll+Bd_ori*LF_error(3);
+        Xe_plus_RFoot_Roll = Ad_ori*Xe_RFoot_Roll+Bd_ori*RF_error(3);
+
+        Xe_plus_LFoot_Pitch = Ad_ori*Xe_LFoot_Pitch+Bd_ori*LF_error(4);
+        Xe_plus_RFoot_Pitch = Ad_ori*Xe_RFoot_Pitch+Bd_ori*RF_error(4);
+
+
+        Xe_LFoot = Xe_plus_LFoot;
+        Xe_RFoot = Xe_plus_RFoot;
+
+
+        Xe_LFoot_Roll = Xe_plus_LFoot_Roll;
+        Xe_RFoot_Roll = Xe_plus_RFoot_Roll;
+
+        Xe_LFoot_Pitch = Xe_plus_LFoot_Pitch;
+        Xe_RFoot_Pitch = Xe_plus_RFoot_Pitch;
+
+
+
+
 
         ///////������ġ//////
 
         if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
 
-            Foot_trajectory_global.LFoot.translation()(2) = del_LFoot(2);
-            Foot_trajectory_global.LFoot_euler(0) = del_LFoot(3);
-            //Foot_trajectory_global.LFoot_euler(1) = del_LFoot(4);
+            Foot_trajectory_global.LFoot.translation()(2) = Foot_trajectory_global.LFoot.translation()(2)-Xe_LFoot(0,0);
+            //Foot_trajectory_global.LFoot_euler(0) = Foot_trajectory_global.LFoot_euler(0)-Xe_LFoot_Roll(0,0);
+            //Foot_trajectory_global.LFoot_euler(1) = Foot_trajectory_global.LFoot_euler(1)-Xe_LFoot_Pitch(0,0);
 
-              if(_cnt > _T_Start+_T_Total-_T_rest_last*0.5)
-             {
-                 Foot_trajectory_global.RFoot.translation()(2) = del_RFoot(2);
-                 Foot_trajectory_global.RFoot_euler(0) = del_RFoot(3);
-                 Foot_trajectory_global.RFoot_euler(1) = del_RFoot(4);
-             }
-		//Foot_trajectory_global.RFoot.translation()(2) = del_RFoot(2);
-              Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
-              Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
-
-
+            Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
+            Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
         }
         else if(_foot_step(_step_number,6) == 1)
         {
-            Foot_trajectory_global.RFoot.translation()(2) = del_RFoot(2);
-            Foot_trajectory_global.RFoot_euler(0) = del_RFoot(3);
-            //Foot_trajectory_global.RFoot_euler(1) = del_RFoot(4);
-            ///kajita
+            Foot_trajectory_global.RFoot.translation()(2) = Foot_trajectory_global.RFoot.translation()(2)-Xe_RFoot(0,0);
+          //  Foot_trajectory_global.RFoot_euler(0) = Foot_trajectory_global.RFoot_euler(0)-Xe_RFoot_Roll(0,0);
+          //  Foot_trajectory_global.RFoot_euler(1) = Foot_trajectory_global.RFoot_euler(1)-Xe_RFoot_Pitch(0,0);
 
-
-            Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
+           Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
             Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
-            if(_cnt > _T_Start+_T_Total-_T_rest_last*0.5)
-            {
-                Foot_trajectory_global.LFoot.translation()(2) = del_LFoot(2);
-                Foot_trajectory_global.LFoot_euler(0) = del_LFoot(3);
-                Foot_trajectory_global.LFoot_euler(1) = del_LFoot(4);
-            }
-            Foot_trajectory_global.RFoot.linear() = Rotate_with_Z(Foot_trajectory_global.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.RFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.RFoot_euler(0));
-            Foot_trajectory_global.LFoot.linear() = Rotate_with_Z(Foot_trajectory_global.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory_global.LFoot_euler(1))*Rotate_with_X(Foot_trajectory_global.LFoot_euler(0));
-
-
         }
 
 
@@ -983,12 +972,10 @@ void Robot_Control::Impedance_control()
          if((Foot_trajectory_global.RFoot.translation()(2)-_init_info._XR_global_init.translation()(2)) < -0.05)
              Foot_trajectory_global.RFoot.translation()(2) = _init_info._XR_global_init.translation()(2) -0.05;
 
-         file[2]<<_cnt<< "\t" << del_LFoot(4) << "\t" << Foot_trajectory_global.LFoot.translation()(2) << "\t" << del_LFoot(3) << "\t" << Foot_trajectory_global.LFoot_euler(0)<< "\t" << del_RFoot(2)<< "\t" << Foot_trajectory_global.RFoot.translation()(2)<< "\t" << del_RFoot(3)<< "\t" << Foot_trajectory_global.RFoot_euler(0)<< "\t" << _R_Ft(2)<< "\t" << _R_Ft(3)<< "\t" << _R_Ft(4)<< "\t" << _R_Ft(5) << endl;
-         // fprintf(fp13,"%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",_cnt,_T_Trunk_support_euler(0),_T_Trunk_support_euler(1),_T_Trunk_support_euler(2),trunk_temp(0),trunk_temp(1),trunk_temp(2),Foot_trajectory.LFoot.translation()(0),Foot_trajectory.LFoot.translation()(1),Foot_trajectory.LFoot.translation()(2));
-         file[8] << _cnt << "\t" << RF_error(4)/(m_imp*Hz*Hz+d_imp*Hz) << "\t" << RX_error(4) << "\t" << (2*m_imp*Hz*Hz + d_imp*Hz)*_Impedance_Ref_prev1_R2(4)/(m_imp*Hz*Hz+d_imp*Hz) << "\t" << -m_imp*Hz*Hz*_Impedance_Ref_prev2_R2(4)/(m_imp*Hz*Hz+d_imp*Hz) << endl;
-
 
        }
+
+
 
 
 }

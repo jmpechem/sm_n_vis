@@ -3,6 +3,8 @@
 void UpperPara::set_user_value()
 {
     _Hz = 200;
+    _gap = 4*_Hz;
+    _gap2 = 5*_Hz;
 }
 
 void UpperPara::Upperpara_initialize()
@@ -57,6 +59,9 @@ void UpperPara::Upperpara_initialize()
 	_Rarm.J_inv.setZero();
 
 	_rmax = pi/4;
+
+    _Gyro_data.setZero();
+    _gyroMatrix.setOnes();
 	
 
 }

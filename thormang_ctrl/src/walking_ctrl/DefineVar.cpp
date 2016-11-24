@@ -47,7 +47,7 @@ namespace math_function{
     float
         Cubic(double rT, float rT_0, float rT_f, float rx_0, float rx_dot_0, float rx_f, float rx_dot_f)
     {
-        double rx_t ;
+       /* double rx_t ;
         if(rT<rT_0)
         {
             rx_t = rx_0;
@@ -57,11 +57,27 @@ namespace math_function{
             rx_t = rx_0 + rx_dot_0*(rT-rT_0)
                 + (3 * (rx_f - rx_0)/((rT_f-rT_0) * (rT_f-rT_0)) - 2 * rx_dot_0/(rT_f-rT_0) - rx_dot_f/(rT_f-rT_0))*(rT-rT_0)*(rT-rT_0)
                 + (-2 * (rx_f - rx_0)/((rT_f-rT_0) * (rT_f-rT_0) * (rT_f-rT_0)) + (rx_dot_0 + rx_dot_f)/((rT_f-rT_0) * (rT_f-rT_0)))*(rT-rT_0)*(rT-rT_0)*(rT-rT_0);
-        }
+}
         else
         {
             rx_t = rx_f;
         }
+        return (rx_t);*/
+    double rx_t ;
+		if(rT<rT_0)
+		{
+			rx_t = rx_0;
+		}
+		else if(rT>=rT_0 && rT<rT_f)
+		{
+            rx_t = rx_0 + rx_dot_0*(rT-rT_0)
+                            + (3 * (rx_f - rx_0)/((rT_f-rT_0) * (rT_f-rT_0)) - 2 * rx_dot_0/((rT_f-rT_0) * (rT_f-rT_0)) - rx_dot_f/((rT_f-rT_0) * (rT_f-rT_0)))*(rT-rT_0)*(rT-rT_0)
+                            + (-2 * (rx_f - rx_0)/((rT_f-rT_0) * (rT_f-rT_0) * (rT_f-rT_0)) + (rx_dot_0 + rx_dot_f)/((rT_f-rT_0) * (rT_f-rT_0) * (rT_f-rT_0)))*(rT-rT_0)*(rT-rT_0)*(rT-rT_0);
+        }
+		else
+		{
+			rx_t = rx_f;
+		}
         return (rx_t);
     }
 

@@ -69,9 +69,13 @@ public:
 
 
 public:
-
+    VectorXD                Imp_FT_debug;
     bool                    _global_walking_flag;
+    VectorXD                _Joint_Offset_Angle;
+    Vector6D                _Impedance_output_LFoot;
+    Vector6D                _Impedance_output_RFoot;
 
+    Vector3D                _Target_data;
     Vector3D                _scan_data;
 	Vector3D				_Base_COM;
 	Vector3D				_COM_R[6];

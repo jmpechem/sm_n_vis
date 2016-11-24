@@ -35,7 +35,17 @@ public:
     void Hipcompensation();
     void outputHipcompensation();
 
+    void Egress_Init_pose(VectorXD& output);
+    void Egress_compute(VectorXD& output);
+    void InverseKinematics2(Vector3D P_wr5, Vector3D P_wl5,Vector3D Ori_wr5, Vector3D Ori_wl5,VectorXD& qd);
+
+    void SET_IK_Target(Vector3D RFoot);
+
+
 
 private:
     VectorXD _desired_q_notcompensate;
+    Vector3D _desired_R_foot;
+    Vector3D _desired_L_foot;
+    int _duration;
 };

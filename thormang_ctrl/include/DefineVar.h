@@ -49,6 +49,17 @@ typedef Eigen::Matrix<rScalar, -1, 1>  dVector;
 #define l_3_x 0.06
 #define l_3_z 0.368
 
+#define l0_y	0.17
+#define l0_z	0.239
+#define l1_y	0.0317
+#define l1_z	0.0288
+#define l2_y	0.2624
+#define l3_y	0.0519
+#define l3_z	0.075
+#define l4_y	0.2566
+#define l5_z	0
+
+
 
 
 
@@ -62,6 +73,9 @@ typedef Eigen::Matrix<rScalar, -1, 1>  dVector;
 #define LA_BEGIN 9
 #define RF_BEGIN 16
 #define LF_BEGIN 22
+#define RA_HAND 30
+#define LA_HAND 31
+
 
 //basic math function
 

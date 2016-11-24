@@ -1,6 +1,472 @@
 #include "Pattern_Generator.h"
 #include <vector>
+void Pattern_generator::Desired_output(int cnt, int time_parameter_init,int time_parameter_end, Vector6D p_init,Vector6D p_end, Vector6D ori_init, Vector6D ori_end, Vector6D& desired_position,Vector6D& desired_orientation)
+{
+    desired_position(0) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(0),0.0,p_end(0),0.0);
+    desired_position(1) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(1),0.0,p_end(1),0.0);
+    desired_position(2) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(2),0.0,p_end(2),0.0);
+    desired_position(3) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(3),0.0,p_end(3),0.0);
+    desired_position(4) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(4),0.0,p_end(4),0.0);
+    desired_position(5) = Cubic(cnt,time_parameter_init,time_parameter_end,p_init(5),0.0,p_end(5),0.0);
+    desired_orientation(0) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(0),0.0,ori_end(0),0.0);
+    desired_orientation(1) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(1),0.0,ori_end(1),0.0);
+    desired_orientation(2) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(2),0.0,ori_end(2),0.0);
+    desired_orientation(3) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(3),0.0,ori_end(3),0.0);
+    desired_orientation(4) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(4),0.0,ori_end(4),0.0);
+    desired_orientation(5) = Cubic(cnt,time_parameter_init,time_parameter_end,ori_init(5),0.0,ori_end(5),0.0);
+}
 
+void Pattern_generator::Egress(int t_start, int gap, int gap2, VectorXD t_egress)
+{
+    VectorXD constant;
+    constant.resize(13);
+    constant.setZero();
+
+    constant(0) = -0.33;
+    constant(1) = 0.39;
+    constant(2) = -0.30;
+    constant(3) = 0.3;
+    constant(4) = 35*DEGREE;
+    constant(5) = 0.56;
+    constant(6) = 1.2;
+    constant(7) = 0.1;
+    constant(8) = 0.25;// //comx 0.15 OK/ 0.15 OK/ 0.2 OK / 0.25 X/ 0.25 ?/
+    constant(9) = -0.15; //comy -0.1 OK/ -0.15 OK/ -0.1 OK/ -0.1 X/ -0.5 ?/
+    constant(10) = 0.35;//+constant(9);//0.45;//lfootz
+    constant(11) = 0.3; //lfooty
+    constant(12) = 1.3;
+    //constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)) =
+
+    Vector6D desired_p;
+    desired_p.setZero();
+    Vector6D desired_ori;
+    desired_ori.setZero();
+
+    /*int sequence = 16;
+    VectorXD gap_egress;
+    gap_egress.resize(sequence);
+    gap_egress.setZero();
+    VectorXD t_egress;
+    t_egress.resize(sequence+1);
+    t_egress(0) = 0;
+    for (int i=0; i<sequence; i++)
+    {
+        gap_egress(i) = gap;
+        gap_egress(0) = gap2;
+        gap_egress(5) = gap;
+        t_egress(i+1) = t_egress(i)+gap_egress(i);
+    }*/
+
+
+    if (_cnt == 0)
+    {
+        leg_init(0) = -_T_LFoot_global[5].translation()(0) + _T_LFoot_global[0].translation()(0);
+        leg_init(1) = -_T_LFoot_global[5].translation()(1) + _T_LFoot_global[0].translation()(1);
+        leg_init(2) = -_T_LFoot_global[5].translation()(2) + _T_LFoot_global[0].translation()(2);
+        leg_init(3) = -_T_RFoot_global[5].translation()(0) + _T_RFoot_global[0].translation()(0);
+        leg_init(4) = -_T_RFoot_global[5].translation()(1) + _T_RFoot_global[0].translation()(1);
+        leg_init(5) = -_T_RFoot_global[5].translation()(2) + _T_RFoot_global[0].translation()(2);
+        //leg_ori(0) = -_T_LFoot_global_euler[5].rotation()(0) +_T_LFoot_global_euler[0].roataion()(0);
+        //leg_ori(1) = -_T_LFoot_global_euler[5].rotation()(1) +_T_LFoot_global_euler[0].roataion()(1);
+        //leg_ori(2) = -_T_LFoot_global_euler[5].rotation()(2) +_T_LFoot_global_euler[0].roataion()(2);
+        //leg_ori(3) = -_T_LFoot_global_euler[5].rotation()(3) +_T_LFoot_global_euler[0].roataion()(3);
+        //leg_ori(4) = -_T_LFoot_global_euler[5].rotation()(4) +_T_LFoot_global_euler[0].roataion()(4);
+        //leg_ori(5) = -_T_LFoot_global_euler[5].rotation()(5) +_T_LFoot_global_euler[0].roataion()(5);
+        cout<< "leg_init : "<< leg_init<<endl;
+    }
+            //cout<< "_cnt : "<< _cnt<<endl;
+
+           if(_cnt>=t_egress(0) && _cnt < t_egress(1))
+           {
+               if(_cnt == t_egress(0))
+               {
+                   p_parameter_init = leg_init;
+                   p_parameter_end << constant(0), 0.0, constant(1), constant(0), 0.0, constant(1);
+                   ori_parameter_init << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+                   ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+               }
+               Desired_output(_cnt, t_egress(0), t_egress(1), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+               /*
+               desired_p(0) = Cubic(_cnt,0,t_start + gap2,leg_init(0),0.0,constant(0),0.0);
+               desired_p(1) = Cubic(_cnt,0,t_start + gap2,leg_init(1),0.0,0.0,0.0);
+               desired_p(2) = Cubic(_cnt,0,t_start + gap2,leg_init(2),0.0,constant(1),0.0);
+               desired_p(3) = Cubic(_cnt,0,t_start + gap2,leg_init(3),0.0,constant(0),0.0);
+               desired_p(4) = Cubic(_cnt,0,t_start + gap2,leg_init(4),0.0,0.0,0.0);
+               desired_p(5) = Cubic(_cnt,0,t_start + gap2,leg_init(5),0.0,constant(1),0.0);
+               desired_ori(0) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0); //z
+               desired_ori(1) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0); //y
+               desired_ori(2) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0);
+               desired_ori(4) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,0,t_start + gap2,0.0,0.0,0.0,0.0);
+               */
+               //printf("0");
+           }
+           if(_cnt>=t_egress(1) && _cnt < t_egress(2))
+            {
+                if (_cnt ==  t_egress(1) )
+                {
+                    p_parameter_init = p_parameter_end;
+                    p_parameter_end << constant(0), 0.0, constant(1), constant(0), 0.0, constant(1);
+                    ori_parameter_init = ori_parameter_end;
+                    ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+                }
+                /*desired_p(0) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,constant(0),0.0,constant(0),0.0);
+                desired_p(1) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(2) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,constant(1),0.0,constant(1),0.0);
+                desired_p(3) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,constant(0),0.0,constant(0),0.0);
+                desired_p(4) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(5) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,constant(1),0.0,constant(1),0.0);
+                desired_ori(0) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0); //z
+                desired_ori(1) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0); //y
+                desired_ori(2) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0); //x
+                desired_ori(3) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(4) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(5) = Cubic(_cnt,t_start+gap2,t_start + gap+gap2,0.0,0.0,0.0,0.0);
+                */
+                Desired_output(_cnt, t_egress(1), t_egress(2), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+                //printf("1");
+
+                //cout<< "desird_foot in pattern : "<< desired_p<<endl;
+
+            }
+
+            else if (_cnt>=t_egress(2) && _cnt < t_egress(3))
+            {
+               if(_cnt == t_egress(2))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0), 0.0, constant(1), constant(2), 0.0, constant(3);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+               }
+
+                /*desired_p(0) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,constant(0),0.0,constant(0),0.0);
+                desired_p(1) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(2) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,constant(1),0.0,constant(1),0.0);
+                desired_p(3) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,constant(0),0.0,constant(2),0.0);;
+                desired_p(4) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(5) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,constant(1),0.0,constant(3),0.0);
+                desired_ori(0) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0); //z
+                desired_ori(1) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0); //y
+                desired_ori(2) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0); //x
+                desired_ori(3) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(4) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(5) = Cubic(_cnt,t_start + gap+gap2,t_start + 2*gap+gap2,0.0,0.0,0.0,0.0);*/
+                Desired_output(_cnt, t_egress(2), t_egress(3), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+                //printf("2");
+
+            }
+
+            else if (_cnt>=t_egress(3) && _cnt < t_egress(4))
+            {
+               if(_cnt == t_egress(3))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0), 0.0, constant(1), constant(12)*constant(2), 0.0, constant(3);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << -constant(4), 0.0, 0.0, constant(4), 0.0, 0.0;
+               }
+                /*desired_p(0) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,constant(0),0.0,constant(0),0.0);
+                desired_p(1) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(2) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,constant(1),0.0,constant(1),0.0);
+                desired_p(3) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,constant(2),0.0,constant(12)*constant(2),0.0);;
+                desired_p(4) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(5) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,constant(3),0.0,constant(3),0.0);
+                desired_ori(0) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,-constant(4),0.0); //z
+                desired_ori(1) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0); //y
+                desired_ori(2) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0); //x
+                desired_ori(3) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,constant(4),0.0);
+                desired_ori(4) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(5) = Cubic(_cnt,t_start + 2*gap+gap2,t_start + 3*gap+gap2,0.0,0.0,0.0,0.0);*/
+                Desired_output(_cnt, t_egress(3), t_egress(4), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+                //printf("3");
+
+            }
+            else if (_cnt>=t_egress(4) && _cnt < t_egress(5)) //right foot contact ground
+            {
+               if(_cnt == t_egress(4))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0), 0.0, constant(1), constant(6)*constant(2), 0.0, constant(5);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << -constant(4), 0.0, 0.0, constant(4), 0.0, 0.0;
+               }
+
+                /*desired_p(0) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,constant(0),0.0,constant(0),0.0);
+                desired_p(1) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(2) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,constant(1),0.0,constant(1),0.0);
+                desired_p(3) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,constant(12)*constant(2),0.0,constant(6)*constant(2),0.0);;
+                desired_p(4) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_p(5) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,constant(3),0.0,constant(5),0.0);
+                desired_ori(0) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,-constant(4),0.0,-constant(4),0.0); //z
+                desired_ori(1) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0); //y
+                desired_ori(2) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0); //x
+                desired_ori(3) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,constant(4),0.0,constant(4),0.0);
+                desired_ori(4) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0);
+                desired_ori(5) = Cubic(_cnt,t_start + 3*gap+gap2,t_start + 4*gap+gap2,0.0,0.0,0.0,0.0);*/
+                Desired_output(_cnt, t_egress(4), t_egress(5), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+                //printf("4");
+            }
+           else if (_cnt>=t_egress(5) && _cnt < t_egress(6))
+           {
+               if(_cnt == t_egress(5))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)), -constant(8)*sin(constant(4))+constant(9)*cos(constant(4)), constant(1)+constant(7), constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)), -constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)), constant(5)+constant(7);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << -constant(4), 0.0, 0.0, constant(4), 0.0, 0.0;
+               }
+               // c1+c7*cos(c5)+c8*sin(c5), -c7*sin(c5)+c8*cos(c5), c2+0.03, c3+c7*cos(-c5)+c8*sin(-c5), -c7*sin(-c5)+c8*cos(-c5), c6+0.03;
+               /*desired_p(0) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,constant(0),0.0,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4)),0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,constant(1),0.0,constant(1)+constant(7),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,constant(6)*constant(2),0.0,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,constant(5),0.0,constant(5)+constant(7),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,-constant(4),0.0,-constant(4),0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,0.0,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,constant(4),0.0,constant(4),0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 4*gap+gap2,t_start + 5*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(5), t_egress(6), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("5");
+           }
+           else if (_cnt>=t_egress(6) && _cnt < t_egress(7))
+           {
+               if(_cnt == t_egress(6))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)), -constant(8)*sin(constant(4))+constant(9)*cos(constant(4)), constant(10), constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)), -constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)), constant(5)+constant(7);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << -constant(4), -10*DEGREE, 20*DEGREE, constant(4), 0.0, 0.0;
+               }
+               /*desired_p(0) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4)),0.0,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4)),0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,constant(1)+constant(7),0.0,constant(10),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,constant(5)+constant(7),0.0,constant(5)+constant(7),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,-constant(4),0.0,-constant(4),0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,0.0,0.0,-10*DEGREE,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,0.0,0.0,20*DEGREE,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,constant(4),0.0,constant(4),0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 5*gap+gap2,t_start + 6*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(6), t_egress(7), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("6");
+           }
+           else if (_cnt>=t_egress(7) && _cnt < t_egress(8))
+           {
+               if(_cnt == t_egress(7))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)), -constant(8)*sin(constant(4))+constant(9)*cos(constant(4))+constant(11), constant(10), constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)), -constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)), constant(5)+constant(7);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << -constant(4), -10*DEGREE, 20*DEGREE, constant(4), 0.0, 0.0;
+               }
+
+               /*desired_p(0) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4)),0.0,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4))+constant(11),0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,constant(10),0.0,constant(10),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,constant(5)+constant(7),0.0,constant(5)+constant(7),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,-constant(4),0.0,-constant(4),0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,-10*DEGREE,0.0,-10*DEGREE,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,20*DEGREE,0.0,-20*DEGREE,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,constant(4),0.0,constant(4),0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 6*gap+gap2,t_start + 7*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(7), t_egress(8), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("7");
+           }
+           else if (_cnt>=t_egress(8) && _cnt < t_egress(9))
+           {
+               if(_cnt == t_egress(8))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)), 0.0, constant(10), constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)), 0.0, constant(5)+constant(7);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << 0.0, -5*DEGREE, 0.0, 0.0, 0.0, 0.0;
+               }
+
+               /*desired_p(0) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,-constant(8)*sin(constant(4))+constant(9)*cos(constant(4))+constant(11),0.0,0.0,0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,constant(10),0.0,constant(10),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,-constant(8)*sin(-constant(4))+constant(9)*cos(-constant(4)),0.0,0.0,0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,constant(5)+constant(7),0.0,constant(5)+constant(7),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,-constant(4),0.0,0.0,0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,-10*DEGREE,0.0,-5*DEGREE,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,-20*DEGREE,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,constant(4),0.0,0.0,0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 7*gap+gap2,t_start + 8*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(8), t_egress(9), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("8");
+           }
+           else if (_cnt>=t_egress(9) && _cnt < t_egress(10))
+           {
+               if(_cnt == t_egress(9))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)), 0.0, constant(5)+constant(7), 0.0, 0.0, constant(5)+constant(7);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+               }
+
+               /*desired_p(0) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,constant(10),0.0,constant(5)+0.1,0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,constant(6)*constant(2)+constant(8)*cos(-constant(4))+constant(9)*sin(-constant(4)),0.0,0.0,0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,constant(5)+constant(7),0.0,constant(5)+constant(7),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,-5*DEGREE,0.0,0.0,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 8*gap+gap2,t_start + 9*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(9), t_egress(10), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("9");
+           }
+           else if (_cnt>=t_egress(10) && _cnt < t_egress(11))
+           {
+               if(_cnt == t_egress(10))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << (constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2, 0.0, constant(5), -(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2, 0.0, constant(5);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+               }
+
+               /*desired_p(0) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)),0.0,(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,constant(5)+constant(7),0.0,constant(5),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,-(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,constant(5)+constant(7),0.0,constant(5),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 9*gap+gap2,t_start + 10*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(10), t_egress(11), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("10");
+           }
+           else if (_cnt >= t_egress(11))
+           {
+               if(_cnt == t_egress(11))
+               {
+                   p_parameter_init = p_parameter_end;
+                   p_parameter_end << (constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2, 0.0, constant(5), -(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2, 0.0, constant(5);
+                   ori_parameter_init = ori_parameter_end;
+                   ori_parameter_end << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+               }
+
+               /*desired_p(0) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0,(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0);
+               desired_p(1) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(2) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,constant(5),0.0,constant(5),0.0);
+               desired_p(3) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,-(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0,-(constant(0)+constant(8)*cos(constant(4))+constant(9)*sin(constant(4)))/2,0.0);;
+               desired_p(4) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_p(5) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,constant(5),0.0,constant(5),0.0);
+               desired_ori(0) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0); //z
+               desired_ori(1) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0); //y
+               desired_ori(2) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0); //x
+               desired_ori(3) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(4) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0);
+               desired_ori(5) = Cubic(_cnt,t_start + 10*gap+gap2,t_start + 11*gap+gap2,0.0,0.0,0.0,0.0);*/
+               Desired_output(_cnt, t_egress(11), t_egress(12), p_parameter_init, p_parameter_end, ori_parameter_init, ori_parameter_end, desired_p, desired_ori);
+
+               //printf("11");
+           }
+
+           Foot_trajectory.LFoot.translation()(0) = desired_p(0);
+           Foot_trajectory.LFoot.translation()(1) = desired_p(1);
+           Foot_trajectory.LFoot.translation()(2) = desired_p(2);
+
+           Foot_trajectory.RFoot.translation()(0) = desired_p(3);
+           Foot_trajectory.RFoot.translation()(1) = desired_p(4);
+           Foot_trajectory.RFoot.translation()(2) = desired_p(5);
+
+           for(int i=0;i<3;i++){
+               _T_LFoot_global_euler(i) = desired_ori(i);
+               _T_RFoot_global_euler(i) = desired_ori(i+3);
+           }
+}
+
+void Pattern_generator::Foot_swing_trajectory(int cnt, int t_start, int interval, Vector3D& target_p, Vector3D current_p, Vector3D desired_p, double height)
+{
+    //target_p.resize(3);
+    //target_p.zeros();
+    double foot_speed = 0.0;
+
+
+    if (cnt < t_start+interval/4)
+    //if (cnt >= t_start && cnt < t_start+interval/4)
+    {
+        target_p(0) = Cubic(cnt,t_start,t_start+interval/4,current_p(0),0.0,current_p(0),0.0);
+        target_p(1) = Cubic(cnt,t_start,t_start+interval/4,current_p(1),0.0,current_p(1),0.0);
+        target_p(2) = Cubic(cnt,t_start,t_start+interval/4,current_p(2),0.0,current_p(2)+height,foot_speed);
+    }
+
+    else if (cnt >= t_start+interval/4 && cnt < t_start+interval*3/4)
+    {
+        cout<<"yaho"<<_cnt<<endl;
+        target_p(0) = Cubic(cnt,t_start+interval/4,t_start+interval*3/4,current_p(0),0.0,current_p(0)+desired_p(0),0.0);
+        target_p(1) = Cubic(cnt,t_start+interval/4,t_start+interval*3/4,current_p(1),0.0,current_p(1)+desired_p(1),0.0);
+        target_p(2) = Cubic(cnt,t_start+interval/4,t_start+interval*3/4,current_p(2)+height,foot_speed,current_p(2)+height+desired_p(2),-foot_speed);
+    }
+
+    else if (cnt >= t_start+interval*3/4)
+    //else if (cnt >= t_start+interval*3/4 && cnt < t_start+interval)
+    {
+        target_p(0) = Cubic(cnt,t_start+interval*3/4,t_start+interval,current_p(0)+desired_p(0),0.0,current_p(0)+desired_p(0),0.0);
+        target_p(1) = Cubic(cnt,t_start+interval*3/4,t_start+interval,current_p(1)+desired_p(1),0.0,current_p(1)+desired_p(1),0.0);
+        target_p(2) = Cubic(cnt,t_start+interval*3/4,t_start+interval,current_p(2)+height+desired_p(2),-foot_speed,current_p(2)+desired_p(2),0.0);
+    }
+
+
+}
+
+
+void Pattern_generator::Foot_trajectory_update2()
+{
+    Vector3D target = _Target_data;
+    double height = 0.05;
+
+    Vector3D _init_RFoot;
+    _init_RFoot = _init_info._XR_support_init.translation();
+
+    //cout << "init" << _init_RFoot << endl;
+    //cout << "ttt" <<target << endl;
+    Vector3D RFoot_output;
+
+    cout << "cnt" << _cnt << endl;
+    //cout << "start_t" << _T_Start_real+_T_Double1 << endl;
+    //cout << "duiraion " << _T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2 << endl;
+    Foot_swing_trajectory(_cnt,_T_Start_real+_T_Double1,_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2,RFoot_output, _init_RFoot,target,height);
+    Foot_trajectory.LFoot.translation() = _init_info._XL_support_init.translation();
+    Foot_trajectory.RFoot.translation() = RFoot_output;
+ cout << "tttaaaa" <<RFoot_output << endl;
+    Foot_trajectory.LFoot.linear() = _init_info._XL_support_init.linear();
+
+    Foot_trajectory.RFoot.linear() = _init_info._XR_support_init.linear();
+
+}
 
 void Pattern_generator::Heel_Toe_Motion_pattern()
 {
@@ -463,53 +929,67 @@ void Pattern_generator::Foot_trajectory_update()
 
    
         Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
- 	Foot_trajectory.RFoot_dot.setZero();
-	Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot.translation()(2),0.0,0.0,0.0);	
+    	Foot_trajectory.RFoot_dot.setZero();
+        Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot.translation()(2),0.0,0.0,0.0);	
 
         Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
-	for(int i=0; i<2; i++)
-        Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot_euler(i),0.0,0.0,0.0);
-Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));	
+        for(int i=0; i<2; i++)
+            Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start,_T_Start_real,_init_Foot_trajectory.RFoot_euler(i),0.0,0.0,0.0);
+        
+        Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));	
        
     }
     else if(_cnt >= _T_Start_real+_T_Double1 && _cnt < _T_Start+_T_Total-_T_Double2-_T_rest_last)
     {
-double t_rest_temp = 0.1*Hz;
+        double t_rest_temp = 0.1*Hz;
 
         if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
-	    Foot_trajectory.LFoot.translation()(2) = 0.0;	
+            Foot_trajectory.LFoot.translation()(2) = 0.0;	
             //Foot_trajectory.LFoot.linear() = _init_Foot_trajectory.LFoot.linear();
             Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
-	    Foot_trajectory.LFoot_euler(0) = 0.0;
-	    Foot_trajectory.LFoot_euler(1) = 0.0;
+            Foot_trajectory.LFoot_euler.setZero();
+     
             Foot_trajectory.LFoot_dot.setZero();
-	    Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
+            Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
 
+            double ankle_temp;
+            ankle_temp = -3*DEGREE;
             if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
             {
 
                 Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0);
                 Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0,Hz);
+
+                Foot_trajectory.RFoot_euler(1) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,ankle_temp,0.0);
+                Foot_trajectory.RFoot_dot(4) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,ankle_temp,0.0,Hz);
             }
             else
             {
+                Foot_trajectory.RFoot_euler(1) = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-t_rest_temp,_T_Start+_T_Total-_T_rest_last,ankle_temp,0.0,0.0,0.0);
+                Foot_trajectory.RFoot_dot(4) = Cubic_dot(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-t_rest_temp,_T_Start+_T_Total-_T_rest_last,ankle_temp,0.0,0.0,0.0,Hz);
+
+
+
                 Foot_trajectory.RFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
                 Foot_trajectory.RFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
             }
 
             for(int i=0; i<2; i++)
             {
+                Foot_trajectory.RFoot_euler(0) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(0+3),0.0);
+                Foot_trajectory.RFoot_dot(0+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(0+3),0.0,Hz);
+
                 Foot_trajectory.RFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp+0.1*Hz,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0);
                 Foot_trajectory.RFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
-            for(int i=0; i<2; i++)
-            {
-                Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
-            }
+          //  for(int i=0; i<2; i++)
+          //  {
+          //      Foot_trajectory.RFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
+         //       Foot_trajectory.RFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
+         //   }
        Foot_trajectory.RFoot_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(2),0.0,target_swing_foot(5),0.0);
        Foot_trajectory.RFoot_dot(5) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.RFoot_euler(2),0.0,target_swing_foot(5),0.0,Hz);
 
@@ -519,12 +999,16 @@ double t_rest_temp = 0.1*Hz;
         else if(_foot_step(_step_number,6) == 0) // �޹� ����
         {
             Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
-	    Foot_trajectory.RFoot.translation()(2) = 0.0;
+	        Foot_trajectory.RFoot.translation()(2) = 0.0;
            //Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
             Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
             Foot_trajectory.RFoot_euler(0) = 0.0;
-	    Foot_trajectory.RFoot_euler(1) = 0.0;
+	        Foot_trajectory.RFoot_euler(1) = 0.0;
             Foot_trajectory.RFoot_dot.setZero();
+
+            double ankle_temp;
+            ankle_temp = -3*DEGREE;
+
 	    Foot_trajectory.RFoot.linear() = Rotate_with_Z(Foot_trajectory.RFoot_euler(2))*Rotate_with_Y(Foot_trajectory.RFoot_euler(1))*Rotate_with_X(Foot_trajectory.RFoot_euler(0));
 
             if(_cnt < _T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0)
@@ -532,27 +1016,39 @@ double t_rest_temp = 0.1*Hz;
 
                 Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0);
                 Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,_ho,0.0,Hz);
+
+                Foot_trajectory.LFoot_euler(1) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,ankle_temp,0.0);
+                Foot_trajectory.LFoot_dot(4) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+t_rest_temp,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,0.0,0.0,ankle_temp,0.0,Hz);
+
             }
             else
             {
+                Foot_trajectory.LFoot_euler(1) = Cubic(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-t_rest_temp,_T_Start+_T_Total-_T_rest_last,ankle_temp,0.0,0.0,0.0);
+                Foot_trajectory.LFoot_dot(4) = Cubic_dot(_cnt,_T_Start+_T_Total-_T_rest_last-_T_Double2-t_rest_temp,_T_Start+_T_Total-_T_rest_last,ankle_temp,0.0,0.0,0.0,Hz);
+
+
                 Foot_trajectory.LFoot.translation()(2) = Cubic(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0);
                 Foot_trajectory.LFoot_dot(2) = Cubic_dot(_cnt,_T_Start_real+_T_Double1+(_T_Total-_T_rest_init-_T_rest_last-_T_Double1-_T_Double2-_T_Imp)/2.0,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_ho,0.0,target_swing_foot(2),0.0,Hz);
             }
 
             for(int i=0; i<2; i++)
             {
+                Foot_trajectory.LFoot_euler(0) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(0+3),0.0);
+                Foot_trajectory.LFoot_dot(0+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(0+3),0.0,Hz);
+
+
                 Foot_trajectory.LFoot.translation()(i) = Cubic(_cnt,_T_Start_real+_T_Double1+t_rest_temp+0.1*Hz,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0);
                 Foot_trajectory.LFoot_dot(i) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot.translation()(i),0.0,target_swing_foot(i),0.0,Hz);
             }
 
-            for(int i=0; i<3; i++)
-            {
-                Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
-                Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
-            }
+          //  for(int i=0; i<3; i++)
+          //  {
+          //      Foot_trajectory.LFoot_euler(i) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0);
+          //      Foot_trajectory.LFoot_dot(i+3) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,0.0,0.0,target_swing_foot(i+3),0.0,Hz);
+          //  }
 
 
-  Foot_trajectory.LFoot_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(2),0.0,target_swing_foot(5),0.0);
+                 Foot_trajectory.LFoot_euler(2) = Cubic(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(2),0.0,target_swing_foot(5),0.0);
                 Foot_trajectory.LFoot_dot(5) = Cubic_dot(_cnt,_T_Start_real+_T_Double1,_T_Start+_T_Total-_T_rest_last-_T_Double2-_T_Imp,_init_Foot_trajectory.LFoot_euler(2),0.0,target_swing_foot(5),0.0,Hz);
 
 
@@ -576,11 +1072,11 @@ double t_rest_temp = 0.1*Hz;
         if(_foot_step(_step_number,6) == 1) // �޹� ����
         {
             Foot_trajectory.LFoot.translation() = _init_Foot_trajectory.LFoot.translation();
-	    Foot_trajectory.LFoot.translation()(2) = 0.0;
+            Foot_trajectory.LFoot.translation()(2) = 0.0;
             Foot_trajectory.LFoot_euler = _init_Foot_trajectory.LFoot_euler;
-	    Foot_trajectory.LFoot_euler(0) = 0.0;
-	    Foot_trajectory.LFoot_euler(1) = 0.0;
- 	    Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
+            Foot_trajectory.LFoot_euler(0) = 0.0;
+            Foot_trajectory.LFoot_euler(1) = 0.0;
+            Foot_trajectory.LFoot.linear() = Rotate_with_Z(Foot_trajectory.LFoot_euler(2))*Rotate_with_Y(Foot_trajectory.LFoot_euler(1))*Rotate_with_X(Foot_trajectory.LFoot_euler(0));
             Foot_trajectory.LFoot_dot.setZero();
 
             for(int i=0; i<3; i++)
@@ -595,7 +1091,7 @@ double t_rest_temp = 0.1*Hz;
         else if (_foot_step(_step_number,6) == 0)
         {
             Foot_trajectory.RFoot.translation() = _init_Foot_trajectory.RFoot.translation();
-	    Foot_trajectory.RFoot.translation()(2) = 0.0;
+            Foot_trajectory.RFoot.translation()(2) = 0.0;
             //Foot_trajectory.RFoot.linear() = _init_Foot_trajectory.RFoot.linear();
             Foot_trajectory.RFoot_euler = _init_Foot_trajectory.RFoot_euler;
 	    Foot_trajectory.RFoot_euler(0) = 0.0;
@@ -1323,9 +1819,28 @@ void Pattern_generator::ZMP_Generator(int Nom_Size, MatrixXD& _foot_step_localfr
     {
         for (int i=0; i<= _T_temp; i++) //200 tick���� ��� ���
         {
+            if(i <= 0.5*Hz)
+            {
 
-            _Ref_ZMP(i,0) = _init_info._COM_support_init(0)+_COM_offset(0);
-            _Ref_ZMP(i,1) = _init_info._COM_support_init(1)+_COM_offset(1);
+                _Ref_ZMP(i,0) = _init_info._COM_support_init(0)+_COM_offset(0);
+                _Ref_ZMP(i,1) = _init_info._COM_support_init(1)+_COM_offset(1);
+            }
+            else if(i < 1.5*Hz)
+            {
+
+                double del_x = i-0.5*Hz;
+                _Ref_ZMP(i,0) = _init_info._COM_support_init(0)+_COM_offset(0)-del_x*(_init_info._COM_support_init(0)+_COM_offset(0))/(1.0*Hz);
+                _Ref_ZMP(i,1) = _init_info._COM_support_init(1)+_COM_offset(1);
+            }
+            else
+            {
+
+                _Ref_ZMP(i,0) = 0.0;
+                _Ref_ZMP(i,1) = _init_info._COM_support_init(1)+_COM_offset(1);
+            }
+
+
+
             index++;
         }
     }
@@ -1391,7 +1906,8 @@ void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, doub
     {
 	//_initial_local_support_foot_offset(0)=0.0;
 
-        Kx = _initial_local_support_foot_offset(0) - _init_info._COM_support_init(0) - _COM_offset(0);
+       // Kx = _initial_local_support_foot_offset(0) - _init_info._COM_support_init(0) - _COM_offset(0);
+        Kx = _initial_local_support_foot_offset(0);// - _init_info._COM_support_init(0) - _COM_offset(0);
         Kx2 = (_foot_step_localframe(step_number,0)+_initial_local_support_foot(0))/2.0 - _initial_local_support_foot_offset(0);
 
         Ky = _initial_local_support_foot_offset(1) - _init_info._COM_support_init(1);
@@ -1401,13 +1917,15 @@ void Pattern_generator::Onestep_ZMP(double T_rest_init, double T_rest_last, doub
         {
             if(i < T_rest_init)
             {
-                temp_px(i) = _init_info._COM_support_init(0)+_COM_offset(0);
+                temp_px(i) = 0.0;//_init_info._COM_support_init(0)+_COM_offset(0);
                 temp_py(i) = _init_info._COM_support_init(1)+_COM_offset(1);
             }
             else if(i >= T_rest_init && i < T_rest_init+T_Double1)
             {
-                temp_px(i) = _init_info._COM_support_init(0)+_COM_offset(0) + Kx/T_Double1*(i+1-T_rest_init);
+              //  temp_px(i) = _init_info._COM_support_init(0)+_COM_offset(0) + Kx/T_Double1*(i+1-T_rest_init);
                 temp_py(i) = _init_info._COM_support_init(1)+_COM_offset(1) + Ky/T_Double1*(i+1-T_rest_init);
+                temp_px(i) = Kx/T_Double1*(i+1-T_rest_init);
+                //temp_py(i) = Ky/T_Double1*(i+1-T_rest_init);
             }
             else if(i>= T_rest_init+T_Double1 & i< T_Total-T_rest_last-T_Double2)
             {

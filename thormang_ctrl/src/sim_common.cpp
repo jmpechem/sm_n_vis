@@ -1,6 +1,6 @@
 #include "sim_common.h"
 
-simulation::simulation(): rate(200)
+simulation::simulation(ros::NodeHandle &nh): controlBase(nh), rate(200)
 {
 
     simulationRunning = true;

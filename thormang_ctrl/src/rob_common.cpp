@@ -1,6 +1,6 @@
 #include "rob_common.h"
 
-realrobot::realrobot() : rate(200.0)
+realrobot::realrobot(ros::NodeHandle &nh) : controlBase(nh), rate(200.0)
 {
     dxlMode = rt_dynamixel_msgs::ModeSettingRequest::SETTING;
     dxlTorque = 0;
@@ -8,10 +8,7 @@ realrobot::realrobot() : rate(200.0)
     dxlModeSetClient = nh.serviceClient<rt_dynamixel_msgs::ModeSetting>("rt_dynamixel/mode");
     dxlMotorSetClient = nh.serviceClient<rt_dynamixel_msgs::MotorSetting>("rt_dynamixel/motor_set");
 
-    // dxlJointSetPub.initialize(nh, "rt_dynamixel/joint_set", 1, 1, rt_dynamixel_msgs::JointSet());
-
     dxlJointSetPub.init(nh, "rt_dynamixel/joint_set", 1);
-
 
     dxlJointSub = nh.subscribe("rt_dynamixel/joint_state", 1, &realrobot::jointCallback, this, ros::TransportHints().tcpNoDelay(true));
     imuSub = nh.subscribe("imu/imu", 1, &realrobot::imuCallback, this, ros::TransportHints().tcpNoDelay(true));
@@ -19,26 +16,18 @@ realrobot::realrobot() : rate(200.0)
 
     leftFootFTSub = nh.subscribe("ati_ft_sensor/left_foot_ft", 1, &realrobot::leftFootFTCallback, this);
     rightFootFTSub = nh.subscribe("ati_ft_sensor/right_foot_ft", 1, &realrobot::rightFootFTCallback, this);
-    /*
-    dxlJointSub.initialize(3, nh, "rt_dynamixel/joint_state");
 
-    imuSub.initialize(3, nh, "imu/imu");
-    leftFootFTSub.initialize(3, nh, "ati_ft_sensor/left_foot_ft");
-    rightFootFTSub.initialize(3, nh, "ati_ft_sensor/right_foot_ft");
-*/
-
-    // dxlJointSetMsgPtr = dxlJointSetPub.allocate();
-
-    // dxlJointSetMsgPtr->angle.resize(total_dof);
     dxlJointSetPub.msg_.angle.resize(total_dof);
-    // dxlJointSetMsgPtr->id.resize(total_dof);
     dxlJointSetPub.msg_.id.resize(total_dof);
 
     for(int i=0;i<total_dof; i++)
     {
-        jointStateUIPub.msg_.id[i] = jointID[i];
-        dxlJointSetPub.msg_.id[i] = jointID[i];
+        jointStateMsgPtr->id[i] = jointID[i];
     }
+
+
+    gyroLogFileOut.open("/home/pen/DAQ/Gyro/gyro.txt",ios_base::out);
+    Matrix_RPY_Out.open("/home/pen/DAQ/Gyro/MatrixRPY.txt",ios_base::out);
 }
 
 void realrobot::change_dxl_mode(int mode)
@@ -185,7 +174,6 @@ void realrobot::writedevice()
         {
             dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
-        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
             dxlJointSetPub.unlockAndPublish();
         }
@@ -193,11 +181,11 @@ void realrobot::writedevice()
     else if (smach_state == "Auto")
     {
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
+
         for(int i=0; i< total_dof; i++)
         {
             dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
-        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
             dxlJointSetPub.unlockAndPublish();
         }
@@ -205,11 +193,11 @@ void realrobot::writedevice()
     else if (smach_state == "Manual")
     {
         change_dxl_mode(rt_dynamixel_msgs::ModeSettingRequest::CONTROL_RUN);
+
         for(int i=0; i< total_dof; i++)
         {
             dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
-        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
             dxlJointSetPub.unlockAndPublish();
         }
@@ -225,7 +213,6 @@ void realrobot::writedevice()
         {
             dxlJointSetPub.msg_.angle[i] = _desired_q(i);
         }
-        // dxlJointSetPub.publish(dxlJointSetMsgPtr);
         if (dxlJointSetPub.trylock()) {
             dxlJointSetPub.unlockAndPublish();
         }
@@ -277,8 +264,7 @@ void realrobot::jointCallback(const rt_dynamixel_msgs::JointStateConstPtr msg)
 
                 q_dot(i) = msg->velocity[j];
                 torque(i) = msg->current[j];
-                jointStateUIPub.msg_.error[i] = msg->updated[j];
-                // jointStateMsgPtr->error[i] = msg->updated[j];
+                jointStateMsgPtr->error[i] = msg->updated[j];
             }
         }
     }
@@ -316,8 +302,15 @@ void realrobot::imuCallback(const sensor_msgs::ImuConstPtr msg)
 void realrobot::imuFilterCallback(const imu_3dm_gx4::FilterOutputConstPtr msg)
 {
 
+
     tf::Quaternion q(msg->orientation.x,msg->orientation.y,msg->orientation.z,msg->orientation.w);
     tf::Matrix3x3 m(q);
+
+    double _values[3];
+    m.getRPY(_values[0],_values[1],_values[2]);
+
+
+    Matrix_RPY_Out << _values[0] << "\t" << _values[1] << "\t" << _values[2] << endl;
 
     // m.getRPY(gyro[0],gyro[1],gyro[2]);
 
@@ -326,18 +319,25 @@ void realrobot::imuFilterCallback(const imu_3dm_gx4::FilterOutputConstPtr msg)
 
 void realrobot::AngleComplementaryFilter(double dt, double cutoff_freq, double pitch_i, double roll_i, double SensorData[6], double &pitch, double &roll)
 {
- //sensor data = acc x, y, z, ang rate pitch, roll, yaw
- //double cutoff_freq = 0.1; //recommand value:0.1~0.2
- float wn = 2.0*3.1415*cutoff_freq;
- float alpha_const = (1.0/wn/dt)/(1.0+1.0/wn/dt);
+     //sensor data = acc x, y, z, ang rate pitch, roll, yaw
+     //double cutoff_freq = 0.1; //recommand value:0.1~0.2
+     float wn = 2.0*3.1415*cutoff_freq;
+     float alpha_const = (1.0/wn/dt)/(1.0+1.0/wn/dt);
 
- float pitch_Acc, roll_Acc;
+     float pitch_Acc, roll_Acc;
 
- pitch_Acc = (atan2(SensorData[0],SensorData[2]));
- pitch = (alpha_const*(pitch_i-SensorData[4]*dt) + (1.0-alpha_const)*pitch_Acc);
+     // x-y-z order : x - fron direction / y - left direction / z - upper direction
+ //    pitch_Acc = (atan2(SensorData[0],SensorData[2]));// original
+     pitch_Acc = (atan2(-SensorData[0],SensorData[2])); //beom
+     pitch = (alpha_const*(pitch_i+SensorData[4]*dt) + (1.0-alpha_const)*pitch_Acc);
 
- roll_Acc = -(atan2(SensorData[1],SensorData[2]));
- roll = (alpha_const*(roll_i-SensorData[3]*dt) + (1.0-alpha_const)*roll_Acc);
+   //  roll_Acc = -(atan2(SensorData[1],SensorData[2])); //original
+     roll_Acc = (atan2(SensorData[1],SensorData[2])); //beom
+     roll = (alpha_const*(roll_i+SensorData[3]*dt) + (1.0-alpha_const)*roll_Acc);
+
+     gyroLogFileOut << pitch << "\t" << roll << "\t" << endl;
+
+
 }
 
 

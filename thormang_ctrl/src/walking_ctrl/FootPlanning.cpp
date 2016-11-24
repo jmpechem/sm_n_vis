@@ -5,11 +5,13 @@ void Foot_Planning::plan_foot_step(Vector3D& _scan_data, MatrixXD& _foot_step, b
     if(_scan_data(0) == 0 && _scan_data(1) == 0 && _scan_data(2) == 0)
     {
 
+       // _foot_step.resize(1,7);
         _foot_step.resize(80,7);
         _foot_step.setZero();
 
         for (int i=0; i<40 ;i++)
         {
+           //int i = 0;
         _foot_step(2*i+0,0) = 0.0;//0.2*i+0.1;	//0.0;//-0.0491398 ;//0.2*i+0.2;
         _foot_step(2*i+0,1) = -0.127794;
         _foot_step(2*i+0,2) = 0.0;
@@ -29,6 +31,7 @@ void Foot_Planning::plan_foot_step(Vector3D& _scan_data, MatrixXD& _foot_step, b
         _foot_step(0,1) = 0.127794;
         _foot_step(0,6) = 0;
 */
+        //}
     }
     else
     {
@@ -76,7 +79,7 @@ void Foot_Planning::calculate_foot_step_total(Vector3D& _scan_data, MatrixXD& _f
     double final_residual_angle = final_rot-final_total_step_number*final_drot;
 
     double L = sqrt(x*x+y*y);
-    double dlength = 0.20;
+    double dlength = 0.10;
     int middle_total_number = L/(dlength);
     double middle_residual_length = L-middle_total_number*(dlength);
 
@@ -344,7 +347,7 @@ void Foot_Planning::calculate_foot_step_separate(Vector3D& _scan_data,MatrixXD& 
     double y = _scan_data(1);
     double alpha = _scan_data(2);
 
-    double dx = 0.2;
+    double dx = 0.1;
     double dy = 0.05;
     double dtheta = 10.0*DEGREE;
     if(x<0.0)

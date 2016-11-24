@@ -24,29 +24,44 @@ private:
     string fileName;
 
 };
+
 */
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "thormang_ctrl");
-  
-// controlBase *ctrObj = new realrobot;
-controlBase *ctrObj = new simulation;
+    ros::init(argc, argv, "thormang_ctrl");
+    ros::NodeHandle nh;
+    std::string mode;
+    nh.param<std::string>("mode", mode, "simulation");
+    controlBase *ctrObj;
+    if(mode == "simulation")
+    {
+        ROS_INFO("THORMANG MAIN CONTROLLER - !!! SIMULATION MODE !!!");
+        ctrObj = new simulation(nh);
+    }
+    else if(mode == "real")
+    {
+        ROS_INFO("THORMANG MAIN CONTROLLER - !!! REAL ROBOT MODE !!!");
+        ctrObj = new realrobot(nh);
+    }
+    else
+    {
+        ROS_FATAL("Please choose simulation or real");
+    }
 
+    while(ros::ok())
+    {
+        ctrObj->readdevice();
+        ctrObj->update();
+        ctrObj->compute();
+        ctrObj->reflect();
+        ctrObj->writedevice();
+        ctrObj->wait();
+    }
 
-  while(ros::ok())
-  {
-     ctrObj->readdevice();
-     ctrObj->update();
-     ctrObj->compute();
-     ctrObj->reflect();
-     ctrObj->writedevice();
-     ctrObj->wait();
-  }
+    delete ctrObj;
 
-  delete ctrObj;
-
-  return 0;
+    return 0;
 }
 
 /*
