@@ -300,6 +300,8 @@ void MainWindow::autoMissionSelectVisible(int mission)
     ui.button_auto_egress_init->setVisible(mission==3);
     ui.button_auto_egress_egress->setVisible(mission==3);
     ui.button_auto_egress_standby->setVisible(mission==3);
+    ui.button_auto_egress_guide->setVisible(mission==3);
+    ui.button_auto_egress_hello->setVisible(mission==3);
 }
 void MainWindow::updateUI()
 {
@@ -512,7 +514,6 @@ void MainWindow::stateButtonClicked()
         state = "e_hello";
     } else if (objName.compare("button_auto_egress_guide") == 0) {
         state = "e_guide";
-
     } else if (objName.compare("button_manual") == 0) {
         state = "manu_on";
     } else if (objName.compare("button_manual_joint_ctrl") == 0) {
