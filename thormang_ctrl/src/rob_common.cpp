@@ -22,6 +22,7 @@ realrobot::realrobot(ros::NodeHandle &nh) : controlBase(nh), rate(200.0)
 
     for(int i=0;i<total_dof; i++)
     {
+        dxlJointSetPub.msg_.id[i] = jointID[i];
         jointStateUIPub.msg_.id[i] = jointID[i];
     }
 
