@@ -26,6 +26,9 @@
 
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point32.h>
+#include <geometry_msgs/PolygonStamped.h>
+#include <geometry_msgs/Polygon.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include "cv.h"
@@ -44,6 +47,8 @@
 
 #include <string>
 #include <vector>
+
+#include "jm_planner/tinysplinecpp.h"
 
 using namespace std;
 using namespace grid_map;
@@ -88,11 +93,15 @@ int world_map[ MAP_WIDTH * MAP_HEIGHT ] = {1,};
 
 };
 */
+int roundToInt(double x) {
+  if (x >= 0) return (int) (x + 0.5);
+  return (int) (x - 0.5);
+}
 int GetMap( int x, int y )
 {
 	if( x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
 	{
-		return 9;	 
+		return 255;
 	}
 
 	return world_map[(y*MAP_WIDTH)+x];
@@ -103,7 +112,8 @@ class MapSearchNode
 public:
 	int x;
 	int y;	
-	MapSearchNode() { x = y = 0; }
+	int z;
+	MapSearchNode() { x = y = z= 0; }
 	MapSearchNode( int px, int py ) { x=px; y=py; }
 	float GoalDistanceEstimate( MapSearchNode &nodeGoal );
 	bool IsGoal( MapSearchNode &nodeGoal );
@@ -162,23 +172,23 @@ bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapS
 		parent_y = parent_node->y;
 	}
 	MapSearchNode NewNode;
-	if((GetMap( x-1, y ) < 9) && !((parent_x == x-1) && (parent_y == y))) 
+	if((GetMap( x-1, y ) < 255) && !((parent_x == x-1) && (parent_y == y)))
 	{
 		NewNode = MapSearchNode( x-1, y );
 		astarsearch->AddSuccessor( NewNode );
 	}	
 
-	if((GetMap( x, y-1 ) < 9) && !((parent_x == x) && (parent_y == y-1))) 
+	if((GetMap( x, y-1 ) < 255) && !((parent_x == x) && (parent_y == y-1)))
 	{
 		NewNode = MapSearchNode( x, y-1 );
 		astarsearch->AddSuccessor( NewNode );
 	}	
-	if((GetMap( x+1, y ) < 9) && !((parent_x == x+1) && (parent_y == y))) 
+	if((GetMap( x+1, y ) < 255) && !((parent_x == x+1) && (parent_y == y)))
 	{
 		NewNode = MapSearchNode( x+1, y );
 		astarsearch->AddSuccessor( NewNode );
 	}	
-	if((GetMap( x, y+1 ) < 9) && !((parent_x == x) && (parent_y == y+1)))
+	if((GetMap( x, y+1 ) < 255) && !((parent_x == x) && (parent_y == y+1)))
 	{
 		NewNode = MapSearchNode( x, y+1 );
 		astarsearch->AddSuccessor( NewNode );
@@ -197,10 +207,12 @@ bool publish_path = false;
 bool do_local_planning = false;
 bool first_time_running = true;
 nav_msgs::Path a_star_path;
+nav_msgs::Path b_spline_path;
 std::vector<geometry_msgs::PoseStamped> a_star_plan;
+std::vector<geometry_msgs::PoseStamped> b_spline_plan;
 geometry_msgs::PoseStamped astar_root_pose;
 geometry_msgs::PoseStamped user_goal_pose;
-
+geometry_msgs::PoseStamped b_spline_pose;
 float norm_dist(float grid_x,float grid_y,float user_x,float user_y)
 {
 
@@ -219,37 +231,30 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
 
   if(do_local_planning)
   {
+      ros::Time tick = ros::Time::now();
+
       publish_path = true;
       ROS_INFO("map size : %d x %d",map_data.getSize()(0),map_data.getSize()(1));
       float dist_min = 0.0f;
       float dmin = 0.0f;
       Index goal_idx;
       int i=0;
+
       for (GridMapIterator it(map_data); !it.isPastEnd(); ++it) {          
         if (!map_data.isValid(*it, "plan")){
-              world_map[i] = 9;
+              world_map[i] = 255;
             }
         else{
 
              Eigen::Vector2d center;
              map_data.getPosition(*it,center);
-/*             int cost_trav = (int)(9.0*map_data.at("costmap",*it)+1);
-              for(SpiralIterator submapIterator(map_data,center,ROBOT_FOOTPRINT);!submapIterator.isPastEnd();++submapIterator){
-                  if (!map_data.isValid(*submapIterator, "costmap")) continue;
-                  if (  ((int)(9.0*map_data.at("costmap",*it)+1)) > 1 )
-                  {
-                      continue;
-                  }
-                  else
-                  {
-                      map_data.at("costmap",*submapIterator) = (int)(9.0*map_data.at("costmap",*it)+5);
-                  }
-                  //cost_trav
-                  //map_data.at("costmap",*submapIterator) = ;
-                }*/
-                world_map[i] = (int)(9.0*map_data.at("plan",*it)+1);
-              //world_map[i];
 
+                //z_cost = (0.35/0.2)*map_data.at("cost_elevation",*it);
+
+                world_map[i] = (int)((map_data.at("plan",*it)+1));
+ //               cout << "world cost : " << world_map[i] << endl;
+                if(world_map[i] >= 255){world_map[i]=255;}
+                else if(world_map[i] <= 0 ){world_map[i] = 0;}
               Position test_pos;
               test_pos(0) = user_goal_pose.pose.position.x;
               test_pos(1) = user_goal_pose.pose.position.y;
@@ -274,8 +279,8 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
 
                  // Create a start state
                  MapSearchNode nodeStart;
-                 nodeStart.x = 195;//rand()%MAP_WIDTH;
-                 nodeStart.y = 100;//rand()%MAP_HEIGHT;
+                 nodeStart.x = 190;//195;//rand()%MAP_WIDTH;
+                 nodeStart.y = 100;//100;//rand()%MAP_HEIGHT;
 
                  // Define the goal state
                  MapSearchNode nodeEnd;
@@ -332,22 +337,19 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
    Index plan_idx;
    Position astar_grid_pos;
 
-
    astar_root_pose.header.frame_id = "base_link";
-
    astar_root_pose.pose.orientation.x = 0.0;
    astar_root_pose.pose.orientation.y = 0.0;
    astar_root_pose.pose.orientation.z = 0.0;
    astar_root_pose.pose.orientation.w = 0.0;
    astar_root_pose.pose.position.z = 0.0;
-
    a_star_plan.clear();
    for(int j=0;j<x_node_grid.size(); j++){
        plan_idx(0) = x_node_grid.at(j);
        plan_idx(1) = y_node_grid.at(j);
-       map_data.at("plan",plan_idx) = 9;
+       map_data.at("plan",plan_idx) = 255;
        map_data.getPosition(plan_idx,astar_grid_pos);
-       cout << "x : " <<astar_grid_pos(0) << "y : " << astar_grid_pos(1) << endl;
+
        astar_root_pose.pose.position.x = astar_grid_pos(0);
        astar_root_pose.pose.position.y = astar_grid_pos(1);
        a_star_plan.push_back(astar_root_pose);
@@ -355,11 +357,94 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
    a_star_path.poses.clear();
    a_star_path.poses.resize(a_star_plan.size());
 
+
+
+   Index spline_plan_idx;
+   Position spline_grid_pos;
+   int spline_deg = 3;
+   int spline_dimension = 2;
+   int spline_control_point = x_node_grid.size();
+
+   int divide_control_point = spline_control_point/5;
+
+   ts::BSpline spline(spline_deg,spline_dimension,divide_control_point,TS_CLAMPED);
+   std::vector<float> ctrlp = spline.ctrlp();
+   b_spline_plan.clear();
+   for(int i=0;i<divide_control_point;i++){
+
+       if(i==(divide_control_point-1))
+         {
+           spline_plan_idx(0) = x_node_grid.back();
+           spline_plan_idx(1) = y_node_grid.back();
+         }
+       else
+         {
+           spline_plan_idx(0) = x_node_grid.at(5*i);
+           spline_plan_idx(1) = y_node_grid.at(5*i);
+         }
+
+       map_data.at("plan",spline_plan_idx) = 255;
+       map_data.getPosition(spline_plan_idx,spline_grid_pos);
+
+       ctrlp[2*i] = (float)spline_grid_pos(0);
+       ctrlp[1+2*i] = (float)spline_grid_pos(1);
+
+     }
+
+   spline.setCtrlp(ctrlp);
+   std::vector<float> spline_result;
+   float spline_resolution = 0.0f;
+   b_spline_pose.header.frame_id = "base_link";
+
+
+   for(int i=0;i<1000;i++)
+     {
+       spline_result = spline.evaluate(spline_resolution).result();
+       spline_resolution = i*0.001;
+       b_spline_pose.pose.position.z = 0.0;
+       b_spline_pose.pose.orientation.w = 1.0;
+       b_spline_pose.pose.orientation.x = 0.0;
+       b_spline_pose.pose.orientation.y = 0.0;
+       b_spline_pose.pose.orientation.z = 0.0;
+       b_spline_pose.pose.position.x = (double)spline_result[0];
+       b_spline_pose.pose.position.y = (double)spline_result[1];
+       b_spline_plan.push_back(b_spline_pose);
+       spline_result.clear();
+     }
+      spline_result.clear();
+      ctrlp.clear();
+       b_spline_path.poses.clear();
+       b_spline_path.poses.resize(b_spline_plan.size());
+
+       for(int i=0;i<b_spline_plan.size();i++){
+           b_spline_path.poses.push_back(b_spline_plan.at(i));
+         }
+
+   /*ctrlp[0]  = -1.75f; // x0
+   ctrlp[1]  = -1.0f;  // y0
+   ctrlp[2]  = -1.5f;  // x1
+   ctrlp[3]  = -0.5f;  // y1
+   ctrlp[4]  = -1.5f;  // x2
+   ctrlp[5]  =  0.0f;  // y2
+   ctrlp[6]  = -1.25f; // x3
+   ctrlp[7]  =  0.5f;  // y3
+   ctrlp[8]  = -0.75f; // x4
+   ctrlp[9]  =  0.75f; // y4
+   ctrlp[10] =  0.0f;  // x5
+   ctrlp[11] =  0.5f;  // y5
+   ctrlp[12] =  0.5f;  // x6
+   ctrlp[13] =  0.0f;  // y6
+   spline.setCtrlp(ctrlp);
+   std::vector<float> result = spline.evaluate(1.0f).result();
+   std::cout << "x = " << result[0] << ", y = " << result[1] << " curv size : " << result.size() << std::endl;*/
+
    for(int a=0; a<a_star_plan.size();a++){
    a_star_path.poses.push_back(a_star_plan.at(a));
      }
 
       do_local_planning = false;
+      ros::Time tock = ros::Time::now();
+      cout << "time " << tick - tock << endl;
   }
 }
 
@@ -383,9 +468,12 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::Publisher publisher = nh.advertise<grid_map_msgs::GridMap>("plan_test", 1, true);
   ros::Publisher pub_root = nh.advertise<nav_msgs::Path>("astar_root",1,true);
+  ros::Publisher pub_spline_root = nh.advertise<nav_msgs::Path>("b_spline_root",1,true);
+  ros::Publisher pub_footprint = nh.advertise<geometry_msgs::PolygonStamped>("robot_footprint",1,true);
 
   ros::Subscriber sub_map = nh.subscribe("/grid_map",1,map_cb);
   ros::Subscriber sub_goal = nh.subscribe<geometry_msgs::PoseStamped>("move_base_simple/goal",1,goal_pose_stamped_cb);
+
  /* GridMap map({"ele","planner"});
   map.setFrameId("base_link");
   //map.setGeometry(Length(MAX_X,MAX_Y), 0.03,Position(5,0));
@@ -492,12 +580,39 @@ int main(int argc, char** argv)
       GridMapRosConverter::toMessage(map_data, message);
       publisher.publish(message);
 
+      geometry_msgs::Point32 p32;
+      geometry_msgs::PolygonStamped pstamped;
+      p32.x = 0.35;
+      p32.y = -0.35;
+      p32.z = 0.0;
+      pstamped.polygon.points.push_back(p32);
+      p32.x = 0.35;
+      p32.y = 0.35;
+      p32.z = 0.0;
+      pstamped.polygon.points.push_back(p32);
+      p32.x = -0.35;
+      p32.y = 0.35;
+      p32.z = 0.0;
+      pstamped.polygon.points.push_back(p32);
+      p32.x = -0.35;
+      p32.y = -0.35;
+      p32.z = 0.0;
+      pstamped.polygon.points.push_back(p32);
+
+      pstamped.header.frame_id = "base_link";
+      pstamped.header.stamp = ros::Time::now();
+
+      pub_footprint.publish(pstamped);
 
       if(publish_path)
       {
+
           a_star_path.header.frame_id = "base_link";
           a_star_path.header.stamp = ros::Time::now();
           pub_root.publish(a_star_path);
+          b_spline_path.header.frame_id = "base_link";
+          b_spline_path.header.stamp = ros::Time::now();
+          pub_spline_root.publish(b_spline_path);
         }
 
     ros::spinOnce();

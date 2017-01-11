@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   nav_msgs
   geometry_msgs
+  visualization_msgs
 )
 
 catkin_package(
@@ -32,7 +33,7 @@ include_directories(
 )
 
 ## Declare a C++ executable
- add_executable(a_star src/a_star.cpp)
+ add_executable(a_star src/a_star.cpp src/tinysplinecpp.cpp src/tinyspline.c)
  target_link_libraries(a_star
    ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}

@@ -2,6 +2,7 @@ grid_map_topic: /plan_test
 
 grid_map_visualizations:
 
+
   - name: elevation_points
     type: point_cloud
     params:
@@ -57,7 +58,7 @@ grid_map_visualizations:
     params:
      layer: costmap
      data_min: 0.0
-     data_max: 1.0
+     data_max: 255.0
 
   - name: costmap_points
     type: point_cloud
@@ -69,7 +70,7 @@ grid_map_visualizations:
     params:
      layer: plan
      data_min: 0.0
-     data_max: 1.0
+     data_max: 255.0
 
   - name: boundary_cost
     type: occupancy_grid

@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  visualization_msgs
 )
 
 catkin_package(
@@ -25,6 +26,7 @@ catkin_package(
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
 )
@@ -36,7 +38,7 @@ include_directories(
    ${PCL_LIBRARIES}
    ${OpenCV_LIBRARIES}
  )
- add_executable(traversability src/traversability.cpp)
+ add_executable(traversability src/traversability.cpp src/egbis.cpp src/disjoint-set.cpp src/filter.cpp src/misc.cpp src/segment-graph.cpp src/segment-image.cpp)
  target_link_libraries(traversability
    ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}

@@ -57,16 +57,42 @@ grid_map_visualizations:
     params:
      layer: costmap
      data_min: 0.0
-     data_max: 1.0
+     data_max: 255.0
 
-  - name: costmap_points
+  - name: filtered_points
     type: point_cloud
     params:
      layer: cost_elevation
+
+  - name: traverse_points
+    type: point_cloud
+    params:
+     layer: t_points
+
+  - name: plan_cost
+    type: occupancy_grid
+    params:
+     layer: plan
+     data_min: 0.0
+     data_max: 255.0
 
   - name: boundary_cost
     type: occupancy_grid
     params:
      layer: boundary
      data_min: 0.0
-     data_max: 1.0
+     data_max: 255.0
+
+  - name: height_cost
+    type: occupancy_grid
+    params:
+     layer: h_cost
+     data_min: 0.0
+     data_max: 255.0
+
+  - name: edge_cost
+    type: occupancy_grid
+    params:
+     layer: edge
+     data_min: 0.0
+     data_max: 255.0

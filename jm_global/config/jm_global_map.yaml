@@ -1,0 +1,52 @@
+grid_map_topic: /grid_map
+
+grid_map_visualizations:
+
+  - name: elevation_points
+    type: point_cloud
+    params:
+     layer: elevation
+
+  - name: elevation_grid
+    type: occupancy_grid
+    params:
+     layer: elevation
+     data_min: 0.08
+     data_max: -0.16
+
+  - name: normals
+    type: vectors
+    params:
+     layer_prefix: normal_
+     position_layer: elevation
+     scale: 0.06
+     line_width: 0.005
+     color: 15600153
+
+  - name: slope
+    type: occupancy_grid
+    params:
+     layer: slope
+     data_min: 0.0
+     data_max: 1.0
+
+  - name: step_height
+    type: occupancy_grid
+    params:
+     layer: height
+     data_min: 0.0
+     data_max: 1.0
+
+  - name: edge
+    type: occupancy_grid
+    params:
+     layer: edge
+     data_min: 0.0
+     data_max: 1.0
+
+  - name: global_cost
+    type: occupancy_grid
+    params:
+     layer: global
+     data_min: 0.0
+     data_max: 1.0
