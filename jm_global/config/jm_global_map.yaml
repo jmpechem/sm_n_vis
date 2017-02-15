@@ -37,10 +37,10 @@ grid_map_visualizations:
      data_min: 0.0
      data_max: 1.0
 
-  - name: edge
+  - name: roughness
     type: occupancy_grid
     params:
-     layer: edge
+     layer: roughness
      data_min: 0.0
      data_max: 1.0
 
@@ -48,5 +48,12 @@ grid_map_visualizations:
     type: occupancy_grid
     params:
      layer: global
+     data_min: 0.0
+     data_max: 1.0
+
+  - name: root_cost
+    type: occupancy_grid
+    params:
+     layer: root
      data_min: 0.0
      data_max: 1.0

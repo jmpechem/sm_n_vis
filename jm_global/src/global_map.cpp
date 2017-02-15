@@ -3,18 +3,19 @@
 pcl::PointCloud<pcl::PointXYZ>::Ptr clouds (new pcl::PointCloud<pcl::PointXYZ>);
 
 Global_Map_Builder::Global_Map_Builder()
-  : grid_map_({"elevation","normal_x","normal_y","normal_z","height","slope","edge","global"})
+  : grid_map_({"elevation","normal_x","normal_y","normal_z","height","slope","roughness","global","root"})
 {
     clouds->clear();
     grid_map_.setGeometry(Length(GRID_X_SIZE,GRID_Y_SIZE), GRID_RESOLUTION,Position(GRID_X_OFFSET,GRID_Y_OFFSET));
     grid_map_.setFrameId("base_link");
     grid_pub_ = nh_.advertise<grid_map_msgs::GridMap>("grid_map", 1, true);
+    grid_map_root_sub_ = nh_.subscribe<>("root_grid_array", 100, &Global_Map_Builder::Global_Root,this);
     is_first = true;
 }
 
 void Global_Map_Builder::PCD2GridMap()
 {
-  if (pcl::io::loadPCDFile<pcl::PointXYZ> ("/home/jimin/catkin_ws/src/jm_global/pcd_data_set/d2_ds.pcd", *clouds) == -1) //* load the file
+  if (pcl::io::loadPCDFile<pcl::PointXYZ> ("/home/jimin/catkin_ws/src/jm_global/out_pcd_data_set/d2_ds.pcd", *clouds) == -1) //* load the file
   {
     PCL_ERROR ("Couldn't read pcd file\n");
     return ;
@@ -36,6 +37,7 @@ void Global_Map_Builder::PCD2GridMap()
    pcl::getMinMax3D(*assembly,filter_min,filter_max);
    pcl::PointCloud<pcl::PointXYZ> final_assembly;
    double z_thres = HEIGHT_LIMIT;
+   cout << "assm size : " << assembly->size() << endl;
    for(int i=0;i<assembly->size();i++)
    {
            if ( abs(filter_min.z-assembly->points[i].z) <= z_thres)
@@ -46,7 +48,7 @@ void Global_Map_Builder::PCD2GridMap()
                    final_assembly.push_back(temp);
            }
    }
-
+  cout << "f_assm size : " << final_assembly.size() << endl;
    for(unsigned int i=0; i<final_assembly.size();++i){
      auto& point = final_assembly.points[i];
      Index index;
@@ -55,6 +57,8 @@ void Global_Map_Builder::PCD2GridMap()
      auto& elevation = grid_map_.at("elevation",index);
      if(!grid_map_.isValid(index)){ elevation = point.z;continue;}
    }
+
+
    ROS_INFO("Elevation Grid Map Created!!");
 }
 
@@ -135,154 +139,138 @@ void Global_Map_Builder::Empty_Grid_Filter(int mask_size,GridMap& output_map, Gr
   scopedLockmap.unlock();
 }
 
-void Global_Map_Builder::Grid_Normal_Estimation(double radius,GridMap& output_map, GridMap input_map)
+void Global_Map_Builder::Grid_Normal_Estimation(double gs_crit,double radius,GridMap& output_map, GridMap input_map)
 {
   boost::recursive_mutex::scoped_lock scopedLockmap(MapMutex_);
   output_map = input_map;
 
-
-    Eigen::Vector3d surfaceNormalPositiveAxis_;
+  Eigen::Vector3d surfaceNormalPositiveAxis_;
   surfaceNormalPositiveAxis_ = grid_map::Vector3::UnitZ();
   vector<string> surfaceNormalTypes;
   surfaceNormalTypes.push_back("normal_x");
   surfaceNormalTypes.push_back("normal_y");
   surfaceNormalTypes.push_back("normal_z");
 
-  for(GridMapIterator iter(output_map);!iter.isPastEnd();++iter){
+  for(GridMapIterator iter(output_map);!iter.isPastEnd();++iter)
+  {
     if(!output_map.isValid(*iter,"elevation")) continue;
     if(output_map.isValid(*iter,surfaceNormalTypes)) continue; // normal extraction once...
     Length submapLength = Length::Ones() * (2.0 * radius);
-    Position submapPosition;
+    Position submapPosition;    
     output_map.getPosition(*iter,submapPosition);
-    Index submapTopLeftIndex, submapBufferSize, requestedIndexInSubmap;
-    getSubmapInformation(submapTopLeftIndex, submapBufferSize, submapPosition, submapLength,
-                             requestedIndexInSubmap, submapPosition, submapLength,
-                             output_map.getLength(), output_map.getPosition(), output_map.getResolution(),
-                             output_map.getSize(), output_map.getStartIndex());
-
-    const int maxNumberOfCells = submapBufferSize.prod();
+    Index submapIdx;
+    output_map.getIndex(submapPosition,submapIdx);
+    Position3 submapPosition3;
+    output_map.getPosition3("elevation",submapIdx,submapPosition3);
+    const int maxNumberOfCells = pow(ceil(2*radius/output_map.getResolution()),2);
     Eigen::MatrixXd points(3, maxNumberOfCells);
-
     size_t nPoints = 0;
-    size_t Edge_nPoints = 0;
-    size_t Not_Edge_nPoints = 0;
-    Position3 max_point;
-    Position3 min_point;
-    Position3 edge_point;
-    bool min_max_first = true;
-    Position3 start_point;
-    output_map.getPosition3("elevation",submapTopLeftIndex,start_point);
-       for (SubmapIterator submapIterator(output_map, submapTopLeftIndex, submapBufferSize); !submapIterator.isPastEnd(); ++submapIterator) {
+    for (CircleIterator submapIterator(output_map, submapPosition, radius);!submapIterator.isPastEnd(); ++submapIterator)
+    {
+        if (!output_map.isValid(*submapIterator, "elevation")) continue;
+        Position3 point;
+        output_map.getPosition3("elevation", *submapIterator, point);
+        points.col(nPoints) = point;
+        nPoints++;
+    }
+    points.conservativeResize(3, nPoints);
 
-         if (!output_map.isValid(*submapIterator,"elevation")) continue;               
-         if(output_map.at("edge",*submapIterator) == 0)
-           {
-              Edge_nPoints++;
-              output_map.getPosition3("elevation",*submapIterator,edge_point);
-              if(min_max_first)
-              {
-                  max_point = edge_point;
-                  min_point = edge_point;
-                  min_max_first = false;
-              }
-              if(max_point(2) <= edge_point(2))
-              {
-                  max_point = edge_point;
-              }
-              if(min_point(2) >= edge_point(2))
-              {
-                  min_point = edge_point;
-              }
-           }
-         else
-           {
-              Not_Edge_nPoints++;
-           }
-       }
-       int min_cnt = 0;
-       int max_cnt = 0;
-       for (SubmapIterator submapIterator(output_map, submapTopLeftIndex, submapBufferSize); !submapIterator.isPastEnd(); ++submapIterator) {
-         if (!output_map.isValid(*submapIterator,"elevation")) continue;
-             Position3 point;
-             output_map.getPosition3("elevation", *submapIterator, point);
-             if( abs(min_point(2) - point(2)) < abs(max_point(2) - point(2)) )
-             {
-                min_cnt++;
-             }
-             else if( abs(min_point(2) - point(2)) >= abs(max_point(2) - point(2)) )
-             {
-                max_cnt++;
-             }
-       }
-
-       if(Not_Edge_nPoints == submapBufferSize(0)*submapBufferSize(1))
-       {
-          for (SubmapIterator submapIterator(output_map, submapTopLeftIndex, submapBufferSize); !submapIterator.isPastEnd(); ++submapIterator) {
-            if (!output_map.isValid(*submapIterator,"elevation")) continue;
-                Position3 point;
-                output_map.getPosition3("elevation", *submapIterator, point);
-                points.col(nPoints) = point;
-                nPoints++;
-          }
-       }
-       else if(Edge_nPoints > 0)
-       {
-           for (SubmapIterator submapIterator(output_map, submapTopLeftIndex, submapBufferSize); !submapIterator.isPastEnd(); ++submapIterator) {
-             if (!output_map.isValid(*submapIterator,"elevation")) continue;
-                Position3 point;
-                output_map.getPosition3("elevation", *submapIterator, point);
-                if( abs(min_point(2) - point(2)) <= GRID_RESOLUTION && min_cnt > max_cnt)
-                {
-                    points.col(nPoints) = point;
-                    nPoints++;
-                }
-                if( abs(max_point(2) - point(2)) <= GRID_RESOLUTION && min_cnt < max_cnt)
-                {
-                    points.col(nPoints) = point;
-                    nPoints++;
-                }
-           }
-       }
-       else
-       {
-           for (SubmapIterator submapIterator(output_map, submapTopLeftIndex, submapBufferSize); !submapIterator.isPastEnd(); ++submapIterator) {
-             if (!output_map.isValid(*submapIterator,"elevation")) continue;
-                 Position3 point;
-                 output_map.getPosition3("elevation", *submapIterator, point);
-                 points.col(nPoints) = point;
-                 nPoints++;
-           }
-       }
-
-
-
-       const Eigen::Vector3d mean = points.leftCols(nPoints).rowwise().sum() / nPoints;
+    const Position3 mean = points.leftCols(nPoints).rowwise().sum() / nPoints;
        const Eigen::MatrixXd NN = points.leftCols(nPoints).colwise() - mean;
 
        const Eigen::Matrix3d covarianceMatrix(NN * NN.transpose());
-       Eigen::Vector3d eigenvalues = Eigen::Vector3d::Identity();
+       Vector3 eigenvalues = Vector3::Ones();
        Eigen::Matrix3d eigenvectors = Eigen::Matrix3d::Identity();
-           if (covarianceMatrix.fullPivHouseholderQr().rank() >= 3) {
-             const Eigen::EigenSolver<Eigen::MatrixXd> solver(covarianceMatrix);
-             eigenvalues = solver.eigenvalues().real();
-             eigenvectors = solver.eigenvectors().real();
-           } else {
-             ROS_DEBUG("Covariance matrix needed for eigen decomposition is degenerated. Expected cause: no noise in data (nPoints = %i)", (int) nPoints);
-           }
+       // Ensure that the matrix is suited for eigenvalues calculation
+       if (covarianceMatrix.fullPivHouseholderQr().rank() >= 3) {
+         const Eigen::EigenSolver<Eigen::MatrixXd> solver(covarianceMatrix);
+         eigenvalues = solver.eigenvalues().real();
+         eigenvectors = solver.eigenvectors().real();
+       } else {
+         ROS_DEBUG("Covariance matrix needed for eigen decomposition is degenerated. Expected cause: no noise in data (nPoints = %i)", (int) nPoints);
+
+         eigenvalues.z() = 0.0;
+       }
+       // Keep the smallest eigenvector as surface normal
        int smallestId(0);
-       double smallestValue(numeric_limits<double>::max());
+       double smallestValue(std::numeric_limits<double>::max());
        for (int j = 0; j < eigenvectors.cols(); j++) {
-           if (eigenvalues(j) < smallestValue) {
-              smallestId = j;
-              smallestValue = eigenvalues(j);
+         if (eigenvalues(j) < smallestValue) {
+           smallestId = j;
+           smallestValue = eigenvalues(j);
+         }
+       }
+       Vector3 eigenvector = eigenvectors.col(smallestId);
+       if (eigenvector.dot(surfaceNormalPositiveAxis_) < 0.0) eigenvector = -eigenvector;
+       output_map.at("normal_x", *iter) = eigenvector.x();
+       output_map.at("normal_y", *iter) = eigenvector.y();
+       output_map.at("normal_z", *iter) = eigenvector.z();
+
+       double slope = acos(eigenvector.z());
+       if(slope >= gs_crit)
+       {
+
+           size_t chosen_nPoints = 0;
+           for (CircleIterator submapIterator(output_map, submapPosition, 2*radius);!submapIterator.isPastEnd(); ++submapIterator)
+           {
+               if (!output_map.isValid(*submapIterator, "elevation")) continue;
+               Position3 point;
+               output_map.getPosition3("elevation", *submapIterator, point);
+               if(  abs(point(2) - submapPosition3(2)) <= GRID_RESOLUTION )
+               {
+                   //points.col(nPoints) = point;
+                   chosen_nPoints++;
+               }
            }
+           Eigen::MatrixXd chosen_points(3, chosen_nPoints);
+           size_t cnt = 0;
+           for (CircleIterator submapIterator(output_map, submapPosition, 2*radius);!submapIterator.isPastEnd(); ++submapIterator)
+           {
+               if (!output_map.isValid(*submapIterator, "elevation")) continue;
+               Position3 point;
+               output_map.getPosition3("elevation", *submapIterator, point);
+               if(  abs(point(2) - submapPosition3(2)) <= GRID_RESOLUTION )
+               {
+                   chosen_points.col(cnt) = point;
+                   cnt++;
+               }
            }
-           Eigen::Vector3d eigenvector = eigenvectors.col(smallestId);
-           if (eigenvector.dot(surfaceNormalPositiveAxis_) < 0.0) eigenvector = -eigenvector;
-              output_map.at("normal_x",*iter)=eigenvector.x();
-              output_map.at("normal_y",*iter)=eigenvector.y();
-              output_map.at("normal_z",*iter)=eigenvector.z();
-  }
+
+           const Position3 re_mean = chosen_points.leftCols(chosen_nPoints).rowwise().sum() / chosen_nPoints;
+              const Eigen::MatrixXd re_NN = chosen_points.leftCols(chosen_nPoints).colwise() - re_mean;
+
+              const Eigen::Matrix3d re_covarianceMatrix(re_NN * re_NN.transpose());
+              Vector3 re_eigenvalues = Vector3::Ones();
+              Eigen::Matrix3d re_eigenvectors = Eigen::Matrix3d::Identity();
+              // Ensure that the matrix is suited for eigenvalues calculation
+              if (re_covarianceMatrix.fullPivHouseholderQr().rank() >= 3) {
+                const Eigen::EigenSolver<Eigen::MatrixXd> re_solver(re_covarianceMatrix);
+                re_eigenvalues = re_solver.eigenvalues().real();
+                re_eigenvectors = re_solver.eigenvectors().real();
+              } else {
+                ROS_DEBUG("Covariance matrix needed for eigen decomposition is degenerated. Expected cause: no noise in data (nPoints = %i)", (int) nPoints);
+
+                re_eigenvalues.z() = 0.0;
+              }
+              // Keep the smallest eigenvector as surface normal
+              int re_smallestId(0);
+              double re_smallestValue(std::numeric_limits<double>::max());
+              for (int j = 0; j < re_eigenvectors.cols(); j++) {
+                if (re_eigenvalues(j) < re_smallestValue) {
+                  re_smallestId = j;
+                  re_smallestValue = re_eigenvalues(j);
+                }
+              }
+              Vector3 re_eigenvector = re_eigenvectors.col(re_smallestId);
+              if (re_eigenvector.dot(surfaceNormalPositiveAxis_) < 0.0) re_eigenvector = -re_eigenvector;
+              output_map.at("normal_x", *iter) = re_eigenvector.x();
+              output_map.at("normal_y", *iter) = re_eigenvector.y();
+              output_map.at("normal_z", *iter) = re_eigenvector.z();
+
+
+       }
+   }
+
   scopedLockmap.unlock();
 }
 
@@ -299,9 +287,11 @@ void Global_Map_Builder::Global_Slope(double gs_crit,GridMap& output_map, GridMa
        if (slope < gs_crit)
        {
              output_map.at("slope", *iter) = 1.0 - slope / gs_crit;
+          //   output_map.at("edge", *iter) = 255;
        }
        else
        {
+          //   output_map.at("edge", *iter) = 0;
              output_map.at("slope", *iter) = 0.0;
        }
        if (slope > slopeMax) slopeMax = slope;
@@ -327,9 +317,11 @@ void Global_Map_Builder::Global_Height(double foot_center_z,GridMap& output_map,
 
            if (height > heightMax) heightMax = height;
     }
+
+
   scopedLockmap.unlock();
 }
-/*void Global_Map_Builder::Global_Roughness(double gr_crit,double r_radius,GridMap& output_map, GridMap input_map)
+void Global_Map_Builder::Global_Roughness(double gr_crit,double r_radius,GridMap& output_map, GridMap input_map)
 {
   boost::recursive_mutex::scoped_lock scopedLockmap(MapMutex_);
 
@@ -381,7 +373,7 @@ void Global_Map_Builder::Global_Height(double foot_center_z,GridMap& output_map,
           if (roughness > roughnessmax) roughnessmax = roughness;
         }
   scopedLockmap.unlock();
-}*/
+}
 int Global_Map_Builder::roundToInt(double x) {
   if (x >= 0) return (int) (x + 0.5);
   return (int) (x - 0.5);
@@ -451,22 +443,83 @@ void Global_Map_Builder::Edge_Extraction(GridMap& output_map, GridMap input_map)
   scopedLockmap.unlock();
 }
 
-void Global_Map_Builder::Global_Cost(double alpha,GridMap& output_map, GridMap input_map)
+void Global_Map_Builder::Global_Edge_Normal_Estimation(GridMap& output_map, GridMap input_map)
 {
   boost::recursive_mutex::scoped_lock scopedLockmap(MapMutex_);
   output_map = input_map;
 
+  for(GridMapIterator iter(output_map); !iter.isPastEnd(); ++iter)
+  {
+    if(!output_map.isValid(*iter,"elevation")) continue;
+    if(!output_map.isValid(*iter,"edge")) continue;
+    if(output_map.at("edge",*iter) == 0)
+      {
+
+      }
+
+  }
+
+  scopedLockmap.unlock();
+
+}
+void Global_Map_Builder::Global_Cost(double alpha,GridMap& output_map, GridMap input_map)
+{
+  boost::recursive_mutex::scoped_lock scopedLockmap(MapMutex_);
+  output_map = input_map;
+  
   double gcost = 0.0;
   for (GridMapIterator iter(output_map); !iter.isPastEnd();++iter){
       if (!output_map.isValid(*iter, "elevation")) continue;
       if (!output_map.isValid(*iter, "height")) continue;
       if (!output_map.isValid(*iter, "slope")) continue;
-
-       gcost = alpha*output_map.at("height",*iter)+(1-alpha)*output_map.at("slope",*iter);
+      if (!output_map.isValid(*iter, "roughness")) continue;
+       gcost = alpha*output_map.at("height",*iter)+(1-alpha)*output_map.at("slope",*iter);// + gamma*output_map.at("roughness",*iter);
        output_map.at("global", *iter) = gcost;
 
     }
   scopedLockmap.unlock();
+}
+void Global_Map_Builder::Global_Root(const std_msgs::Int32MultiArray::ConstPtr& root_array)
+{
+        int i = 0;
+        // print all the remaining numbers
+        //cout << root_array->data.size() << endl;
+        root_arr_.data.clear();
+
+        for(std::vector<int>::const_iterator it = root_array->data.begin(); it != root_array->data.end(); ++it)
+        {
+           root_arr_.data.push_back(root_array->data.at(i));
+           i++;
+        }
+
+        root_x_.data.clear();
+        root_y_.data.clear();
+        for(size_t j = 0; j< (root_arr_.data.size()/2); j++)
+          {
+            root_x_.data.push_back(root_arr_.data.at(2*j));
+            root_y_.data.push_back(root_arr_.data.at(2*j+1));
+          }
+        //cout << root_x_.data.size() << "   " << root_y_.data.size() << endl;
+        for (GridMapIterator iter(grid_map_); !iter.isPastEnd();++iter){
+
+            grid_map_.at("root",*iter) = -1;
+          }
+        for(int j = 0; j<root_x_.data.size(); j++){
+            Index idx;
+            idx(0) = root_x_.data.at(j);
+            idx(1) = root_y_.data.at(j);
+            Position submapPosition;
+            grid_map_.getPosition(idx,submapPosition);
+            for (CircleIterator submapIterator(grid_map_, submapPosition, 0.5);!submapIterator.isPastEnd(); ++submapIterator)
+            {
+              grid_map_.at("root",*submapIterator) = 255;
+            }
+
+          }
+
+
+
+  return;
 }
 
 void Global_Map_Builder::Update()
@@ -475,22 +528,23 @@ void Global_Map_Builder::Update()
     {
       PCD2GridMap();
     }
-  if(is_first)
+  /*if(is_first)
   {
       for(int i = 0; i<FILTER_UPDATE_NUM;i++)
       {
           Empty_Grid_Filter(3,grid_map_,grid_map_);
       }
       is_first = false;
-  }
+  }*/
 
   Global_Height(-1.09,grid_map_,grid_map_);
-  Edge_Extraction(grid_map_,grid_map_);  
-  Grid_Normal_Estimation(GRID_RESOLUTION*CIRCLE_SCALE,grid_map_,grid_map_);
+  //Edge_Extraction(grid_map_,grid_map_);
+  Grid_Normal_Estimation(deg2rad(23),GRID_RESOLUTION*CIRCLE_SCALE,grid_map_,grid_map_);
   Global_Slope(deg2rad(23),grid_map_,grid_map_);
-  //Global_Roughness(0.02,GRID_RESOLUTION*CIRCLE_SCALE,grid_map_,grid_map_);
+  //Global_Edge_Normal_Estimation(grid_map_,grid_map_);
+  Global_Roughness(0.05,GRID_RESOLUTION*CIRCLE_SCALE,grid_map_,grid_map_);
 
-  Global_Cost(0.5,grid_map_,grid_map_);
+  Global_Cost(0.8,grid_map_,grid_map_);
 
   //boost::recursive_mutex::scoped_lock scopedLockmap(MapMutex_);
   pcl::PointCloud<pcl::PointXYZ>::Ptr grid_points(new pcl::PointCloud<pcl::PointXYZ>);

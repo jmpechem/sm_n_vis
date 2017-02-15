@@ -1,8 +1,8 @@
 <launch>
   <node name="a_star" pkg="jm_planner" type="a_star" />
-  <!--node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen"-->
-    <!--rosparam command="load" file="$(find jm_planner)/config/jm_planner.yaml" /-->
-  <!--/node-->
+  <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
+    <rosparam command="load" file="$(find jm_planner)/config/jm_planner.yaml" />
+  </node>
 
   <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find grid_map_demos)/rviz/grid_map_demo.rviz" /-->
 </launch>

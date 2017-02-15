@@ -14,6 +14,6 @@ int main(int argc, char** argv)
   while(nh.ok())
     {
       g_map.Update();
-   // ros::spinOnce();
+      ros::spinOnce();
     }
 }

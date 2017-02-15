@@ -47,6 +47,7 @@
 
 #include <string>
 #include <vector>
+#include <std_msgs/Int32MultiArray.h>
 
 #include "jm_planner/tinysplinecpp.h"
 
@@ -65,7 +66,7 @@ const int MAP_WIDTH = 200;
 const int MAP_HEIGHT = 200;
 
 int world_map[ MAP_WIDTH * MAP_HEIGHT ] = {1,};
-
+std_msgs::Int32MultiArray root_arr;
 /*int world_map[ MAP_WIDTH * MAP_HEIGHT ] =
 {
 
@@ -125,16 +126,8 @@ public:
 
 bool MapSearchNode::IsSameState( MapSearchNode &rhs )
 {
-	if( (x == rhs.x) &&
-		(y == rhs.y) )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-
+	if( (x == rhs.x) && (y == rhs.y) ){ return true;}
+	else{ return false;}
 }
 
 void MapSearchNode::PrintNodeInfo()
@@ -153,12 +146,7 @@ float MapSearchNode::GoalDistanceEstimate( MapSearchNode &nodeGoal )
 bool MapSearchNode::IsGoal( MapSearchNode &nodeGoal )
 {
 
-	if( (x == nodeGoal.x) &&
-		(y == nodeGoal.y) )
-	{
-		return true;
-	}
-
+	if( (x == nodeGoal.x) && (y == nodeGoal.y) ){ return true;  }
 	return false;
 }
 bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapSearchNode *parent_node )
@@ -239,9 +227,26 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
       float dmin = 0.0f;
       Index goal_idx;
       int i=0;
-
+      double grid_max = 0;
+      double max_buf = 0;
+      double grid_min = 0;
+      double min_buf = 0;
+      for (GridMapIterator it(map_data); !it.isPastEnd(); ++it){
+          if(!map_data.isValid(*it,"global")) continue;
+          max_buf = map_data.at("global",*it);
+           if(max_buf >= grid_max)
+             {
+               grid_max = max_buf;
+             }
+           min_buf = map_data.at("global",*it);
+           if(min_buf <= grid_min && min_buf != -1)
+             {
+               grid_min = min_buf;
+             }
+        }
+        cout << "max : " << grid_max << " min : " << grid_min << endl;
       for (GridMapIterator it(map_data); !it.isPastEnd(); ++it) {          
-        if (!map_data.isValid(*it, "plan")){
+        if (!map_data.isValid(*it, "global")){
               world_map[i] = 255;
             }
         else{
@@ -251,7 +256,7 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
 
                 //z_cost = (0.35/0.2)*map_data.at("cost_elevation",*it);
 
-                world_map[i] = (int)((map_data.at("plan",*it)+1));
+                world_map[i] = (int)(255*map_data.at("global",*it));
  //               cout << "world cost : " << world_map[i] << endl;
                 if(world_map[i] >= 255){world_map[i]=255;}
                 else if(world_map[i] <= 0 ){world_map[i] = 0;}
@@ -333,7 +338,31 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
 
    cout << "x path : " << x_node_grid.size()  << endl;
    cout << "y path : " << y_node_grid.size()  << endl;
+   root_arr.data.clear();
+   for(int i=0;i<x_node_grid.size();i++)
+     {
+       root_arr.data.push_back(x_node_grid.at(i));
+       root_arr.data.push_back(y_node_grid.at(i));
+     }
 
+  /* for(GridMapIterator it(map_data); !it.isPastEnd(); ++it)
+     {
+        map_data.at("root",*it) = 255;
+     }
+
+   for(size_t i=0; i<x_node_grid.size(); i++)
+     {
+       Index idx;
+       idx(0) = x_node_grid.at(i);
+       idx(1) = y_node_grid.at(i);
+       //for(GridMapIterator it(map_data); !it.isPastEnd(); ++it)
+       //  {
+
+            map_data.at("root",idx) = 0;
+       //  }
+
+       //cout << "x,y : " << x_node_grid.at(i) << y_node_grid.at(i) << endl;
+     }*/
    Index plan_idx;
    Position astar_grid_pos;
 
@@ -347,7 +376,7 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
    for(int j=0;j<x_node_grid.size(); j++){
        plan_idx(0) = x_node_grid.at(j);
        plan_idx(1) = y_node_grid.at(j);
-       map_data.at("plan",plan_idx) = 255;
+       map_data.at("global",plan_idx) = 255;
        map_data.getPosition(plan_idx,astar_grid_pos);
 
        astar_root_pose.pose.position.x = astar_grid_pos(0);
@@ -383,7 +412,7 @@ void map_cb(const grid_map_msgs::GridMap& map_input){
            spline_plan_idx(1) = y_node_grid.at(5*i);
          }
 
-       map_data.at("plan",spline_plan_idx) = 255;
+       map_data.at("global",spline_plan_idx) = 255;
        map_data.getPosition(spline_plan_idx,spline_grid_pos);
 
        ctrlp[2*i] = (float)spline_grid_pos(0);
@@ -470,8 +499,9 @@ int main(int argc, char** argv)
   ros::Publisher pub_root = nh.advertise<nav_msgs::Path>("astar_root",1,true);
   ros::Publisher pub_spline_root = nh.advertise<nav_msgs::Path>("b_spline_root",1,true);
   ros::Publisher pub_footprint = nh.advertise<geometry_msgs::PolygonStamped>("robot_footprint",1,true);
+  ros::Publisher pub_root_grid = nh.advertise<std_msgs::Int32MultiArray>("root_grid_array",100);
 
-  ros::Subscriber sub_map = nh.subscribe("/grid_map",1,map_cb);
+  ros::Subscriber sub_map = nh.subscribe("grid_map",1,map_cb);
   ros::Subscriber sub_goal = nh.subscribe<geometry_msgs::PoseStamped>("move_base_simple/goal",1,goal_pose_stamped_cb);
 
  /* GridMap map({"ele","planner"});
@@ -613,6 +643,7 @@ int main(int argc, char** argv)
           b_spline_path.header.frame_id = "base_link";
           b_spline_path.header.stamp = ros::Time::now();
           pub_spline_root.publish(b_spline_path);
+          pub_root_grid.publish(root_arr);
         }
 
     ros::spinOnce();

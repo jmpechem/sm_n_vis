@@ -37,7 +37,6 @@ grid_map_visualizations:
      layer: height
      data_min: 0.0
      data_max: 1.0
-     color: 3289650
 
   - name: roughness
     type: occupancy_grid
@@ -46,35 +45,16 @@ grid_map_visualizations:
      data_min: 0.0
      data_max: 1.0
 
-  - name: traversability
+  - name: global_cost
     type: occupancy_grid
     params:
-     layer: traverse
+     layer: global
      data_min: 0.0
      data_max: 1.0
 
-  - name: filtered_cost
+  - name: root_cost
     type: occupancy_grid
     params:
-     layer: costmap
-     data_min: 0.0
-     data_max: 255.0
-
-  - name: costmap_points
-    type: point_cloud
-    params:
-     layer: cost_elevation
-
-  - name: plan_cost
-    type: occupancy_grid
-    params:
-     layer: plan
-     data_min: 0.0
-     data_max: 255.0
-
-  - name: boundary_cost
-    type: occupancy_grid
-    params:
-     layer: boundary
+     layer: root
      data_min: 0.0
      data_max: 1.0

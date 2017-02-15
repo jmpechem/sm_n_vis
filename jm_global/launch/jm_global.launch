@@ -1,8 +1,8 @@
 <launch>
   <node name="jm_global_map" pkg="jm_global" type="jm_global_map" />
   <!--node name="traversability" pkg="jm_map" type="traversability" /-->
-  <node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen">
-    <rosparam command="load" file="$(find jm_global)/config/jm_global_map.yaml" />
-  </node>
+  <!--node pkg="grid_map_visualization" type="grid_map_visualization" name="grid_map_visualization" output="screen"-->
+    <!--rosparam command="load" file="$(find jm_global)/config/jm_global_map.yaml" /-->
+  <!--/node-->
 
 </launch>
